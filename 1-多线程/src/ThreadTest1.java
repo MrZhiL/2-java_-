@@ -7,7 +7,7 @@
  *        1. 创建一个继承于Thread类的子类
  *        2. 重写Thread类中的run()方法 --> 该run()方法体中实现该子类要实现的功能
  *        3. 实例化一个子类对象
- *        4. 该实例化的对象调用start() 方法
+ *        4. 该实例化的对象调用start() 方法: 1)启动当前线程；2)调用当前线程的run();
  */
 
 // 1. 创建一个继承于Thread类的子类，并计算0-99之间的偶数
@@ -39,8 +39,14 @@ public class ThreadTest1 {
     public static void main(String[] args) {
         // 4. 实例化一个MyThread子类的对象
         MyThread mt = new MyThread();
-        // 5. 调用start方法
+        // 5. 调用start方法: 1)启动当前线程；2)调用当前线程的run();
         mt.start();
+
+        // note: 1) 不可以通过调用run()方法来启动线程，此时是通过main()方法来调用的
+        // mt.run();
+
+        // note: 2) 如果一个实例化对象已经调用过start()方法吗，则不可以再次调用start()方法，否则会报IllegalThreadStateException异常
+        // mt.start();
 
         // test：同时创建两个线程
         MyThread2 mt2 = new MyThread2();
