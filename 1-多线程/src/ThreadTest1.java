@@ -18,7 +18,7 @@ class MyThread extends Thread {
         // 3. 需要在方法体内实现该子类的功能
         for (int i = 0; i < 100; ++i) {
             if (i % 2 == 0)
-                System.out.println("thread A : " + i);
+                System.out.println(Thread.currentThread().getName() + " : " + i);
         }
     }
 }
@@ -29,7 +29,7 @@ class MyThread2 extends Thread {
     public void run() {
         for (int i = 1; i <100; ++i) {
             if (i % 2 == 1) {
-                System.out.println("thread B : " + i);
+                System.out.println(Thread.currentThread().getName() + " : " + i);
             }
         }
     }
