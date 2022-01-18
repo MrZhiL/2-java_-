@@ -37,6 +37,12 @@ class MyThread2 extends Thread {
 
 public class ThreadTest1 {
     public static void main(String[] args) {
+        // new ThreadTest1().method1();
+        new ThreadTest1().method2();
+    }
+
+    // 一、 通过实例化对象来创建多线程
+    public void method1() {
         // 4. 实例化一个MyThread子类的对象
         MyThread mt = new MyThread();
         // 5. 调用start方法: 1)启动当前线程；2)调用当前线程的run();
@@ -52,4 +58,32 @@ public class ThreadTest1 {
         MyThread2 mt2 = new MyThread2();
         mt2.start();
     }
+
+    // 二、通过匿名对象来创建多个线程
+    public void method2() {
+        new Thread(){
+            @Override
+            public void run() {
+                // 寻找0-99之间的偶数
+                for (int i = 1; i <100; ++i) {
+                    if (i % 2 == 0) {
+                        System.out.println(Thread.currentThread().getName() + " : " + i);
+                    }
+                }
+            }
+        }.start();
+
+        new Thread(){
+            @Override
+            public void run() {
+                // 寻找0-99之间的奇数
+                for (int i = 1; i <100; ++i) {
+                    if (i % 2 == 1) {
+                        System.out.println(Thread.currentThread().getName() + " : " + i);
+                    }
+                }
+            }
+        }.start();
+    }
+
 }
