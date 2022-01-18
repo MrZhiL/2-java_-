@@ -1,0 +1,49 @@
+/**
+ * @Description: Java-多线程的创建方式一：通过继承Thread来实现
+ * @author : zhilx(zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/1/18 9:03
+ * @node: 步骤 ：
+ *        1. 创建一个继承于Thread类的子类
+ *        2. 重写Thread类中的run()方法 --> 该run()方法体中实现该子类要实现的功能
+ *        3. 实例化一个子类对象
+ *        4. 该实例化的对象调用start() 方法
+ */
+
+// 1. 创建一个继承于Thread类的子类，并计算0-99之间的偶数
+class MyThread extends Thread {
+    // 2. 重写Thread类中的run方法，并在方法体内实现功能
+    @Override
+    public void run() {
+        // 3. 需要在方法体内实现该子类的功能
+        for (int i = 0; i < 100; ++i) {
+            if (i % 2 == 0)
+                System.out.println("thread A : " + i);
+        }
+    }
+}
+
+// 1. 创建一个继承于Thread类的子类，并计算0-99之间的奇数
+class MyThread2 extends Thread {
+    @Override
+    public void run() {
+        for (int i = 1; i <100; ++i) {
+            if (i % 2 == 1) {
+                System.out.println("thread B : " + i);
+            }
+        }
+    }
+}
+
+public class ThreadTest1 {
+    public static void main(String[] args) {
+        // 4. 实例化一个MyThread子类的对象
+        MyThread mt = new MyThread();
+        // 5. 调用start方法
+        mt.start();
+
+        // test：同时创建两个线程
+        MyThread2 mt2 = new MyThread2();
+        mt2.start();
+    }
+}
