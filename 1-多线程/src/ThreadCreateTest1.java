@@ -35,10 +35,10 @@ class MyThread2 extends Thread {
     }
 }
 
-public class ThreadTest1 {
+public class ThreadCreateTest1 {
     public static void main(String[] args) {
         // new ThreadTest1().method1();
-        new ThreadTest1().method2();
+        new ThreadCreateTest1().method2();
     }
 
     // 一、 通过实例化对象来创建多线程
