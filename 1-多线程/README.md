@@ -35,6 +35,37 @@
 
 ### 2.1 多线程创建方式一：通过继承Thread类来实现
 
+One is to declare a class to be a subclass of `Thread`. This subclass should override the `run` method of class `Thread`. An instance of the subclass can then be allocated and started. For example, a thread that computes primes larger than a stated value could be written as follows:
+
+------
+
+> ```java
+>      class PrimeThread extends Thread {
+>          long minPrime;
+>          PrimeThread(long minPrime) {
+>              this.minPrime = minPrime;
+>          }
+> 
+>          public void run() {
+>              // compute primes larger than minPrime
+>               . . .
+>          }
+>      }
+>  
+> ```
+
+------
+
+The following code would then create a thread and start it running:
+
+> ```java
+>      PrimeThread p = new PrimeThread(143);
+>      p.start();
+>  
+> ```
+
+
+
 Java语言的JVM允许程序运行多个线程，它通过java.lang.Thread类来体现。
 
 1. 步骤：
@@ -53,7 +84,57 @@ Java语言的JVM允许程序运行多个线程，它通过java.lang.Thread类来
 
 
 
-### 2.2 Thread类的有关方法()
+### 2.2 多线程创建方式二：通过实现Runnable接口来实现
+
+- 创建线程的另一种方法是声明一个实现`Runnable`接口的类。  该类然后实现`run`方法。  然后可以分配类的实例，在创建`Thread`时作为参数传递，然后启动。
+
+- The other way to create a thread is to declare a class that implements the `Runnable` interface. That class then implements the `run` method. An instance of the class can then be allocated, passed as an argument when creating `Thread`, and started. The same example in this other style looks like the following:
+
+  ------
+
+  > ```java
+  >      class PrimeRun implements Runnable {
+  >          long minPrime;
+  >          PrimeRun(long minPrime) {
+  >              this.minPrime = minPrime;
+  >          }
+  > 
+  >          public void run() {
+  >              // compute primes larger than minPrime
+  >               . . .
+  >          }
+  >      }
+  >  
+  > ```
+
+  ------
+
+  The following code would then create a thread and start it running:
+
+  > ```java
+  >      PrimeRun p = new PrimeRun(143);
+  >      new Thread(p).start();
+  >  
+  > ```
+
+  Every thread has a name for identification purposes. More than one thread may have the same name. If a name is not specified when a thread is created, a new name is generated for it.
+
+  Unless otherwise noted, passing a `null` argument to a constructor or method in this class will cause a `NullPointerException`to be thrown.
+
+
+
+步骤：
+
+1. 创建一个实现了Runnable接口的类
+2. 实现类去实现Runnable接口中的抽象方法：run()
+3. 创建实现类的实例化对象 ： `MyThread p = new MyThread();`
+4. 将此实例化对象作为参数传递到Thread类的构造器中，并创建Thread类的对象: `new Thread(p)`
+5. 通过Thread类的对象调用start() ： `new Thread(p). start()`
+6. note: 如果创建多个线程，可以共用同一个实现Runnable接口的类的实例化对象
+
+
+
+### 2.3 Thread类的有关方法()
 
 - `void start()` 启动线程，并执行对象的run()方法
 
@@ -82,3 +163,39 @@ Java语言的JVM允许程序运行多个线程，它通过java.lang.Thread类来
 
 - `boolean isAlive()` 返回boolean，判断线程是否还活着
 
+
+
+### 2.4 两种创建多线程方式的对比
+
+开发中：优先选择实现Runnable接口的方式
+
+原因：
+
+1. 出现的方式没有类的单继承性的局限性
+2. 实现的方式更适合来处理多个线程有共享数据的情况
+
+联系：Thread类本身也实现了Runnable接口
+
+相同点：两种方式都需要重写run()方法，将线程要执行的逻辑声明在run() 中。
+
+
+
+## 3. 线程的调用
+
+- 调度策略
+  - 时间片
+  - 抢占式：高优先级的线程抢先占用CPU
+- Java的调度方法
+  - 同优先级线程组成先进先出（FIFO），使用时间片策略
+  - 对高优先级，使用优先调度的抢占式策略
+
+- 线程的优先级等级
+  - MAX_PRIORITY : 10
+  - MIIN_PRIORITY: 1
+  - NORM_PRIORITY: 5
+- 涉及的方法
+  - getPriority(): 返回线程优先值
+  - setPriority(int newPriority) : 改变线程的优先级
+- 说明
+  - 线程创建时继承父线程的优先级
+  - 低优先级只是获得调度的概率低，并非一定是在高优先级之后才被调用。
