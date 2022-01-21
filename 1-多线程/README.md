@@ -199,3 +199,294 @@ Java语言的JVM允许程序运行多个线程，它通过java.lang.Thread类来
 - 说明
   - 线程创建时继承父线程的优先级
   - 低优先级只是获得调度的概率低，并非一定是在高优先级之后才被调用。
+
+## 4. 线程的分类
+
+Java中线程分为两类：一类是守护线程，一类是用户线程。
+
+- 它们在几乎每个方面都是相同的，唯一的区别是判断`JVM`何事离开
+
+- 守护线程时用来服务用户线程的，通过在start() 方法签调用`thread.setDaemon(true)`可以把一个用户线程变成一个守护线程
+
+- Java垃圾回收就是一个典型的守护线程。
+
+- 若`JVM`中都是守护线程，当前`JVM`将退出
+
+- 形象理解：兔死狗烹，鸟尽弓藏
+
+  
+
+## 5. 线程的声明周期
+
+- `JDK`中用`Thread.State`类定义了线程的几种状态：`NEW`, `TIMED_WAITING`. `BOLCKED`, `WITIING`, `TIMED_WAITING`,  `TERMMINATED`, 
+
+  要想实现多线程，必须了主线程中创建新的线程对象。Java语言使用Thread类及其子类的对象来表示线程，在它的一个完整的声明周期中通常要经历**如下的五种状态：**
+
+  1. 新建(`NEW`)：当一个Thread类或其子类的对象被声明并创建时，新生的线程对象处于新建状态
+  2. 就绪()：处于新建状态的线程被`start()`后，将进入线程队列等待CPU时间片，此时它已经具备了运行的条件，只是没分配到CPU资源。
+  3. 运行(`RUNNABLE`)：当就绪状态的线程被调度并获得CPU资源时，便进入运行状态，run()方法定义了线程的操作和功能。
+  4. 阻塞()：在某种特殊情况下，被人为挂起或执行输入输出操作时，让出CPU并临时中止自己的执行，进入阻塞状态
+  5. 死亡：线程完成了它的全部工作或线程被提前强制性地中止或出现异常导致结束。
+
+<img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\1-多线程\README.assets\image-20220120165318314-16426689565601.png" alt="image-20220120165318314" style="zoom:67%;" />
+
+
+
+## 6. 线程的同步
+
+- 问题的提出
+
+  - 多个线程执行的不确定性引起执行结果的不稳定
+
+  - 多个线程对账本的共享，会造成操作的不完整性，会破坏数据
+
+    <img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\1-多线程\README.assets\image-20220121091650637-16427278254601.png" alt="image-20220121091650637" style="zoom:50%;" />
+
+- 关于同步方法的踪迹：
+
+  - 同步方法仍然涉及到同步监视器，只是不需要我们显式的声明
+  - 非静态的同步方法，同步监视器是：this
+  - 静态的同步方法，同步监视器是：当前类本身
+
+  ```java
+  package ThreadSynchronizationTest;
+  
+  import static java.lang.Thread.sleep;
+  
+  /**
+   * @author : zhilx(zhilx1997@sina.com)
+   * @Description: Java
+   * @version: v1.2
+   * @data: 2022/1/21 9:25
+   * @node:
+   *         v1.0, v1.1 创建三个窗口售票，总票数为10张(通过继承Thread类来实现)
+   *         1. 问题：买票过程中，出现了重票和错票问题，出现线程安全问题。
+   *         2. 原因：当某个线程操作车票的过程中，在尚未完成操作时，其他线程也参与进来，从而导致出现问问题
+   *         3. 如何解决：当一个线程a在操作ticket的时候，其他线程不能参与进来，直到线程a操作完成ticket操作时
+   *                    其他线程才可以进行操作。这种情况，即使线程a出现了阻塞，也不能被改变。
+   *         4. 在Java中，我们通过同步机制，来解决线程的安全问题
+   *         -4.1 方式一：同步代码块
+   *              synchronized(同步监视器) {
+   *                  // 需要被同步的代码
+   *
+   *              }
+   *              说明：1. 操作共享数据的代码，即为需要被同步的代码。 --> 不能包代码过多或过少，必须值包含需要被同步的代码
+   *                   2. 共享数据：多个线程共同操作的变量。比如：ticket
+   *                   3. 同步监视器，俗称：锁。**任何一个类的对象**，都可以充当锁
+   *                      要求：多个线程必须要共用同一把锁。
+   *                   4. (补充)在通过实现接口来实现多线程的方式中，可以考虑通过使用this来充当同步监视器
+   *                   5. (补充)在通过继承来实现多线程的方式中，要慎用this来充当监视器，可以考虑当前类充当同步监视器
+   *         -4.2 方式而：同步方法
+   *
+   *          5. 优点：同步的方式，解决了线程的安全问题
+   *             局限性：操作同步代码时，只能有一个线程参与，其他线程等待。相等于是一个单线程的过程，效率较低。
+   */
+  
+  // 方式一: 通过实现Runnable接口来实现多线程，并使用同步代码块方式来解决线程安全问题
+  class windows implements Runnable {
+      // note: 此时可以不必声明为static的，因为在method2()中多个线程共有同一个windows2的实例化对象
+      private int ticket = 10;
+  
+      // note: 使用同步代码块进行线程安全操作时，需要多个线程共用同一把锁，因此需要共用同一个变量
+      Object obj = new Object();
+  
+      @Override
+      public void run() {
+          // Object obj = new Object(); // error, 所有的线程必须共用同一把锁
+          // 4. (补充)在通过实现接口来实现多线程的方式中，可以考虑通过使用this来充当同步监视器
+          // synchronized(obj) {
+          synchronized(this) {    // right, 此时this表示windows w = new windows()对象本身
+              while (true) {
+                  try {
+                      sleep(100);
+                  } catch (Exception e) {
+                      e.printStackTrace();
+                  }
+  
+                  if (ticket > 0) {
+                      // 因为实现的是接口，所有无法直接调用getName()方法，需要调用Thread.currentThread()来获取当前线程
+                      System.out.println(Thread.currentThread().getName() + "售出票号为: " + ticket + "的票");
+                      ticket--;
+                  } else {
+                      break;
+                  }
+              }
+          }
+      }
+  }
+  
+  // 方式一_1 使用代码块的方式解决继承方式实现多线程的 线程同步问题
+  class windows2 extends Thread {
+      private static int ticket = 10;
+  
+      // 在继承实现多线程中，需要创建静态变量来解决同步问题
+      private static Object obj = new Object();
+  
+      @Override
+      public void run() {
+          // 5. (补充)在通过继承来实现多线程的方式中，要慎用this来充当监视器，可以考虑当前类充当同步监视器
+          // synchronized(obj) {
+          // synchronized(this) { // error, 此时this表示不同的实例化对象w2_1, w2_2, w2_3
+          synchronized(windows2.class) { // right, windows2.class为window2的唯一对象
+              while (true) {
+                  try {
+                      sleep(100);
+                  } catch (Exception e) {
+                      e.printStackTrace();
+                  }
+  
+                  if (ticket > 0) {
+                      System.out.println(getName() + "售出票号为: " + ticket + "的票");
+                      ticket--;
+                  } else {
+                      break;
+                  }
+              }
+          }
+      }
+  }
+  
+  public class ThreadWindowsDemo {
+      public static void main(String[] args) {
+          ThreadWindowsDemo demo = new ThreadWindowsDemo();
+          demo.method();
+          System.out.println("--------------------------");
+          // demo.method2();
+      }
+  
+      public void method() {
+          windows w = new windows();
+          Thread t1 = new Thread(w, "window_1");
+          Thread t2 = new Thread(w, "window_2");
+          Thread t3 = new Thread(w, "window_3");
+  
+          t1.start();
+          t2.start();
+          t3.start();
+      }
+  
+      public void method2() {
+          windows2 w2_1 = new windows2();
+          windows2 w2_2 = new windows2();
+          windows2 w2_3 = new windows2();
+  
+          w2_1.setName("window2_1");
+          w2_2.setName("window2_2");
+          w2_3.setName("window2_3");
+  
+          w2_1.start();
+          w2_2.start();
+          w2_3.start();
+      }
+  }
+  
+  ```
+
+  ```java
+  package ThreadSynchronizationTest;
+  
+  import static java.lang.Thread.sleep;
+  
+  /**
+   * @ClassName: ThreadWindowsDemo2
+   * @Description: Java的同步方法：使用同步代方法
+   * @author: zhilx(zhilx1997@sina.com)
+   * @version: v1.0
+   * @data: 2022/1/21 11:16
+   * @node:
+   *        4.2 方式二：同步方法
+   *        如果操作共享数据的代码完成的声明在一个方法中，我们不妨将此方法声明为同步的。
+   */
+  
+  // 方式二：使用同步方法将多线程声明为同步的
+  class windows3 implements Runnable {
+      private int ticket = 100;
+  
+      @Override
+      public void run() {
+          while (ticket > 0) {
+              show();
+          }
+      }
+  
+      // note: 此时使用的是同步方法，若没有声明synchronized(obj)，则默认为使用了this对象
+          private synchronized void show() {
+          try {
+              sleep(10);
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+  
+          if (ticket > 0) {
+              // 因为实现的是接口，所有无法直接调用getName()方法，需要调用Thread.currentThread()来获取当前线程
+              System.out.println(Thread.currentThread().getName() + "售出票号为: " + ticket + "的票");
+              ticket--;
+          }
+      }
+  }
+  
+  // 使用同步方法解决继承的多线程安全问题
+  class windows4 extends Thread {
+      private static int ticket = 100;
+  
+      @Override
+      public void run() {
+          while (ticket > 0) {
+              show();
+          }
+      }
+  
+      // note: 此时使用的是同步方法，若没有声明synchronized(obj)，则默认为使用了this对象
+          // private synchronized void show() { // 此时的同步监视器为w4_1, w4_2, w4_3，所以这个方式是错误的，需要将其声明为static的
+          private static synchronized void show() { // 此时的同步监视器为window4.class
+          try {
+              sleep(10);
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+  
+          if (ticket > 0) {
+              // 因为实现的是接口，所有无法直接调用getName()方法，需要调用Thread.currentThread()来获取当前线程
+              System.out.println(Thread.currentThread().getName() + "售出票号为: " + ticket + "的票");
+              ticket--;
+          }
+      }
+  }
+  
+  public class ThreadWindowsDemo2 {
+      public static void main(String[] args) {
+          ThreadWindowsDemo2 demo = new ThreadWindowsDemo2();
+          // demo.method3();
+          System.out.println("--------------------------");
+          demo.method4();
+      }
+  
+      public void method3() {
+          windows3 w = new windows3();
+          Thread t1 = new Thread(w, "window3_1");
+          Thread t2 = new Thread(w, "window3_2");
+          Thread t3 = new Thread(w, "window3_3");
+  
+          t1.start();
+          t2.start();
+          t3.start();
+      }
+  
+      public void method4() {
+          windows4 w4_1 = new windows4();
+          windows4 w4_2 = new windows4();
+          windows4 w4_3 = new windows4();
+  
+          w4_1.setName("window4_1");
+          w4_2.setName("window4_2");
+          w4_3.setName("window4_3");
+  
+          w4_1.start();
+          w4_2.start();
+          w4_3.start();
+      }
+  }
+  
+  ```
+
+  

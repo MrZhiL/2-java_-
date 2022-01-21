@@ -4,7 +4,7 @@ import static java.lang.Thread.sleep;
 
 /**
  * @author : zhilx(zhilx1997@sina.com)
- * @Description: Java
+ * @Description: Java的同步方法：使用同步代码块
  * @version: v1.2
  * @data: 2022/1/21 9:25
  * @node:
@@ -25,7 +25,9 @@ import static java.lang.Thread.sleep;
  *                      要求：多个线程必须要共用同一把锁。
  *                   4. (补充)在通过实现接口来实现多线程的方式中，可以考虑通过使用this来充当同步监视器
  *                   5. (补充)在通过继承来实现多线程的方式中，要慎用this来充当监视器，可以考虑当前类充当同步监视器
- *         -4.2 方式而：同步方法
+ *
+ *         -4.2 方式二：同步方法
+ *              如果操作共享数据的代码完成的声明在一个方法中，我们不妨将此方法声明为同步的。
  *
  *          5. 优点：同步的方式，解决了线程的安全问题
  *             局限性：操作同步代码时，只能有一个线程参与，其他线程等待。相等于是一个单线程的过程，效率较低。
@@ -37,7 +39,7 @@ class windows implements Runnable {
     private int ticket = 100;
 
     // note: 使用同步代码块进行线程安全操作时，需要多个线程共用同一把锁，因此需要共用同一个变量
-    private Object obj = new Object();
+    private final Object obj = new Object();
 
     @Override
     public void run() {
@@ -69,7 +71,7 @@ class windows2 extends Thread {
     private static int ticket = 100;
 
     // 在继承实现多线程中，需要创建静态变量来解决同步问题
-    private static Object obj = new Object();
+    private static final Object obj = new Object();
 
     @Override
     public void run() {
@@ -99,9 +101,9 @@ class windows2 extends Thread {
 public class ThreadWindowsDemo {
     public static void main(String[] args) {
         ThreadWindowsDemo demo = new ThreadWindowsDemo();
-        demo.method();
+//        demo.method();
         System.out.println("--------------------------");
-        // demo.method2();
+        demo.method2();
     }
 
     public void method() {

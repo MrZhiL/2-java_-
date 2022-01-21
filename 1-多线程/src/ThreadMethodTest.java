@@ -87,8 +87,13 @@ public class ThreadMethodTest {
             // 10. `boolean isAlive()` 返回boolean，判断线程是否还活着
             if (i == 90) {
                 System.out.println(Thread.currentThread().getName() + "is alive ? " + Thread.currentThread().isAlive());
-                System.out.println(myt3 + "is alive ? " + myt3.isAlive());
+                System.out.println(myt3.getName() + "is alive ? " + myt3.isAlive());
             }
+
         }
+
+        System.out.println(myt3.getName() + " priority is : " + myt3.getPriority());
+        System.out.println(Thread.currentThread().getName() + " priority is " +Thread.currentThread().getPriority());
+
     }
 }
