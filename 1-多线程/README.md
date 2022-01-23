@@ -234,6 +234,8 @@ Java中线程分为两类：一类是守护线程，一类是用户线程。
 
 ## 6. 线程的同步
 
+### 6.1 线程同步方法
+
 - 问题的提出
 
   - 多个线程执行的不确定性引起执行结果的不稳定
@@ -488,5 +490,740 @@ Java中线程分为两类：一类是守护线程，一类是用户线程。
   }
   
   ```
+
+  
+
+### 6.2 线程安全的单例模式之懒汉式
+
+- 通过同步方法/同步代码块 将单例模式设置为线程安全的
+- 可以通过外加判断来提高 线程安全懒汉式单例模式的效率
+
+```java
+package SingletonPatternTest;
+
+/**
+ * @ClassName: SingletonBankTest
+ * @Description: Java - 通过同步方式解决懒汉式单例模式中的线程安全问题
+ * @author: zhilx(zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/1/21 20:45
+ * @node:
+ */
+public class SingletonBankTest {
+    public static void main(String[] args) {
+
+    }
+}
+
+class Bank {
+    // 1. 单例设计模式中需要将构造器初始化
+    private Bank() {}
+
+    // 2. 私有化Back的一个属性
+    private static Bank instance = null;
+
+    // 3. 返回Back属性的instance方法
+    /*
+    public static Bank getInstance() {
+        if (instance == null) {
+            instance = new Bank();
+        }
+
+        return instance;
+    }*/
+
+    // 4. 改为线程安全的getInstance()方法
+    // 4.1 直接通过同步方法进行同步
+    /*
+    public static synchronized Bank getInstance() {
+        if (instance == null) {
+            instance = new Bank();
+        }
+
+        return instance;
+    }*/
+
+    // 4.2 通过同步代码块进行同步
+    /*
+    public static Bank getInstance() {
+        synchronized(Bank.class) {
+            if (instance == null) {
+                instance = new Bank();
+            }
+
+            return instance;
+        }
+    }*/
+
+    // note: 在4.1和4.2的方法中，此时由于所有线程都需要进行同步等待，因此效率较低
+    // 4.3 可以对4.2进行改进，来提高单例模式的效率
+    public static Bank getInstance() {
+        // note: 此时通过首先对instance进行判断，从而避免所有节点均需要进行同步等待
+        if (instance == null) {
+            synchronized (Bank.class) {
+                if (instance == null) {
+                    instance = new Bank();
+                }
+
+                return instance;
+            }
+        }
+    }
+}
+
+```
+
+
+
+## 7. 线程的死锁问题
+
+- 死锁：
+  - 不同的线程分别占用对方需要的同步资源不放弃，都在等待对方放弃自己需要的同步资源，就形成了线程的死锁
+  - 出现死锁后，不会出现异常，不会出现提示，只是所有的线程都处于阻塞状态，无法继续
+- 解决方法：
+  - 专门的算法、原则
+  - 尽量减少同步资源的定义
+  - 尽量避免嵌套同步
+
+```java
+package DeadThreadTest;
+
+import java.sql.SQLOutput;
+
+import static java.lang.Thread.sleep;
+
+/**
+ * @ClassName: DeadThreadTest2
+ * @Description: Java - 死锁案例测试2
+ * @author: zhilx(zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/1/22 9:11
+ * @node:
+ */
+
+class A {
+    public synchronized void foo(B b) {
+        System.out.println("当前线程名: " + Thread.currentThread().getName()
+                + " 进入了A实例的foo方法");
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("当前线程名: " + Thread.currentThread().getName()
+        + " 企图调用B实例的last方法");
+
+        b.last();
+    }
+
+    public synchronized void last() {
+        System.out.println("进入了A类内部的last()方法");
+    }
+}
+
+class B {
+    public synchronized void bar(A a) {
+        System.out.println("当前线程名: " + Thread.currentThread().getName()
+                + " 进入了B实例的bar方法");
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("当前线程名: " + Thread.currentThread().getName()
+        + " 企图调用A实例的last方法");
+
+        a.last();
+    }
+
+    public synchronized void last() {
+        System.out.println("进入了B类内部的last()方法");
+    }
+}
+
+public class DeadThreadTest2 implements Runnable{
+    A a = new A();
+    B b = new B();
+
+    public void init() {
+        Thread.currentThread().setName("主线程");
+        a.foo(b);
+        System.out.println("进入了主线程之后");
+    }
+
+    @Override
+    public void run() {
+        Thread.currentThread().setName("副线程");
+        b.bar(a);
+        System.out.println("进入了副线程之后");
+    }
+
+    public static void main(String[] args) {
+        DeadThreadTest2 dl = new DeadThreadTest2();
+        Thread t = new Thread(dl);
+
+        t.start(); // 此时调用的是副线程
+
+        dl.init(); // 此时通过主线程调用
+    }
+}
+
+```
+
+
+
+## 8. Lock(锁)
+
+- 从JDK5.0 开始，Java提供了更强大的线程同步机制——通过显式定义同步锁对象来实现同步。同步锁使用Lock对象充当。
+
+- `java.util.concurrent.locks.Lock` **接口是控制多个线程对共享资源进行访问的工具**。锁提供了对共享资源的独占访问，每次只能有一个线程对Lock对象加锁，线程开始访问共享资源之前应先获得Lock对象。
+
+- `ReentrantLock`类实现了Lock，它拥有与`synchronized`相同的并发性和内存语义，在实现线程安全的控制中，比较常用的是`ReentrantLock`，可以显式加锁、释放锁。
+
+- ```
+  4. Lock锁的使用步骤：
+      4.1 首先通过 ReentrantLock类 来创建一个锁（需要声明为run()方法之外，因为所有的线程要共用同一个lock锁）
+        ReentrantLock lock_t = new ReentrantLock(); // new ReentrantLock(true)表示为公平的，即按照FIFO的顺序进行资源的分配
+      4.2 进行lock()方法，进行加锁
+      4.3 进行相应代码的调用
+  	4.4 进行unlick()解锁
+  ```
+
+  
+
+### 8.1 面试题：synchronized 与 lock的异同
+
+- 相同点：两者都可以解决线程安全问题
+- 不同点：
+  - `synchronized`机制在执行完相应的同步代码以后，自动的释放同步监视器
+  - `Lock` 需要手动的启动同步（`lock()`），同时结束同步也需要手动释放（`unlock()`）
+
+### 8.2 面试题：如何解决线程安全问题？有几种方式？
+
+1. 可以通过lock、同步方法和同步代码块来解决问题。
+
+2. 其中：
+
+   1. Lock 是显式锁（需要手动开启和关闭锁，别忘记关闭锁），synchronized是隐式锁，出了作用域自动释放。
+   2. Lock 只有代码块锁，synchronized 有代码块锁和方法锁
+   3. 使用Lock锁，JVM将花费较少的时间来调度线程，性能更好。并且具有更好的扩展性（提过更多的子类）。
+
+3. 优先使用顺序：
+
+   Lock -> 同步代码块（已经进入方法体，分配了相应资源）-> 同步方法（在方法体之外）
+
+```java
+package DeadThreadTest;
+
+import java.util.concurrent.locks.ReentrantLock;
+
+/**
+ * @ClassName: LockTest.java
+ * @Description: Java - 解决死锁的方法三：通过Lock锁机制
+ * @author: zhilx(zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/1/22 9:47
+ * @node:
+ *      1. Lock锁介绍：
+ *      - 从JDK5.0 开始，Java提供了更强大的线程同步机制——通过显式定义同步锁对象来实现同步。同步锁使用Lock对象充当。
+ *      - `java.util.concurrent.locks.Lock` **接口是控制多个线程对共享资源进行访问的工具**。锁提供了对共享资源的独占访问，每次只能有一个线程对Lock对象加锁，线程开始访问共享资源之前应先获得Lock对象。
+ *      - `ReentrantLock`类实现了Lock，它拥有与`synchronized`相同的并发性和内存语义，在实现线程安全的控制中，比较常用的是`ReentrantLock`，可以显式加锁、释放锁。
+ *
+ *      2. synchronized 与 Lock 锁的区别
+ *      2.1. Lock 是显式锁（需要手动开启和关闭锁，别忘记关闭锁），synchronized是隐式锁，出了作用域自动释放。
+ *      2.2. Lock 只有代码块锁，synchronized 有代码块锁和方法锁
+ *      2.3. 使用Lock锁，JVM将花费较少的时间来调度线程，性能更好。并且具有更好的扩展性（提过更多的子类）。
+ *
+ *      3. 优先使用顺序：
+ *      Lock -> 同步代码块（已经进入方法体，分配了相应资源）-> 同步方法（在方法体之外）
+ *
+ *      4. Lock锁的使用步骤：
+ *      4.1 首先通过 ReentrantLock类 来创建一个锁（需要声明为run()方法之外，因为所有的线程要共用同一个lock锁）
+ *          ReentrantLock lock_t = new ReentrantLock(); // new ReentrantLock(true)表示为公平的，即按照FIFO的顺序进行资源的分配
+ *      4.2 进行lock()方法，进行加锁
+ *      4.3 进行相应代码的调用
+ *      4.4 进行unlick()解锁
+ */
+class window implements Runnable {
+    private int ticket = 100;
+
+    // 方法三：通过Lock锁来解决线程安全问题
+    // 1. 首先通过 ReentrantLock类 来创建一个锁
+    ReentrantLock lock_t = new ReentrantLock(); // new ReentrantLock(true)表示为公平的，即按照FIFO的顺序进行资源的分配
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                // 2. 进行lock()方法，进行加锁
+                lock_t.lock();
+
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (ticket > 0) {
+                    // 因为实现的是接口，所有无法直接调用getName()方法，需要调用Thread.currentThread()来获取当前线程
+                    System.out.println(Thread.currentThread().getName() + "售出票号为: " + ticket + "的票");
+                    ticket--;
+                } else {
+                    break;
+                }
+            } finally {
+                // 4. 调用unlock()方法，进行解锁
+                // note: 将unlock()放到finally块中，可以避免因为异常而无法导致unlock()方法的调用
+                lock_t.unlock();
+            }
+
+        }
+
+    }
+}
+public class LockTest {
+    public static void main(String[] args) {
+        window w = new window();
+
+        Thread t1 = new Thread(w, "Thread1");
+        Thread t2 = new Thread(w, "Thread2");
+        Thread t3 = new Thread(w, "Thread3");
+
+        t1.start();
+        t2.start();
+        t3.start();
+    }
+}
+
+```
+
+
+
+### 8.3 练习
+
+```java
+银行有一个账户：有两个储户分别向同一个账户存3000元，每次存1000，存3次，每次存完后打印余额。
+分析：
+	1. 是否为多线程问题？是，因为有两个储户线程
+	2. 是否有共享数据？  是，账户（或账户余额）
+	3. 是否有线程安全问题？ 是
+	4. 需要考虑如何解决线程安全问题？同步机制：有三种方式（这里使用继承方式实现多线程，然后用同步方法和lock来解决线程安全问题）
+```
+
+```java
+package ThreadExercise;
+
+import java.util.concurrent.locks.ReentrantLock;
+
+/**
+ * @ClassName: ThreadExerce1
+ * @Description: Java - 线程安全练习_1
+ * @author: zhilx(zhilx1997 @ sina.com)
+ * @version: v1.0
+ * @data: 2022/1/22 10:21
+ * @node: 银行有一个账户：有两个储户分别向同一个账户存3000元，每次存1000，存3次，每次存完后打印余额。
+ *      分析：
+ * 	        1. 是否为多线程问题？是，因为有两个储户线程
+ * 	        2. 是否有共享数据？  是，账户（或账户余额）
+ * 	        3. 是否有线程安全问题？ 是
+ * 	        4. 需要考虑如何解决线程安全问题？同步机制：有三种方式（这里使用继承方式实现多线程，然后用同步方法和lock来解决线程安全问题）
+ */
+
+// 1. 创建一个银行账户
+class Account {
+    private double balance; // 创建账户余额
+
+    public Account() {
+        balance = 0;
+    }
+
+    public Account(double amt) {
+        balance = amt;
+    }
+
+    // 存钱，通过同步方法来实现
+    // note: 因为这时候所有储户共用同一个账户，所以可以不用声明为静态的，使用全局监视器为this（this为共用的）
+    public synchronized void deposit(double amt) {
+        if (amt >0) {
+            balance += amt;
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println(Thread.currentThread().getName() + "存钱成功！当前账户余额为: " + balance);
+        }
+    }
+
+    // 存钱，通过Lock锁来实现
+    ReentrantLock lock = new ReentrantLock(true); // 设置为公平的
+    public void deposit2(double amt) {
+        if (amt >0) {
+            try {
+                lock.lock();
+
+                balance += amt;
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(Thread.currentThread().getName() + "存钱成功！当前账户余额为: " + balance);
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+}
+
+// 2. 创建储户
+class Customer extends Thread {
+    Account acct;   // 在储户中创建一个银行账户，此时需要两个储户共用同一个账户
+
+    // 可以通过构造器来实现多个储户共用同一个账户
+    public Customer(Account acct) {
+        this.acct = acct;
+    }
+
+    @Override
+    public void run() {
+        // 在run方法中实现同步, 每次存入1000元，共存入3此
+        for (int i = 0; i < 3; ++i) {
+            acct.deposit2(1000);
+        }
+    }
+}
+
+public class ThreadExerce1 {
+    public static void main(String[] args) {
+        Account acct = new Account(0);
+
+        // 因为c1和c2都是通过构造器初始化的，所以两个储户共用同一个账户
+        Customer c1 = new Customer(acct);
+        Customer c2 = new Customer(acct);
+
+        c1.setName("甲");
+        c2.setName("乙");
+
+        c1.start();
+        c2.start();
+    }
+}
+
+```
+
+
+
+## 9. 线程的通信
+
+### 9.1 线程通信用到的三个方法：
+
+1. `wait()` : 一旦执行此方法，当前线程就会进入阻塞状态，并释放同步监视器
+
+2. `notify()` : 一旦执行此方法，就会唤醒被wait的一个线程。如果有多个线程被wait，就唤醒优先级高的那个。
+
+3. `notifyAll()` : 一旦执行此方法，就会唤醒所有被wait()的线程。
+
+   
+
+### 9.2 说明：
+
+1. `wait()\notify()\norifyAll()`这三个方法必须使用在同步代码块或同步方法中。
+2. `wait()\notify()\norifyAll()`这三个方法的调用者必须是同步代码块或同步方法中**同步监视器**，否则会出现`java.lang.IllegalMonitorStateException`异常。
+3. `wait()\notify()\norifyAll()`这三个方法定义在`java.lang.Object`类中
+
+### 9.3 面试题：sleep() 和 wait()的异同？
+
+- 相同点：一旦执行这两个方法，都可以使得当前线程进入阻塞状态
+- 不同点：
+  	1. 两个方法声明的位置不同，Thread类中声明sleep()，Object类中声明wait()；
+   	2. 调用的要求不同：sleep()可以在任何需要的场景下调用。**wait()必须在同步代码块或同步方法中使用**。
+   	3. 关于是否释放同步监视器：如果两个方法都使用在同步代码块或同步方法中，sleep()方法不会释放同步监视器，wait()方法会释放同步监视器（锁）。
+
+```java
+package ThreadCommunicationTest;
+
+import java.util.concurrent.locks.ReentrantLock;
+/**
+ * @ClassName: ThreadCommun1Test
+ * @Description: Java - 线程间通信方式
+ * @author: zhilx (zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/1/22 11:32
+ * @node: 线程通信的例子：两个线程交替打印1-100之间的数字
+ * 		  释放同步监视器，wait()方法会释放同步监视器（锁）。
+ */
+
+// 一：使用同步代码块进行线程安全同步
+class PrintNumber implements Runnable {
+    private int number = 1;
+    Object obj = new Object();
+
+    @Override
+    public void run() {
+        while (true) {
+            synchronized (obj) {
+                // 2. 进行notifyAll()唤醒
+                obj.notifyAll();
+
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (number < 100) {
+                    System.out.println(Thread.currentThread().getName() + " : " + number);
+                    ++number;
+
+                    // 1. 使用wait()进行阻塞
+                    try {
+                        obj.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+}
+
+// 二、使用lock锁进行线程安全同步(不可以使用lock锁中调用wait()/notify()，因为lock锁住线程之后，无法调用notify()解开)
+class PrintNumber2 implements Runnable {
+    private int number = 1;
+
+    ReentrantLock lock = new ReentrantLock();
+
+    @Override
+    public void run() {
+        while (true) {
+            if (number < 100) {
+
+                try {
+                    lock.lock();
+                    // 2. 进行notifyAll()唤醒
+                    notifyAll();
+
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    System.out.println(Thread.currentThread().getName() + " 加锁 : " + number);
+                    ++number;
+
+                    // 1. 使用wait()进行阻塞
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } finally {
+                    System.out.println(Thread.currentThread().getName() + " 解锁");
+                    lock.unlock();
+                }
+            } else {
+                break;
+            }
+        }
+    }
+}
+public class ThreadCommun1Test {
+    public static void main(String[] args) {
+        ThreadCommun1Test tc = new ThreadCommun1Test();
+        tc.method1();
+//        tc.method2(); // error
+    }
+
+    public void method1() {
+        PrintNumber pn = new PrintNumber();
+
+        Thread t1 = new Thread(pn, "Thread_1");
+        Thread t2 = new Thread(pn, "Thread_2");
+
+        t1.start();
+        t2.start();
+    }
+
+    // error
+    public void method2() {
+        PrintNumber2 pn2 = new PrintNumber2();
+
+        Thread t1 = new Thread(pn2, "Thread_1");
+        Thread t2 = new Thread(pn2, "Thread_2");
+
+        t1.start();
+        t2.start();
+    }
+}
+
+```
+
+
+
+### 9.4 线程通信的应用：经典例题：生产者/消费者问题
+
+生产者（producer）将产品交给店员（clerk），而消费者（Customer）从店员处取走产品，店员一次只能持有固定数量的产品（比如，20），如果生产者试图生产更多的产品，店员会叫生产者停一下，如果店中有空位放产品了再通知生产者继续生产；如果店中没有产品了，店员会告诉消费者等一下，如果店中有产品了再通知消费者来取走产品。
+
+
+
+分析：
+
+1. 是否为多线程问题？是，生产者线程，消费者线程
+2. 是否有共享数据？是，产品（或店员）
+3. 如何解决线程的安全问题？同步机制，有三种方法
+4. 是否涉及线程的通信？是
+
+
+
+## 10. JDK5.0 新增线程创建方式
+
+- ### 新增方式一：实现`Callable`接口
+
+  - 与使用`Runnable`相比，`Callable`功能更强大些：
+    - 相比run()方法，可以有返回值；
+    - 方法可以抛出异常
+    - 支持泛型的返回值
+    - 需要借助`Future Task`类，比如获取返回结果
+  - `Futher`接口
+    - 可以对具体Runnable、Callable任务的执行结果进行取消、查询是否完成、获取结果等。
+    - **FutherTask是Futher接口的唯一的实现类**
+    - FutherTask同时实现了Runnable，Futher接口。它既可以作为Runnable被线程执行，又可以作为Futher得到Callable的返回值。
+
+- 步骤：
+  1. 创建一个实现`Callable`的实现类
+  2. 实现`call()`方法，将此线程需要执行的操作声明在`call()`中
+  3. 创建`Callable`接口实现类的对象
+  4. 将此`Callable`接口实现类的对象作为传递到`FutherTask`构造器中，并创建`FutherTask`的对象的
+  5. 将`FutherTask`的对象作为单数传递到`Thread`类的构造器中，创建`Thread`对象。
+  6. 可以通过`get()`方法获取`Callable`中的`call()`方法的返回值
+- 如何理解实现`Callable`接口的方式创建多线程比实现`Runnable`接口创建多线程方式强大？
+  - `call()`方法可以有返回值
+  - `call()`方法可以抛出异常，从而被外面操作，获取异常的信息
+  - `Callable`是支持泛型的
+
+```java
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
+/**
+ * @ClassName: ThreadCreateTest3
+ * @Description: Java 创建多线程方式三：实现Callable接口
+ * @author: zhilx (zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/1/23 9:41
+ * @node: - 新增方式三：实现`Callable`接口
+ */
+
+// 1. 创建一个实现Callable的实现类
+// note: Callable支持泛型，这里使用Integer进行介绍
+class NewThread implements Callable<Integer> {
+    @Override
+    // 2. 实现`call()`方法，将此线程需要执行的操作声明在`call()`中
+    public Integer call() throws Exception {
+        int sum = 0;
+        // 找出1-100中所有的偶数并返回偶数和
+        for (int i = 1; i <= 100; ++i) {
+            if (i % 2 == 0) {
+                System.out.println(Thread.currentThread().getName() + " : " + i);
+                sum += i;
+            }
+        }
+
+        return sum;
+    }
+}
+
+class NewThread2 implements Callable<Integer> {
+    @Override
+    // 2. 实现`call()`方法，将此线程需要执行的操作声明在`call()`中
+    public Integer call() throws Exception {
+        int sum = 0;
+        // 找出1-100中所有的偶数并返回偶数和
+        for (int i = 1; i <= 100; ++i) {
+            if (i % 2 == 1) {
+                System.out.println(Thread.currentThread().getName() + " : " + i);
+                sum += i;
+            }
+        }
+
+        return sum;
+    }
+}
+
+public class ThreadCreateTest3 {
+    public static void main(String[] args) {
+        // 3. 创建`Callable`接口实现类的对象
+        NewThread newThread = new NewThread();
+        NewThread2 newThread2 = new NewThread2();
+
+        // 4. 将此`Callable`接口实现类的对象作为传递到`FutherTask`构造器中，并创建`FutherTask`的对象的
+        FutureTask<Integer> futureTask = new FutureTask<Integer>(newThread);
+        FutureTask<Integer> futureTask2 = new FutureTask<Integer>(newThread2);
+
+        // 5. 将`FutherTask`的对象作为单数传递到`Thread`类的构造器中，创建`Thread`对象
+        new Thread(futureTask, "Thread_1").start();
+        new Thread(futureTask2, "Thread_2").start();
+
+        // 6. 可以通过`get()`方法获取`Callable`中的`call()`方法的返回值
+        try {
+            Integer sum = futureTask.get();
+            System.out.println("sum = " + sum);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Integer sum = futureTask2.get();
+            System.out.println("sum = " + sum);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+
+
+- ### 新增方式二：使用线程池
+
+  - 背景：经常创建或销毁、使用量特别大的资源，比如并发情况下的线程，对性能影响很大。
+  - 思路：提前创建好多个线程，放入线程池中，使用时直接获取，使用完返回池中。可以避免频繁创建销毁、实现重复利用。类似生活中的公共交通工具。
+  - 好处：
+    - 提高响应速度（减少了创建新线程的时间）
+    - 降低资源销毁（重复利用线程池中的线程，不需要每次都创建）
+    - 便于线程管理：
+      - `corePoolSize` : 核心池的大小
+      - `maximumPoolSize` : 最大线程数
+      - `keepAliveTime` : 线程没有任务时最多保持多长时间后会终止。
+      - `...`
+  - 线程池相关API
+    - JDK 5.0 起提供了线程池相关API : `ExecutorService` 和 `Executors`
+    - `ExecutorService` : 真正的线程池接口。常见子类ThreadPoolExecutor
+      - `void execute(Runnable command)` : 执行任务/命令，无返回值，一般用来执行`Runnable`
+      - `<T>Future<T> submit(Callable<T> task)`: 执行任务，，有返回值，一般用来执行Callable
+      - `void shutdown()` : 关闭连接池
+    - `Executors` : 工具类、线程池的工厂类，用于创建并返回不同类型的线程池
+      - `Executors.newCachedThreadPool()` : 创建一个可根据需要创建新线程的线程池
+      - `Executors.newFixedThreadPool(n)` : 创建一个可重用固定线程数的线程池
+      - `Executors.newSingleThreadExecutor()` : 创建一个只有一个线程的线程池
+      - `Executors.newScheduledThreadPool(n)` : 创建一个线程池，它可安排在给定延迟后运行命令或者定期地执行。
 
   
