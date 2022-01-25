@@ -167,8 +167,48 @@ String s4 = new String(char[] a, int startIndex, int count);
 
 ### 练习3：
 
-```
-	
+```java
+class Person {
+    String name;
+    int age;
+
+    public Person() {
+
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+
+public void test2() {
+        // 1. 通过字母量的方式：此时的s1和s2的数据javaEE声明在方法区中的字符串常量池中
+        String s1 = "javaEE";
+        String s2 = "javaEE";
+
+        // 2. 通过new+构造器的方式：此时s3和s4保存的地址值，是数据在堆空间中开辟空间以后对应的地址
+        String s3 = new String("javaEE");
+        String s4 = new String("javaEE");
+
+        System.out.println("s1 == s2 ? " + (s1 == s2)); // true
+        System.out.println("s1 == s3 ? " + (s1 == s3)); // false
+        System.out.println("s1 == s4 ? " + (s1 == s4)); // false
+        System.out.println("s3 == s4 ? " + (s3 == s4)); // false
+
+        // 3. 对自定义类进行创建
+        Person p1 = new Person("Bob", 13);
+        Person p2 = new Person("Bob", 13);
+        System.out.println("p1.name = " + p1.name + ", p2.name = " + p2.name);
+        System.out.println("p1.name.equals(p2.name) ? " + p1.name.equals(p2.name)); // true
+        System.out.println("p1.name == p2.name ? " + (p1.name == p2.name)); // true
+        System.out.println("*************************");
+
+        p2.name = "Jone";
+        System.out.println("p1.name = " + p1.name + ", p2.name = " + p2.name);
+        System.out.println("p1.name.equals(p2.name) ? " + p1.name.equals(p2.name)); // false
+        System.out.println("p1.name == p2.name ? " + (p1.name == p2.name)); // false
+    }
 ```
 
 <img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\2-Java常用类\README.assets\image-20220125215837145.png" alt="image-20220125215837145" style="zoom:67%;" />
