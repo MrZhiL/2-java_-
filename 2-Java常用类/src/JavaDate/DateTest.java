@@ -1,5 +1,6 @@
-import org.junit.Test;
+package JavaDate;
 
+import org.junit.Test;
 import java.util.Date;
 
 /**
