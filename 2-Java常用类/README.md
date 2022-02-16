@@ -45,8 +45,8 @@
 
       1. 当对字符串重新赋值时，需要重新指定内存区域赋值，不能使用原有的value进行赋值。
 
-           2. 当对现有的字符串进行连接操作时，也需要重新指定内存区域赋值，不能指定原有的value。
-              3. 当调用String的replace()方法修改字符或字符串时，也必须重新指定内存区域赋值，不能使用原有的value。
+         2. 当对现有的字符串进行连接操作时，也需要重新指定内存区域赋值，不能指定原有的value。
+            3. 当调用String的replace()方法修改字符或字符串时，也必须重新指定内存区域赋值，不能使用原有的value。
 
    5. 通过自变量的方式（String s = "abc"; 区别于new）给一个字符串赋值，此时的字符串声明在字符串常量池中。
 
@@ -940,3 +940,155 @@ System类提供的`public static long currentTimeMilli()`用来返回的当前�
   - `public String format(Date date)` ： 方法格式化时间对象date
 - 解析：
   - `public Date parse(String source)` : 从给定字符串的开始解析文本，以生产一个日期。
+
+```java
+public void simpleDateFormatTest() throws ParseException {
+        // 1. SimpleDateFormat初始化
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
+
+        // 2. 格式化： 日期->字符串
+        Date date = new Date();
+        System.out.println(date);
+
+        String format = simpleDateFormat.format(date);
+        System.out.println(format);
+
+        // 3. 解析：格式化的逆过程，字符串 -> 日期
+        String str = "2022/2/14 下午5:16";
+        Date date2 = simpleDateFormat.parse(str); // parse函数需要抛出异常
+        System.out.println(date2);
+    }
+
+    public void simpleDateFormateTest2() throws ParseException {
+        // 1. 利用指定的方式进行格式化和解析
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyyy.MMMMM.dd GGG hh:mm aaa");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // 2020-10-09 10:02:29 格式的
+        Date date = new Date();
+
+        // 2. 格式化：日期->字符串
+        String str = sdf.format(date);
+        System.out.println(str);
+
+        // 3. 解析：格式化的逆过程: 字符串->日期
+        // note: 解析要求字符串必须是符合SimpleDateFormat识别的格式（通过构造器参数体现），否则会抛出异常
+        String str2 = "2020-10-09 10:02:29";
+        Date date2 = sdf.parse(str2);
+        System.out.println(date2);
+    }
+```
+
+
+
+#### 1.4 java.util.Calendar类
+
+- Calendar是一个抽象基类，主要用于完成日期字段之间相互操作的功能。
+
+- 获取Calendar实例的方法：
+
+  - 使用Calendar.getInstance()方法
+  - 调用它的子类GregorianCalendar的构造器
+
+- 一个Calendar的实例是系统时间的抽象表示，通过get(int field)方法来取得想要的时间信息。比如YEAR、MONTH、DAY_OF_MONTH、DAY_OF_WEEK、HOUR_OF_DAY、MINUTE、SECOND
+
+  - public int get(int field);
+  - public void set(int field, int value);
+  - public final Date getTime()
+  - public final void setTime(Date date)
+
+- 注意：
+
+  - 获取月份时：一月是0，二月是1，以此类推，12月是11
+  - 获取星期时：周日是1，周二是2，。。。周六是7
+
+  ```java
+  package JavaDate;
+  
+  import org.junit.Test;
+  
+  import java.util.Calendar;
+  import java.util.Date;
+  import java.util.GregorianCalendar;
+  
+  /**
+   * @ClassName: JavaDate
+   * @Description: Java - JDK8.0之前的Calendar日历类测试（Calendar为抽象基类）
+   * @author: zhilx (zhilx1997@sina.com)
+   * @version: v1.0
+   * @data: 2022/2/16 9:44
+   * @node:
+   *          . 1. System类中的currentTimeMillis();
+   *            2. java.util.Date和子类java.sql.Date; (Date不利用国际化的操作)
+   *            3. SimpleDateFormat
+   *            4. Calendar
+   */
+  public class CalendarTest {
+      @Test
+      /* Calendar是一个**抽象基类**，主要用于完成日期字段之间互相操作的功能。 */
+      public void test() {
+          // 1. 获取Calendar实例的方法：
+          // 1.1 使用Calendar.getInstance()方法
+          Calendar cal1 = Calendar.getInstance();
+  
+          // 1.2 调用它的子类GregorianCalendar的构造器
+          Calendar cal2 = new GregorianCalendar();
+  
+          // 2. 常用方法
+          // 2.1 get() : 获取Calendar的指定时间
+          System.out.println("***********get() function*************");
+          int day = cal1.get(Calendar.DAY_OF_MONTH); // Calendar.DAY_OF_MONTH: 获取cal1为当月的第几天
+          System.out.println(day);
+          System.out.println(cal1.get(Calendar.DAY_OF_WEEK));  // Calendar.DAY_OF_WEEK: 获取当前为这周的第几天
+          System.out.println(cal1.get(Calendar.DAY_OF_YEAR));  // Calendar.DAY_OF_YEAR: 获取当前为今年的第几天
+  
+          // 2.2 set(int field, int value):
+          System.out.println("***********set() function*************");
+          cal1.set(Calendar.DAY_OF_MONTH, 1);
+          System.out.println(cal1.get(Calendar.DAY_OF_MONTH));
+          System.out.println(cal1.get(Calendar.DAY_OF_WEEK));  // Calendar.DAY_OF_WEEK: 获取当前为这周的第几天
+          System.out.println(cal1.get(Calendar.DAY_OF_YEAR));  // Calendar.DAY_OF_YEAR: 获取当前为今年的第几天
+  
+          // 2.3 add()
+          System.out.println("***********add() function*************");
+          cal1.add(Calendar.DAY_OF_MONTH, 5); //  根据日历的规则，将指定的时间量添加或减去给定的日历字段
+          cal1.add(Calendar.DAY_OF_MONTH, -1); //  根据日历的规则，将指定的时间量添加或减去给定的日历字段
+          System.out.println(cal1.get(Calendar.DAY_OF_MONTH));
+          System.out.println(cal1.get(Calendar.DAY_OF_WEEK));  // Calendar.DAY_OF_WEEK: 获取当前为这周的第几天
+          System.out.println(cal1.get(Calendar.DAY_OF_YEAR));  // Calendar.DAY_OF_YEAR: 获取当前为今年的第几天
+  
+          // 2.4 getTime(): Calendar ---> Date类
+          System.out.println("***********getTime() function*************");
+          Date date1 = cal1.getTime(); // 返回一个Date类型的返回值
+          System.out.println(date1);
+  
+          // 2.5 setTime(): Date类 ---> Calendar
+          System.out.println("***********getTime() function*************");
+          Date date2 = new Date();
+          cal1.setTime(date2);
+          System.out.println(cal1.get(Calendar.DAY_OF_MONTH));
+          System.out.println(cal1.get(Calendar.DAY_OF_WEEK));  // Calendar.DAY_OF_WEEK: 获取当前为这周的第几天
+          System.out.println(cal1.get(Calendar.DAY_OF_YEAR));  // Calendar.DAY_OF_YEAR: 获取当前为今年的第几天
+      }
+  }
+  
+  ```
+
+  
+
+### 2. JDK8中的新日期时间API
+
+#### 2.1 新时间日期API出现的背景
+
+我们希望时间与昼夜和四季有关，使得事情较为复杂。JDK 1.0中包含了一个java.util.Date类，但是它的大多数方法已经在JDK 1.1引入Calendar类之后被弃用了。而Calendar并不比Date好多少。他们面临的问题是：
+
+- 可变性：像日期和时间这样的类应该是不可变的。
+- 偏移性：Date中的年份是从1900开始的，而月份都是从0开始
+- 格式化：格式化只对Date有用，Calendar则不行
+- 此外，它们也不是线程安全的；不能处理闰秒等。
+
+总结：对日期和时间的操作一直是Java程序员最痛苦的地方之一。
+
+#### 2.2 新时间日期API
+
+- 第三次引入的API是成功的，并且Java8中引入的java.time API已经纠正了过去的缺陷，将来很长一段时间内它都会为我们服务。
+- Java 8吸收了Joda-Time的精华，以一个新的开始为Java创建优秀的API。**新的java.time中包含了所有关于本地日期（LocalDate）、本地时间（LocalTime）、本地日期时间（LocalDateTime）、时区（ZonedDateTime）和持续时间（Duration）的类**。历史悠久的**Date类新增了toInstant()方法**，用于把Date转换成新的表示形式。这些新增的本地化时间日期API大大简化了日期时间和本地化的管理。
+
