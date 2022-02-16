@@ -22,7 +22,7 @@ import java.time.*;
  *          4. jata.time.temporal - 包括底层框架和扩展特性
  *          5. java.time.zone - 包含时区支持的类
  */
-public class DateTime {
+public class JDK8TimeClassTest {
     @Test
     public void test01() {
         // LocalTime\LocalDate\LocalDateTime的测试
