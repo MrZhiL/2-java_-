@@ -547,6 +547,8 @@ public void test2() {
 
 
 
+#### 5. 参考：与传统日期处理的转换
+
 | 类                                                        | To遗留类                              | From遗留类                  |
 | --------------------------------------------------------- | ------------------------------------- | --------------------------- |
 | java.time.Instant 与 java.util.Date                       | Date.form(instant)                    | date.toInstant()            |
@@ -557,4 +559,8 @@ public void test2() {
 | java.time.LocalDate / java.sql.Timestamp                  | Timestamp.valueOf(localDate Time)     | timestamp.toLocalDateTime() |
 | java.time.ZoneId / java.util.TimeZone                     | timeZone.getTimeZone(id)              | timeZone toZoned()          |
 | java.time.format.DateTimeFormatter / java.text.DateFormat | formatter.toFormat()                  | 无                          |
+
+
+
+## 9. Java比较器
 
