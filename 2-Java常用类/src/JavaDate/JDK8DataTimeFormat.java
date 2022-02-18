@@ -5,9 +5,11 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.TemporalAccessor;
+import java.util.Set;
 
 import static java.time.format.FormatStyle.FULL;
 
@@ -61,7 +63,7 @@ public class JDK8DataTimeFormat {
         // FormatStyle.FULL / FormatStyle.LONG / FormatStyle.MEDIUM / FormatStyle.SHORT
         System.out.println("***********本地格式化：ofLocalDate()**************");
         // 这个函数时jdk8.0中的，因此需要指定ZoneID，否则会报错
-        DateTimeFormatter formatter10 = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter10 = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withZone(ZoneId.of("Asia/Shanghai"));
         DateTimeFormatter formatter11 = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withZone(ZoneId.systemDefault());
         DateTimeFormatter formatter12 = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
         DateTimeFormatter formatter13 = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withZone(ZoneId.systemDefault());
@@ -81,5 +83,32 @@ public class JDK8DataTimeFormat {
         String str5 = formatter4.format(LocalDateTime.now());
         System.out.println(str5);
 
+    }
+
+    @Test
+    public void test2() {
+        // ZoneId: 类中包含了所有的时区信息
+        // ZoneId的getAvailableZoneIds() : 获取所有的ZoneId
+        System.out.println("---------获取所有时区信息---------------");
+        Set<String> zoneIds = ZoneId.getAvailableZoneIds();
+        for (String s : zoneIds) {
+            System.out.println(s);
+        }
+
+        // ZoneId的of()；获取指定时区的时间
+        System.out.println("----------获取指定时区信息--------------");
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Tokyo"));
+        System.out.println(localDateTime);
+
+        // ZonedDateTime: 带时区的日期时间
+        // ZonedDateTime的now()：获取本时区的ZonedDateTime对象
+        System.out.println("------------获取带时区的日期时间: ZonedDateTime.now()-----------");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(); // 2022-02-18T12:12:06.829560800+08:00[Asia/Shanghai]
+        System.out.println(zonedDateTime);
+
+        // ZonedDateTime的now(ZoneId id)：
+        System.out.println("-----------zonedDateTime.now(ZoneId.of(\"Asia/Tokyo\"));--------------");
+        ZonedDateTime zonedDateTime1 = zonedDateTime.now(ZoneId.of("Asia/Tokyo")); // 2022-02-18T13:12:06.829560800+09:00[Asia/Tokyo]
+        System.out.println(zonedDateTime1);
     }
 }

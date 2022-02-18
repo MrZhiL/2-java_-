@@ -504,3 +504,57 @@ public class JDK8DataTimeFormat {
 
 ```
 
+
+
+#### 2.5 其它API
+
+- Zoneld: 该类中包含了所有的时区信息，一个时区的ID，如Europe/Paris。
+- ZonedDateTime: 一个在ISO-8601日历系统时区的日期时间，如2007-12-03T10:15:30+01:00 Europe/Paris
+  - 其中每个时区都对应着ID，地区ID都为“{区域}/{城市}”的格式，例如: Asia/Shanghai等。
+- Clock：使用时区提供对当前即时、日期和时间的访问的时钟。
+- 持续时间：Duration，用于计算两个“时间”间隔
+- 日期间隔：Period，用于计算两个“日期”间隔
+- TemporalAdjuster: 时间校正器。有时我们可能需要获取例如：将日期调整到“下一个工作日”等操作。
+- TemporalAdjusters:  该类通过静态方法（firstDayOfXxx() / lastDayOfXxx() / nextXxx()提供了大量的常用TemporalAdjuster的实现）
+
+```java
+public void test2() {
+        // ZoneId: 类中包含了所有的时区信息
+        // ZoneId的getAvailableZoneIds() : 获取所有的ZoneId
+        System.out.println("---------获取所有时区信息---------------");
+        Set<String> zoneIds = ZoneId.getAvailableZoneIds();
+        for (String s : zoneIds) {
+            System.out.println(s);
+        }
+
+        // ZoneId的of()；获取指定时区的时间
+        System.out.println("----------获取指定时区信息--------------");
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Tokyo"));
+        System.out.println(localDateTime);
+
+        // ZonedDateTime: 带时区的日期时间
+        // ZonedDateTime的now()：获取本时区的ZonedDateTime对象
+        System.out.println("------------获取带时区的日期时间: ZonedDateTime.now()-----------");
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(); // 2022-02-18T12:12:06.829560800+08:00[Asia/Shanghai]
+        System.out.println(zonedDateTime);
+
+        // ZonedDateTime的now(ZoneId id)：
+        System.out.println("-----------zonedDateTime.now(ZoneId.of(\"Asia/Tokyo\"));--------------");
+        ZonedDateTime zonedDateTime1 = zonedDateTime.now(ZoneId.of("Asia/Tokyo")); // 2022-02-18T13:12:06.829560800+09:00[Asia/Tokyo]
+        System.out.println(zonedDateTime1);
+    }
+```
+
+
+
+| 类                                                        | To遗留类                              | From遗留类                  |
+| --------------------------------------------------------- | ------------------------------------- | --------------------------- |
+| java.time.Instant 与 java.util.Date                       | Date.form(instant)                    | date.toInstant()            |
+| java.time.Instant 与 java.sql.Timestamp                   | Timestamp.from(instant)               | timestamp.toInstant()       |
+| java.time.ZonedDateTime / java.util.GregorianCalendar     | GregorianCalendar.from(zonedDateTime) | cal.toZonedDateTime()       |
+| java.time.LocalDate / java.sql.Time                       | Date.valudOf(localDate)               | date.toLocalDate()          |
+| java.time.LocalTime / java.sql.Time                       | Date.valueOf(localDate)               | date.toLocalTime()          |
+| java.time.LocalDate / java.sql.Timestamp                  | Timestamp.valueOf(localDate Time)     | timestamp.toLocalDateTime() |
+| java.time.ZoneId / java.util.TimeZone                     | timeZone.getTimeZone(id)              | timeZone toZoned()          |
+| java.time.format.DateTimeFormatter / java.text.DateFormat | formatter.toFormat()                  | 无                          |
+
