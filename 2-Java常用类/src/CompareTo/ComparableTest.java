@@ -66,5 +66,6 @@ public class ComparableTest {
             System.out.println(goods[i].getName() + ", " + goods[i].getPrice());
         }
         System.out.println(Arrays.deepToString(goods));
+
     }
 }
