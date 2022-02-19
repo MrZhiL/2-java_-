@@ -3,8 +3,8 @@ package CompareTo;
 import java.util.Arrays;
 
 /**
- * @ClassName: CompareTo
- * @Description: Java - 比较器
+ * @ClassName: ComparableTest
+ * @Description: Java - comparable接口：比较器
  * @author: zhilx (zhilx1997@sina.com)
  * @version: v1.0
  * @data: 2022/2/18 13:43
@@ -24,11 +24,15 @@ import java.util.Arrays;
  *             - 如果当前对象this大于形参对象obj，则返回负整数
  *             - 如果当前对象this等于形参对象obj，则返回零。
  *          4. 对于自定义类来说，如果需要排序，我们可以让自定义类实现Compareble类，重写compareTo()方法并指明如何排序
+ *
+ *          5. Comparator和Comparable对比：
+ *          - Comparator接口属于临时性的比较，只能使用一次.
+ *          - Comparable接口的方式一旦固定，保证Comparable接口实现类的对象在任何位置都可以比较大小。
  */
-public class CompareTest {
+public class ComparableTest {
 
     public static void main(String[] args) {
-        CompareTest compareTest = new CompareTest();
+        ComparableTest compareTest = new ComparableTest();
         compareTest.test01();
         System.out.println("*******************");
         compareTest.test02();
