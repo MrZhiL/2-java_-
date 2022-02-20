@@ -19,7 +19,7 @@
  *       ### 枚举类的定义
  *          - 枚举类的实现：
  *            - JDK 1.5此前需要自定义枚举类
- *            - JDK 1.5新增enum关键字用于定义枚举类
+ *            - JDK 1.5新增enum关键字用于定义枚举类 (enum类继承与java.lang.Enum类)
  *          - 若枚举类只有一个对象，则可以作为一种单例模式的实现方式
  *          - **枚举类的属性**：
  *            - 枚举类对象的属性不应允许被改动，所以应该使用 private final 修饰
@@ -34,6 +34,12 @@ public class enumTest {
         System.out.println(season1);
         System.out.println(season2);
 
+        // 2. enum类测试
+        Season2 summer = Season2.SUMMER;
+        Season2 autumn = Season2.AUTUMN;
+        System.out.println(summer); // 如果没有重写toString(), 此时会输出SUMMER
+        System.out.println(autumn); // 此时会输出AUTUMN
+        System.out.println(Season2.class.getSuperclass()); // class java.lang.Enum
     }
 }
 
@@ -72,4 +78,34 @@ class Season {
                 ", seasonDesc='" + seasonDesc + '\'' +
                 '}';
     }
+}
+
+// 二、使用enum关键字来实现枚举类
+enum Season2 {
+    // 1. 使用enum关键字创建枚举类时，首先需要提供枚举类的对象，多个对象之间用逗号”，“隔开，最后使用“;"结尾
+    SPRING("春天", "春暖花开"),
+    SUMMER("夏天", "夏日炎炎"),
+    AUTUMN("秋天", "秋高气爽"),
+    WINTER("冬天", "梅花盛开");
+
+    // 2. 创建枚举类的属性
+    private final String seasonName;
+    private final String seasonDesc;
+
+    // 3. 将构造器声明为private的
+    private Season2(String seasonDesc, String seasonName) {
+        this.seasonDesc = seasonDesc;
+        this.seasonName = seasonName;
+    }
+
+    // 4. 其他诉求：获取属性信息
+    public String getSeasonName() {
+        return seasonName;
+    }
+
+    public String getSeasonDesc() {
+        return seasonDesc;
+    }
+
+    // 4.2 此时可以不必重写toString()方法，因为enum继承于Enum类
 }
