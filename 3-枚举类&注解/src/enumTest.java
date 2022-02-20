@@ -81,6 +81,18 @@ public class enumTest {
         System.out.println("\n*************** enum类实现接口************");
         summer.show(); // 夏天是万物生长的季节
         autumn.show(); // 秋天是万物成熟的季节
+
+        switch (summer) {
+            // 使用switch时，不需要指明 enum类名
+            case SUMMER :
+                System.out.println("this is a summer");
+                break;
+            case AUTUMN:
+                System.out.println("this is a autumn");
+                break;
+            default:
+                break;
+        }
     }
 }
 
