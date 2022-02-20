@@ -33,6 +33,10 @@
  *                                  IllegalArgumentException。 |
  *          | toString()          | 得到当前枚举常量的名称。可以通过重写这个方法来使得结果更加容易读取 |
  *          | values()            | 返回枚举类型的对象数组。该方法可以很方便的遍历所有的枚举值。 |
+*
+ *      4. 使用enum关键字定义的枚举类实现接口
+ *          - 情况一：实现接口，在enum类中实现抽象方法，此时所有枚举类的返回值相同
+ *          - 情况二：让枚举类的对象分别实现接口中的抽象方法
  */
 public class enumTest {
     public static void main(String[] args) {
@@ -73,6 +77,10 @@ public class enumTest {
         // valueOf(str)方法：直接返回str的枚举类型，如果不存在则报错java.lang.IllegalArgumentException
         Season2 spring = Season2.valueOf("SPRING");
         System.out.println(spring);
+
+        System.out.println("\n*************** enum类实现接口************");
+        summer.show(); // 夏天是万物生长的季节
+        autumn.show(); // 秋天是万物成熟的季节
     }
 }
 
@@ -113,13 +121,40 @@ class Season {
     }
 }
 
+// enum类实现接口
+interface info {
+    void show();
+}
+
 // 二、使用enum关键字来实现枚举类
-enum Season2 {
+// 接口1：首先需要实现接口
+enum Season2 implements info {
     // 1. 使用enum关键字创建枚举类时，首先需要提供枚举类的对象，多个对象之间用逗号”，“隔开，最后使用“;"结尾
-    SPRING("春天", "春暖花开"),
-    SUMMER("夏天", "夏日炎炎"),
-    AUTUMN("秋天", "秋高气爽"),
-    WINTER("冬天", "梅花盛开");
+    // 方法二: 在每个枚举类对象中实现接口
+    SPRING("春天", "春暖花开") {
+        @Override
+        public void show() {
+            System.out.println("春天是万物复苏的季节");
+        }
+    },
+    SUMMER("夏天", "夏日炎炎") {
+        @Override
+        public void show() {
+            System.out.println("夏天是万物生长的季节");
+        }
+    },
+    AUTUMN("秋天", "秋高气爽") {
+        @Override
+        public void show() {
+            System.out.println("秋天是万物成熟的季节");
+        }
+    },
+    WINTER("冬天", "梅花盛开") {
+        @Override
+        public void show() {
+            System.out.println("冬天是冰雪的世界");
+        }
+    };
 
     // 2. 创建枚举类的属性
     private final String seasonName;
@@ -140,5 +175,14 @@ enum Season2 {
         return seasonDesc;
     }
 
+
+
     // 4.2 此时可以不必重写toString()方法，因为enum继承于Enum类
+
+    // 5. 方法一：重写接口中的抽象方法，此时所有枚举类的返回值相同
+    @Override
+    public void show() {
+        System.out.println("This is a season!");
+    }
+
 }
