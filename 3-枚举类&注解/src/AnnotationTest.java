@@ -21,6 +21,14 @@
  *             3.4 如果自定义注解没有成员，表明是一个标识作用。
  *
  *             如果注解有成员，在使用注解时，需要指明成员的值
+ *
+ *         4. jdk提供的4中元注解：
+ *            元注解：对现有注解进行解释说明的注解
+ *            Retention: 指定所修饰的Annotation的声明周期：SOURCE/CLASS(默认方法)/RUNTIME
+ *                       只有声明为RUNTIME声明周期的注解，才能通过反射获取
+*             Target: 用于修饰Annotation定义，用于指定被修饰的Annotation能用于修饰哪些程序元素。@Target也包含一个名为value的成员变量。
+ *            Documented(使用频率较低): 用于指定被该元Annotation修饰的Annotation类将被javadoc工具提取出文档。默认情况下，javadoc是不包括注解的。
+ *            Inherited(使用频率较低): 被它修饰的Annotation将具有**继承性**。如果某个类使用了被@Inherited修饰的Annotation，则其子类将自动具有该注解。
  */
 public class AnnotationTest {
     public static void main(String[] args) {
