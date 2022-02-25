@@ -2,9 +2,7 @@ package src;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @ClassName: CollectionTest.java
@@ -34,7 +32,8 @@ import java.util.Date;
 *               - Map接口：双列数据，用来存储一对（key - value）的数据。
  *                    -- HashMap、LinkedHashMap、TreeMap、Hashtable、Properties
  *
- *          4. Collection接口中的方法的使用
+ *          4. Collection接口中的方法的使用:
+ *              向Collection接口的实现类的对象中添加数据obj时，要求obj所在类要重写equals()方法
  */
 public class CollectionTest {
     @Test
@@ -67,5 +66,82 @@ public class CollectionTest {
         coll.clear();
         System.out.println("coll.size = " + coll.size());
         System.out.println("coll.isEmpty() = " + coll.isEmpty());
+    }
+
+    @Test
+    public void test02() {
+        Collection coll = new ArrayList();
+        coll.add(123);
+        coll.add(456);
+        coll.add(new Person("jerry", 21));
+        coll.add(new Person("Tom", 19));
+        coll.add(new String("hello"));
+        coll.add(false);
+
+        // 6. 调用contains(Obj e)方法，判断coll中是否存在e对象: 若存在则返回true，不存在则返回false
+        // String()类中自动重写了equals()方法
+        System.out.println("---------------contains()-----------------");
+        System.out.println(coll.contains(new String("hello"))); // true
+        // 调用contains()方法时，编译器会自动对coll的对象依次进行比较（按照add的顺序进行比较）
+        System.out.println(coll.contains(new Person("jerry", 21))); // 如果不重写实现类中的equals()方法则返回false，如果重写则返回true
+
+        // 7. containsAll(Collection c): 判断c中的对象是否被包含, 如果都被包含则返回true，否则返回false
+        System.out.println("-------------containsAll(Collection c)------------------");
+        Collection coll1 = Arrays.asList(123, 456);
+        Collection coll2 = Arrays.asList(123, 4567);
+        System.out.println(coll.containsAll(coll1)); // true
+        System.out.println(coll.containsAll(coll2)); // false
+
+    }
+}
+
+class Person {
+    private String name;
+    private int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        System.out.println("Person equals() ...");
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return age == person.age && Objects.equals(name, person.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
     }
 }
