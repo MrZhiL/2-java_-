@@ -94,5 +94,14 @@ public class IteratorTest {
         for(Object c : coll) {
             System.out.println(c);
         }
+
+        // note: 如果使用增强for循环，则此时会转换为Iterator，如果对数据进行修改不会发生变化
+        int[] arr = new int[]{1,2,3,4,5};
+        for (int i : arr) {
+            i = 10; // 此时i为临时变量，当调用完成后就会进行释放，因此不会对原数组中的内容进行修改
+        }
+        for (int i : arr) {
+            System.out.println(i); // 1 2 3 4 5
+        }
     }
 }
