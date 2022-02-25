@@ -93,6 +93,70 @@ public class CollectionTest {
         System.out.println(coll.containsAll(coll2)); // false
 
     }
+
+    @Test
+    public void test03() {
+        Collection coll = new ArrayList();
+        coll.add(123);
+        coll.add(456);
+        coll.add(new Person("jerry", 21));
+        coll.add(new Person("Tom", 19));
+        coll.add(new String("hello"));
+        coll.add(false);
+        System.out.println("coll = " + coll);
+
+        // 8. remove(obj) : 从当前集合中移除指定的obj元素，如果移除成功则返回true；失败则返回false
+        System.out.println("---------remove(obj)-----------");
+        coll.remove("hello"); // true
+        coll.remove("123");   // false
+        System.out.println("coll = " + coll);
+
+        // 9. removeAll(Collection c) : 从当前集合中移除Collection c中存在的所有元素：即取交集
+        System.out.println("----------removeAll(Collection c)----------------");
+        Collection coll1 = Arrays.asList(123, new Person("jerry", 21), "false");
+        coll.removeAll(coll1);
+        System.out.println("coll = " + coll);
+    }
+
+    @Test
+    public void test04() {
+        // 10. retainAll()方法：
+        Collection coll = new ArrayList();
+        coll.add(123);
+        coll.add(456);
+        coll.add(new Person("jerry", 21));
+        coll.add(new Person("Tom", 19));
+        coll.add(new String("hello"));
+        coll.add(false);
+        System.out.println("coll = " + coll);
+
+        // 11. equals(obj): 判断当前对象是否与obj元素是否相同（ArrayList为有序的，因此需要顺序也一样；HashSet可以无序），需要所有元素都相同
+        System.out.println("----------------equals(obj)---------------------");
+        Collection coll2 = new ArrayList();
+        coll2.add(123);
+        coll2.add(456);
+        coll2.add(new Person("jerry", 21));
+        coll2.add(new Person("Tom", 19));
+        coll2.add(new String("hello"));
+        coll2.add(false);
+        System.out.println("coll == coll1 ? " + coll.equals(coll2)); // true
+
+        Collection coll3 = new ArrayList();
+        coll3.add(456);
+        coll3.add(123);
+        coll3.add(new Person("jerry", 21));
+        coll3.add(new Person("Tom", 19));
+        coll3.add(new String("hello"));
+        coll3.add(false);
+        System.out.println("-----------------------------------");
+        System.out.println("coll == coll1 ? " + coll.equals(coll3)); //false, 因为ArrayList为有序的，而123 和 456元素位置不一样
+
+        // retainAll(Collection coll): 返回当前集合与coll集合的交集，并返回给当前集合
+        Collection coll1 = Arrays.asList(123, "hello", false);
+        coll.retainAll(coll1);
+        System.out.println("--------------retainAll(coll)---------------");
+        System.out.println("coll = " + coll);
+    }
 }
 
 class Person {
