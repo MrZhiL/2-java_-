@@ -24,7 +24,7 @@
 
 
 
-### 10.2 Java集合体系：Collection和Map
+## 10.2 Java集合体系：Collection和Map
 
 Java集合可分为Collection和Map两种体系
 
@@ -42,3 +42,8 @@ Java集合可分为Collection和Map两种体系
 - Map接口继承树
 
   ​	![image-20220224125230891](D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220224125230891.png)
+
+
+
+## 10.3 Collection接口中的API
+

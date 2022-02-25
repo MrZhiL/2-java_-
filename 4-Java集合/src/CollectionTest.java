@@ -1,5 +1,11 @@
 package src;
 
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+
 /**
  * @ClassName: CollectionTest.java
  * @Description: Java - 集合框架的概述
@@ -27,6 +33,39 @@ package src;
  *                    -- HashSet、LinkedHashset、TreeSet
 *               - Map接口：双列数据，用来存储一对（key - value）的数据。
  *                    -- HashMap、LinkedHashMap、TreeMap、Hashtable、Properties
+ *
+ *          4. Collection接口中的方法的使用
  */
 public class CollectionTest {
+    @Test
+    public void test01() {
+        // 1. 创建Collection接口的变量，需要指定具体的类型，这里使用ArrayList
+        Collection coll = new ArrayList();
+
+        // 2. 调用empty()和size()方法
+        System.out.println("coll.size = " + coll.size());
+        System.out.println("coll.isEmpty() = " + coll.isEmpty());
+
+        // 3. 调用add(Object e) 方法
+        System.out.println("---------------------------");
+        coll.add("AA");
+        coll.add("BB");
+        coll.add(123); // 自动装箱
+        coll.add(new Date());
+        System.out.println("coll.size = " + coll.size());
+        System.out.println("coll.isEmpty() = " + coll.isEmpty());
+
+        // 4. 调用addAll(Collection c)方法
+        Collection coll1 = new ArrayList();
+        coll1.add("CC");
+        coll1.add(879);
+        coll.addAll(coll1);
+        System.out.println("coll.size = " + coll.size() + ", coll = " + coll);
+
+        // 5. clear()方法
+        System.out.println("---------------clear()方法------------------");
+        coll.clear();
+        System.out.println("coll.size = " + coll.size());
+        System.out.println("coll.isEmpty() = " + coll.isEmpty());
+    }
 }
