@@ -88,5 +88,11 @@ public class IteratorTest {
         while (iterator.hasNext()) {
             System.out.println(iterator.next());
         }
+
+        // JDK5.0之后新增了foreach来对集合和数组进行遍历，其底层也是Iterator
+        System.out.println("--------foreach进行遍历--------------");
+        for(Object c : coll) {
+            System.out.println(c);
+        }
     }
 }
