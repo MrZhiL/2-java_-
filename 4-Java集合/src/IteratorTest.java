@@ -61,4 +61,32 @@ public class IteratorTest {
         }
 
     }
+
+    @Test
+    public void test07() {
+        Collection coll = new ArrayList();
+        coll.add(123);
+        coll.add(456);
+        coll.add(new Person("Tom", 19));
+        coll.add(new String("hello"));
+        coll.add(false);
+
+        // 测试Iterator中的remove()方法：删除集合中的指定元素，和集合中的remove()方法不同
+        // note: - Iterator可以删除集合中的元素，但是遍历过程中通过迭代器对象的remove方法，不是集合对象的remove方法。
+        //       - 如果还未调用next()或在上一次调用next方法之后已经调用了remove方法，再调用remove都会报IllegalStateException.
+        Iterator iterator = coll.iterator();
+        while (iterator.hasNext()) {
+            // iterator.remove(); // error, 不可以在next()方法之前调用remove()方法，因为此时iterator的指针可能为空
+            Object obj = iterator.next();
+            if (obj.equals("hello")) {
+                iterator.remove();
+                // iterator.remove(); // error, 此时当上一次调用之后，指针已经为空，再次调用将会报错
+            }
+        }
+
+        iterator = coll.iterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+    }
 }
