@@ -157,6 +157,41 @@ public class CollectionTest {
         System.out.println("--------------retainAll(coll)---------------");
         System.out.println("coll = " + coll);
     }
+
+    @Test
+    public void test05() {
+        Collection coll = new ArrayList();
+        coll.add(123);
+        coll.add(456);
+        coll.add(new Person("jerry", 21));
+        coll.add(new Person("Tom", 19));
+        coll.add(new String("hello"));
+        coll.add(false);
+        System.out.println("coll = " + coll);
+
+        // 12. hashCode()
+        System.out.println("coll.hashCode = " + coll.hashCode());
+
+        // 13. toArray() : 将集合转化为数组，返回值为Object类型
+        System.out.println("-------------Collection to Array()----------------");
+        Object[] objects = coll.toArray();
+        for (int i = 0; i < objects.length; ++i) {
+            System.out.println(objects[i]);
+        }
+
+        // 14. 扩展：数组->集合的转换（Arrays.asList()）,需要注意的是如果直接使用int[] {1, 2}则会识别为一个元素，Integer[] {1, 2}则被识别为两个元素
+        List<String> strings = Arrays.asList(new String[]{"abc", "def", "AAA"});
+        System.out.println(strings);
+
+        List arr1 = Arrays.asList(new int[]{111, 222});
+        System.out.println("arr1 = " + arr1 + ", arr1.length = " + arr1.size()); // arr1 = [[I@5427c60c], arr1.length = 1
+
+        List arr2 = Arrays.asList(new Integer[] {111, 222});
+        List arr3 = Arrays.asList(111, 222);
+
+        System.out.println("arr2 = " + arr2 + ", arr2.length = " + arr2.size()); // arr2 = [111, 222], arr2.length = 2
+        System.out.println("arr3 = " + arr3 + ", arr3.length = " + arr3.size()); // arr3 = [111, 222], arr3.length = 2
+    }
 }
 
 class Person {
