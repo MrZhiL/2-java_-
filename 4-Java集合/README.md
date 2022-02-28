@@ -548,7 +548,7 @@ class Person {
 
 
 
-## 10.7 List接口方法
+### 6. List接口方法
 
 - List除了从Collection集合继承的方法外，List集合里添加了一些根据索引来操作集合元素的方法。
 
@@ -604,7 +604,7 @@ class Person {
 
 
 
-## 10.8 List 面试题：
+### 7. List 面试题：
 
 ```java
 package src;
@@ -647,4 +647,122 @@ public class ListTestQuestion {
 }
 
 ```
+
+
+
+## 10.7 Collection子接口之二：Set接口
+
+### 1. Set接口概述
+
+- Set接口是Collection的子接口，set接口没有提供额外的方法
+- Set集合不允许包含相同的元素，如果试着把两个相同的元素加入同一个Set集合中，则添加操作失败
+- Set判断两个对象是否相同不是使用 == 运算符，而是根据 equal()方法
+
+### 2. Set实现类之一：HashSet
+
+- HashSet是Set接口的典型实现，大多数时候使用Set集合时都使用这个实现类。
+- HashSet按Hash算法来存储集合中的元素，因此具有很好的存取、查找、删除性能。
+- HashSet具有以下特点：
+  - 不能保证元素的排列顺序
+  - HashSet不是线程安全的
+  - 集合元素可以是**null**
+- **HashSet集合判断两个元素相等的标准：**两个对象通过hashCode()方法比较相等，并且两个对象的equals()方法返回值也相等。
+- 对于存放Set容器的对象，**对应的类一定要重写equals()和hashCode(Object obj)方法，以实现对象相等规则。即：“相等的对象必须具有相等的散列码”。**
+
+```java
+package src.SetTest;
+
+import org.junit.Test;
+
+import java.util.Iterator;
+import java.util.Set;
+import java.util.HashSet;
+
+/**
+ * @ClassName: src.SetTest
+ * @Description: Java - Set接口的框架
+ * @author: zhilx (zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/2/28 12:43
+ * @node:
+ *         1. Set接口的框架
+ *            |----Collection接口：单列集合，用来存储一个一个的对象
+ *                |----Set接口：存储无序的、不可重复的数据：线程不安全的，可以存储null值
+ *                    |----LinkedHashSet: 作为HashSet的子类：遍历其内部数据时，可以按照添加的顺序来
+ *                |----TreeSet: 可以按照添加对象的指定属性，进行排序
+ *         2. Set：存储无序的、不可重复的数据（以HashSet为例说明：）
+ *            1. 无序性：不等于随机性。存储的数据在底层数组中并非按照数组所有的顺序添加的，而是根据数据的哈希值进行添加的
+ *            2. 不可重复性：保证添加的元素按照equals()判断时，不能返回true：即，相同的元素只能添加一个
+ *
+ *		4. 要求：
+ *              1) Set接口中没有额外定义新的方法，使用的都是Collection中声明过的方法
+ *              2) 向Set中添加的数据，其所在的类一定要重写hashCode()和equals()方法
+ *                 要求重写的hashCode()和equals()尽可能保持一致性。
+ */
+public class SetTest1 {
+    @Test
+    public void test01() {
+        Set set = new HashSet();    // 默认容量为16
+        set.add(123);
+        set.add(879);
+        set.add(627);
+        set.add("AA");
+        set.add("AA");
+        set.add(new String("BB"));
+        set.add(new String("BB"));
+        set.add(new Person("Tom", 12));
+        set.add(new Person("Tom", 12));
+
+        Iterator iterator = set.iterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+    }
+}
+
+```
+
+
+
+### 3. 添加元素的过程：以HashSet为例
+
+*            我们向HashSet中添加元素a，首先调用元素a所在类的hashCode()方法，计算元素a的哈希值，
+*            此哈希值接着通过某种散列算法（散列表+数组）计算出差在HashSet底层数组中的存放位置（即为，索引位置），
+* 判断数组此位置上是否已经有元素：
+  * 1). 如果此位置上没有元素，则元素a添加成功；
+
+  * 2). 如果存在其他元素b（或以链表形式存在多个元素），则比较元素a与元素b（或链表中的多个元素）的哈希值：
+
+  * 如果hash值不相同，则元素a添加成功；
+
+    如果hash值相同，进而调用元素a所在类的equals()方法进行比较，如果返回true，则添加失败，如果返回false，则添加成功。
+    *
+
+  *              对于添加成功的情况2)和3)而言：元素a与已经存在指定索引位置上的数据以链表的形式存储：
+* jdk7中：元素a放到数组中，指向原来的元素；jdk8中：原来的元素在数组中指向元素a。
+* 总结：七上八下。HashSet底层：数组+链表的结构
+
+- 其中调用的散列函数会与底层数组的长度相计算得到在数组中的下标，并且这种散列函数计算还尽可能保证均匀存储元素，越是散列分布，该散列函数设计的越好。
+
+  
+
+## 10.8 Eclipse/IDEA工具里hashCode()的重写
+
+以Eclipse/IDEA为例，在自定义类中可以调用工具自动重写equals()和hashCode()。**问题：为什么用Eclipse/IDEA复写hashCode()方法，有31这个数字？**
+
+- 选择系数的时候要选择尽量大的系数。因为如果计算出来的hash地址越大，所谓的”冲突“就越少，查找起来效率也会提高。（减少冲突）
+
+- 并且31只占用5bits，相乘造成数据溢出的概率较小。
+
+- 31可以有 i*31 == (1 << 5) - 1来表示，现在很多虚拟机里面都有做相关优化（提高算法效率）。
+
+- 31是一个素数，素数作用就是如果我用一个数字来乘以这个素数，那么最终出来的结果只能被素数本身和被乘数1来整除！（减少冲突）
+
+  
+
+重写hashCode()方法的基本原则：
+
+- 在程序运行时，同一个对象多次调用hashCode()方法应该返回相同的值。
+- 当两个对象的equals()方法比较返回true时，这两个对象的hashCode()方法返回值也应相等。
+- 对象中用作equals()方法比较的Field，都应该用来计算hashCode值。
 
