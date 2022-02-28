@@ -15,6 +15,9 @@ import java.util.Set;
  * @node:
  *          |----Set接口：存储无序的、不可重复的数据：线程不安全的，可以存储null值
  *              |----LinkedHashSet: 作为HashSet的子类：遍历其内部数据时，可以按照添加的顺序来
+ *
+ *          - LinkedHashSet作为HashSet的子类，在添加数据的同时，每个数据还维护了两个引用，分别用来计算上一个元素和后一个元素(的索引)。
+ *          - 优点：对于频繁的遍历操作，LinkedHashSet效率高于HashSet
  */
 public class LinkedHashSetTest {
     @Test
