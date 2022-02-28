@@ -1,5 +1,6 @@
 package src.SetTest;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Objects;
  * @data: 2022/2/28 13:12
  * @node:
  */
-class Person {
+class Person implements Comparable {
     private String name;
     private int age;
 
@@ -60,6 +61,22 @@ class Person {
         return Objects.hash(name, age);
         // 一个简单的方法(不是特别准确)：
         // return name.hashCode() + age;
+    }
+
+    @Override
+    // 指定排序方式为：姓名从大到小，年龄从小到大
+    public int compareTo(Object o) {
+        if (o instanceof Person) {
+            Person p = (Person) o;
+            int i = this.name.compareTo(p.name);
+            if (i != 0) {
+                return -i;
+            } else {
+                return Integer.compare(this.age, p.age);
+            }
+        } else {
+            throw new RuntimeException("输入类型错误！");
+        }
     }
 }
 

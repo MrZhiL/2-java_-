@@ -661,13 +661,31 @@ public class ListTestQuestion {
 ### 2. Set实现类之一：HashSet
 
 - HashSet是Set接口的典型实现，大多数时候使用Set集合时都使用这个实现类。
+
 - HashSet按Hash算法来存储集合中的元素，因此具有很好的存取、查找、删除性能。
+
 - HashSet具有以下特点：
+
   - 不能保证元素的排列顺序
   - HashSet不是线程安全的
   - 集合元素可以是**null**
+
 - **HashSet集合判断两个元素相等的标准：**两个对象通过hashCode()方法比较相等，并且两个对象的equals()方法返回值也相等。
+
 - 对于存放Set容器的对象，**对应的类一定要重写equals()和hashCode(Object obj)方法，以实现对象相等规则。即：“相等的对象必须具有相等的散列码”。**
+
+- ```
+  Set接口的框架
+   *            |----Collection接口：单列集合，用来存储一个一个的对象
+   *                |----Set接口：存储无序的、不可重复的数据：线程不安全的，可以存储null值
+   *                    |----LinkedHashSet: 作为HashSet的子类：遍历其内部数据时，可以按照添加的顺序来
+   *                |----TreeSet: 可以按照添加对象的指定属性，进行排序
+   *         2. Set：存储无序的、不可重复的数据（以HashSet为例说明：）
+   *            1. 无序性：不等于随机性。存储的数据在底层数组中并非按照数组所有的顺序添加的，而是根据数据的哈希值进行添加的
+   *            2. 不可重复性：保证添加的元素按照equals()判断时，不能返回true：即，相同的元素只能添加一个
+  ```
+
+  
 
 ```java
 package src.SetTest;
@@ -743,6 +761,118 @@ public class SetTest1 {
 * 总结：七上八下。HashSet底层：数组+链表的结构
 
 - 其中调用的散列函数会与底层数组的长度相计算得到在数组中的下标，并且这种散列函数计算还尽可能保证均匀存储元素，越是散列分布，该散列函数设计的越好。
+
+
+
+### 4. LinkedHashSet的使用：
+
+- LinkedHashSet作为HashSet的子类，在添加数据的同时，每个数据还维护了两个引用，分别用来计算上一个元素和后一个元素(的索引)。
+- 优点：对于频繁的遍历操作，LinkedHashSet效率高于HashSet
+
+<img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220228195623867.png" alt="image-20220228195623867" style="zoom:67%;" />
+
+
+
+
+
+### 5. TreeSet的使用：
+
+- TreeSet和TreeMap采用红黑数的存储结构；
+
+- 特点：有序，查询速度比List快
+
+- ```java
+  package src.SetTest;
+  
+  import org.junit.Test;
+  
+  import java.util.Comparator;
+  import java.util.Iterator;
+  import java.util.TreeSet;
+  
+  /**
+   * @ClassName: TreeSetTest
+   * @Description: Java - Set集合中的TreeSet测试
+   * @author: zhilx (zhilx1997@sina.com)
+   * @version: v1.0
+   * @data: 2022/2/28 20:12
+   * @node: TreeSet(可以按照添加对象的指定属性，进行排序):
+   *          1. 向TreeSet中添加的数据，要求是相同类的对象。
+   *          2. 两种自然排序方式： 自然排序(实现Comparabl接口) 和 定制排序（通过Comparator来实现）
+   *
+   *          3. 自然排序中，比较两个对象是否相同的标准为：compareTo()返回0，不再是equals()
+   *          4. 定制排序中，比较两个对象是否相同的标准为：compare()返回0，不再是equals()
+   */
+  public class TreeSetTest {
+      @Test
+      public void test01() {
+          // 自然排序
+          // 1. TreeSet可以按照添加对象的指定属性，进行排序（默认为从小到大进行排序）
+          TreeSet set = new TreeSet();
+          set.add(123);
+          set.add(43);
+          set.add(64);
+          // set.add("AA"); // error, TreeSet中必须添加相同元素的对象
+          set.add(-129);
+          set.add(98);
+  
+          Iterator iterator = set.iterator();
+          while (iterator.hasNext()) {
+              System.out.println(iterator.next()); // -129, 43, 64, 98, 123
+          }
+  
+          // 2. 指定排序方式:自然排序
+          set.clear();
+          set.add(new Person("Tom", 21));
+          set.add(new Person("Jack", 17));
+          set.add(new Person("Jerry", 34));
+          set.add(new Person("Smith", 19));
+          set.add(new Person("Meiko", 41));
+          set.add(new Person("Kity", 12));
+          set.add(new Person("Jack", 37));
+  
+          iterator = set.iterator();
+          while (iterator.hasNext()) {
+              System.out.println(iterator.next());
+          }
+      }
+  
+      @Test
+      public void test02() {
+          // 2. 指定排序方式:定制排序
+          Comparator comparator = new Comparator() {
+              @Override
+              public int compare(Object o1, Object o2) {
+                  if (o1 instanceof Person && o2 instanceof Person) {
+                      // 按照年龄从小到大进行排序
+                      Person p1 = (Person) o1;
+                      Person p2 = (Person) o2;
+                      return (Integer.compare(p1.getAge(), p2.getAge()));
+                  } else {
+                      throw new RuntimeException("传输参数类型不一致!");
+                  }
+              }
+          };
+  
+          TreeSet set = new TreeSet(comparator);
+  
+          set.add(new Person("Tom", 21));
+          set.add(new Person("Hose", 21)); // 因为只指定了按照年龄大小排序，此时已经存在21，因此Hose元素无法插入到其中，除非指定二级排序方式
+          set.add(new Person("Jack", 17));
+          set.add(new Person("Jerry", 34));
+          set.add(new Person("Smith", 19));
+          set.add(new Person("Meiko", 41));
+          set.add(new Person("Kity", 12));
+          set.add(new Person("Jack", 37));
+  
+          Iterator iterator = set.iterator();
+          while (iterator.hasNext()) {
+              System.out.println(iterator.next());
+          }
+      }
+  }
+  
+  ```
 
   
 
