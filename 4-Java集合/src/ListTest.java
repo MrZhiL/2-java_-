@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -67,6 +68,15 @@ import java.util.List;
  *          4. Vector源码分析
  *              - jdk7和jdk8中通过Vector()构造器创建对象时，底层都创建了长度为10的Object数组
  *              - 在扩容方面，默认扩容为原来数组长度的2倍。
+ *
+ *          5. List总结：常用方法
+ *              - 增： add(Object obj)
+ *              - 删： remove(int index) / remove(Object obj)
+ *              - 查： get(int index)
+ *              - 改： set(int index, Object ele)
+ *              - 插： add(int index, Object ele)
+ *              - 长度： size()
+ *              - 遍历： Iterator迭代器遍历\增强for循环\普通for循环
  */
 public class ListTest {
     /**
@@ -136,9 +146,10 @@ public class ListTest {
 
         // 6. Object remove(int index); // 移除指定index位置的元素，并返回此元素
         System.out.println("---------6. Object remove(int index)------------");
-        System.out.println("remove第一个元素：" + arrayList.remove(0));
+        System.out.println("remove第一个元素：" + arrayList.remove(0)); // ArrayList中的remove()方法
         System.out.println("remove第二个元素：" + arrayList.remove(0));
         System.out.println("remove第三个元素：" + arrayList.remove(0));
+        arrayList.remove("456"); // Collection中的remove(Object obj)方法
         System.out.println("arrayList = " + arrayList);
 
         // 7. Object set(int index, Object ele); // 设置指定index位置的元素为ele，并返回old值
@@ -151,5 +162,34 @@ public class ListTest {
         List list1 = arrayList.subList(0, 4);
         System.out.println("arrayList.subList(0, 4) = " + list1);
         System.out.println("arrayList = " + arrayList);
+    }
+
+    /* 遍历方法 */
+    @Test
+    public void test02() {
+        ArrayList arrayList = new ArrayList();
+        arrayList.add(123);
+        arrayList.add("ANND");
+        arrayList.add("hello");
+        arrayList.add(new Person("Job", 18));
+
+        // 1. 使用Iterator进行遍历
+        System.out.println("1. 使用Iterator进行遍历");
+        Iterator iterator = arrayList.iterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+
+        // 2. 使用增强for循环
+        System.out.println("2. 使用增强for循环");
+        for (Object obj : arrayList) {
+            System.out.println(obj);
+        }
+
+        // 3. 使用普通for循环
+        System.out.println("3. 使用普通for循环");
+        for (int i = 0; i < arrayList.size(); ++i) {
+            System.out.println(arrayList.get(i));
+        }
     }
 }

@@ -548,3 +548,103 @@ class Person {
 
 
 
+## 10.7 List接口方法
+
+- List除了从Collection集合继承的方法外，List集合里添加了一些根据索引来操作集合元素的方法。
+
+  - ```java
+    void add(int index, Object ele); // 在index位置插入ele元素
+    boolean addAll(int index, Collection eles); // 从index位置开始将eles中的所有元素添加进来
+    Object get(int index); // 获取指定index位置的元素
+    int indexof(Object obj); // 返回第一次出现的位置，如果找不到则返回-1
+    int lastIndexOf(Object obj); // 返回obj在当前集合中末次出现的位置
+    Object remove(int index); // 移除指定index位置的元素，并返回 此元素
+    Object set(int index, Object ele); // 设置指定index位置的元素为ele，并返回old值
+    List subList(int fromIndex, int toIndex); // 返回从fromIndex到toIndex位置的子集合（左闭右开[fromIndex, toIndex)）
+    ```
+
+- 总结：常用方法
+
+  - 增： add(Object obj)
+  - 删： remove(int index) / remove(Object obj)
+  - 查： get(int index)
+  - 改： set(int index, Object ele)
+  - 插： add(int index, Object ele)
+  - 长度： size()
+  - 遍历： Iterator迭代器遍历\增强for循环\普通for循环
+
+  ```java
+  public void test02() {
+          ArrayList arrayList = new ArrayList();
+          arrayList.add(123);
+          arrayList.add("ANND");
+          arrayList.add("hello");
+          arrayList.add(new Person("Job", 18));
+  
+          // 1. 使用Iterator进行遍历
+          System.out.println("1. 使用Iterator进行遍历");
+          Iterator iterator = arrayList.iterator();
+          while (iterator.hasNext()) {
+              System.out.println(iterator.next());
+          }
+  
+          // 2. 使用增强for循环
+          System.out.println("2. 使用增强for循环");
+          for (Object obj : arrayList) {
+              System.out.println(obj);
+          }
+  
+          // 3. 使用普通for循环
+          System.out.println("3. 使用普通for循环");
+          for (int i = 0; i < arrayList.size(); ++i) {
+              System.out.println(arrayList.get(i));
+          }
+      }
+  ```
+
+
+
+## 10.8 List 面试题：
+
+```java
+package src;
+
+import org.junit.Test;
+
+import java.util.ArrayList;
+
+/**
+ * @ClassName: ListTestQuestion
+ * @Description: Java - remove()方法的调用问题
+ * @author: zhilx (zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/2/28 10:16
+ * @node: 区分list中的remove(int index) 和 remove(Object obj)方法
+ */
+public class ListTestQuestion {
+    @Test
+    public void test01() {
+        ArrayList arrayList = new ArrayList();
+        arrayList.add(1);
+        arrayList.add(2);
+        arrayList.add(3);
+        arrayList.add(4);
+        System.out.println(arrayList);
+        updateArrayList(arrayList);
+        System.out.println("调用updateArrayList : " + arrayList);
+        updateArrayList2(arrayList);
+        System.out.println("调用updateArrayList2 : " + arrayList);
+    }
+
+    public void updateArrayList(ArrayList arrayList) {
+        arrayList.remove(2); // 此时调用的是List中重载的remove(int index)方法
+    }
+
+    public void updateArrayList2(ArrayList arrayList) {
+        arrayList.remove(new Integer(2)); // 此时调用的为Collection中的remove(Object obj)方法
+    }
+
+}
+
+```
+
