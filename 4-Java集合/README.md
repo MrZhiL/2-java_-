@@ -47,6 +47,20 @@ Java集合可分为Collection和Map两种体系
 
 ## 10.3 Collection接口中的API
 
+- Q1:使用Collection集合存储对象时，要求对象属性的类满足：
+
+  向Collection接口的实现类的对象中添加数据obj时，要求obj所在类要重写equals()方法
+
+- Q2: Collenction集合与数组间的转换
+
+  - 集合->数组： toArray();
+
+    `Object[] arr = coll.toArray();`
+
+  - 数组->集合：调用Arrays类的静态方法asList();
+
+    `List<String> list = Arrays.asList("AA", "BB", "CC");`
+
 ```java
 package src;
 
@@ -281,6 +295,7 @@ class Person {
     }
 
     @Override
+    // 如果存储自定义类，则需要重写equals()方法，从而可以进行remove/contains()/等等方法的调用
     public boolean equals(Object o) {
         System.out.println("Person equals() ...");
         if (this == o) return true;
@@ -895,4 +910,62 @@ public class SetTest1 {
 - 在程序运行时，同一个对象多次调用hashCode()方法应该返回相同的值。
 - 当两个对象的equals()方法比较返回true时，这两个对象的hashCode()方法返回值也应相等。
 - 对象中用作equals()方法比较的Field，都应该用来计算hashCode值。
+
+
+
+## 10.9 练习：Set接口的两个小问题
+
+### 1. 在List内去除重复数字值，要求尽量简单
+
+```java
+public static List duplicateList(List list) {
+	HashSet set = new HashSet();
+	set.addAll(list);
+	return new ArrayList(set);
+}
+
+public static void main(String[] args) {
+	List list = new ArrayList();
+	list.add(new Integer(1));
+	list.add(new Integer(2));
+	list.add(new Integer(2));
+	list.add(new Integer(4));
+	list.add(new Integer(4));
+	List list2 = duplicateList(list);
+	for (Object integer : list2) {
+		System.out.println(integer);
+	}
+}
+```
+
+
+
+## 2. 去除List内的重复自定义类：
+
+```java
+public void test02() {
+        HashSet set = new HashSet();
+        Person p1 = new Person("jack", 21);
+        Person p2 = new Person("jerry", 22);
+
+        set.add(p1);
+        set.add(p2);
+        System.out.println("set : \n" + set); // [Person{name='jack', age=21}, Person{name='jerry', age=22}]
+
+        System.out.println("-----set.remove(p1)--------");
+        p1.setName("Marry");
+        // 此时set中存储p1元素为Person{name='jack', age=21}的哈希值，此时p1为{Marry, 21}，可以发现两者的hash值不同，因此remove失败
+        boolean remove = set.remove(p1);
+        System.out.println(remove); // false
+        System.out.println(set);    // [Person{name='Marry', age=21}, Person{name='jerry', age=22}]
+
+        System.out.println("------set.add(p1)----------");
+        // 因为set中之前没有存储{Marry, 21}所对应的hash值的元素，因此此时会添加成功，此时set元素为3个
+        set.add(new Person("Marry", 21)); // [Person{name='Marry', age=21}, Person{name='Marry', age=21}, Person{name='jerry', age=22}]
+        System.out.println(set);
+        // 因为set中之前的p1{Jack, 21}已经被更改为了{Marry， 21}，当再次添加该元素时：hash值相同，但是equals()比较返回false，因此可以添加 成功。此时set中的元素数量为4
+        set.add(new Person("Jack", 21)); // [Person{name='Marry', age=21}, Person{name='Marry', age=21}, Person{name='Jack', age=21}, Person{name='jerry', age=22}]
+        System.out.println(set);
+    }
+```
 
