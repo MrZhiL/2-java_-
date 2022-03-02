@@ -37,29 +37,29 @@ Java集合可分为Collection和Map两种体系
 
 - Collection接口继承树
 
-  ![image-20220224125143484](D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220224125143484.png)
+  <img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220224125143484.png" alt="image-20220224125143484" style="zoom: 67%;" />
 
 - Map接口继承树
 
-  ​	![image-20220224125230891](D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220224125230891.png)
+  ​	<img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220224125230891.png" alt="image-20220224125230891" style="zoom:67%;" />
 
 
 
 ## 10.3 Collection接口中的API
 
-- Q1:使用Collection集合存储对象时，要求对象属性的类满足：
+### Q1:使用Collection集合存储对象时，要求对象属性的类满足：
 
-  向Collection接口的实现类的对象中添加数据obj时，要求obj所在类要重写equals()方法
+向Collection接口的实现类的对象中添加数据obj时，要求obj所在类要重写equals()方法
 
-- Q2: Collenction集合与数组间的转换
+### Q2: Collenction集合与数组间的转换
 
-  - 集合->数组： toArray();
+- 集合->数组： toArray();
 
-    `Object[] arr = coll.toArray();`
+  `Object[] arr = coll.toArray();`
 
-  - 数组->集合：调用Arrays类的静态方法asList();
+- 数组->集合：调用Arrays类的静态方法asList();
 
-    `List<String> list = Arrays.asList("AA", "BB", "CC");`
+  `List<String> list = Arrays.asList("AA", "BB", "CC");`
 
 ```java
 package src;
@@ -940,7 +940,7 @@ public static void main(String[] args) {
 
 
 
-## 2. 去除List内的重复自定义类：
+### 2. 去除List内的重复自定义类：
 
 ```java
 public void test02() {
@@ -969,3 +969,402 @@ public void test02() {
     }
 ```
 
+
+
+## 10.10 Map接口：
+
+### 1. Map实现类的结构
+
+- Map: 双列数据，存储key-value键值对
+
+  ​    |----HashMap: 作为Map的主要实现类 (jdk 1.2)；线程不安全的，效率高；可以存储null的key和value
+
+  ​			|----LinkedHashMap (jdk 1.4): 包装在遍历map元素时，可以按照添加的顺序实现遍历。
+
+  ​					原因：在原有的HashMap底层结构基础上，添加了一对指针，指向前一个和后一个元素。
+
+  ​					对于频繁的遍历操作，此类执行效率高于HashMap。
+
+  ​	 |----TreeMap : 包装按照添加的key-value键值对进行排序，实现排序遍历。此时考虑key的自然排序或定制排序 （底层使用红黑树）
+
+  ​	 |----Hashtable: 作为Map的古老实现类（jdk1.0)；线程安全的，效率高；不可以存储null的key和value
+
+  ​			|----Properties: 常用来处理配置文件。key和value都是String类型的5
+
+- HaspMap的底层：（jdk7.0及之前）数组+链表； （jdk8之后）数组+链表+红黑树，为了提高效率
+
+- 面试题：
+
+  1. HashMap的底层实现原理？
+
+  2. HashMap和Hashtable的异同？
+  3. CurrentHaspMap 与 Hashtable的异同？
+
+- ```java
+  Map map = new HashMap();
+  map.put(null, 123); // right, 可以存储key为null的元素
+  map.put(null, numm);// right, 可以存储value为null的元素
+  
+  Map map2 = new Hashtable();
+  map2.put(null, 123); // error, Hashtable不可以存储key或value为null的元素
+  ```
+
+  
+
+<img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220301150739510-16461207409962.png" alt="image-20220301150739510" style="zoom:67%;" />
+
+
+
+### 2. Map接口中key-value的特点 
+
+- Map中的key：无序的、不可重复的，使用Set存储是所有的key --> **要求key所在的类要重写eauqls()和hashCode()方法（以HashMap为例）**
+
+- Map中的value：无序的、可重复的，使用Collection存储所有的value --> value所在的类需要重写equals()方法
+
+- 一个键值对：key-value构成了一个Entry对象
+
+- Map中的Entry：无序的、不可重复的，使用set存储所有的Entry对象。
+
+  map中存储key-value可以看做是存储在Set集合中的entry实体对象，每个entry中包含key和value两个属性。
+
+<img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220301154532904.png" alt="image-20220301154532904" style="zoom:67%;" />
+
+### 3. HashMap的底层实现原理：
+
+HashMap中的内部类：Node
+
+```java
+static class Node<K,V> implements Map.Entry<K,V> {
+    final int hash;
+    final K key;
+    V value;
+    Node<K,V> next;
+	....        
+}
+```
+
+
+
+#### 3.1 在JDK7中：HashMap map = new HashMap();
+
+1. 在实例化以后，底层创建了一个长度为16的一维数组Entry[] table.
+2. ...可能执行过多次put...
+   1. `map.put(key1, value1);`
+   2. 首先，调用key1所在类的hashCode()计算key1的哈希值，此哈希值经过某种散列函数计算以后，得到在Entry数组中的存放位置。
+      1. (**情况一**) 如果此位置上的数据为空，此时的key1-value1添加成功；
+      2. 如果此位置上的数据不为空（意味着此位置上存在一个或多个数据（以链表形式存在）），然后比较key1和已经存在的一个或多个数据的哈希值：
+         - 如果key1 的哈希值与已经存在的数据的哈希值都不相同，此时key1-value1添加成功
+         - 如果key1的哈希值和已经存在的某一个元素(key2-value2)的哈希值相同，继续比较, 调用key1所在类的equals(key2) :
+           - (**情况二**) 如果equals()返回false，此时key1-value1添加成功
+           - (**情况三**) 如果equals()返回true，此时使用value1来替换value2
+3. 补充：关于情况2和情况3：此时key1-value1和原来的数据以链表的方式存储。
+4. 在不断添加元素的过程中，会设计到扩容问题，默认的扩容方式：当插入元素key值不为null且数量超出threshold值时，扩容为原来的2倍，并将之前的数据拷贝进去。
+
+#### 3.2 JDK8与JDK7中在底层实现方式的不同：
+
+1. new HashMap()； 此时底层没有创建一个长度为16的数组
+2. jdk8底层的数组是：Node[]类型，而非Entry[]
+3. 首次调用put()方法时，底层会创建长度为16的数组
+4. jdk7底层结构只有**数组+链表**；jdk8中底层为 **数组+链表+红黑树**
+   - 当数组的某一个所有位置上的元素以链表形式存在的数据个数 > 8 且当前数组的长度超过64，此时此索引位置上的所有数据改为红黑树存储。
+
+
+
+#### 3.3 HashMap源码中的重要常量
+
+- `DEFAULT_INITIAL_CAPACITY` : HashMap的默认容量，16
+- `MAXIMUM_CAPACITY` : HashMap的最大支持容量，2^30
+- `DEFAULT_LOAD_FACTOR` : HashMap的默认加载因子
+- `TREEIFY_THRESHOLD` : Bucket中链表长度大于该默认值，转化为红黑树
+- `UNTREEIFY_THRESHOLD` : Bucket中红黑树存储的Node小于该默认值，转化为链表
+- `MIN_TREEIFY_CAPACITY` （64）: 桶中的Node被树化时最小的hash表容量。（当桶中Node的数量大到需要变为红黑树时，若hash表容量小于MIN_TREEIFY_CAPACITY时，此时应执行resize()扩容操作这个MIN_TREEIFY_CAPACITY的值至少是TREEIFY_THRESHOLD的4倍）。
+- `table` : 存储元素的数组，总是2的n次幂
+- `entrySet` : 存储具体元素的集
+- `size` : HashMap中存储键值对的数量
+- `modCount` : HashMap扩容和结构改变的次数
+- `threshold` : 扩容的临界值， = 容量*填充因子
+- `loadFactor` ：填充因子
+
+
+
+### 4. LinkedHashMap的底层实现原理
+
+LinkedHashMap中的内部类：Entry
+
+```java
+/**
+ * HashMap.Node subclass for normal LinkedHashMap entries.
+ */
+static class Entry<K,V> extends HashMap.Node<K,V> {
+    Entry<K,V> before, after; // 此时可以记录添加元素的上一个和后一个元素的顺序
+    Entry(int hash, K key, V value, Node<K,V> next) {
+        super(hash, key, value, next);
+    }
+}
+```
+
+
+
+## 10.11 Map接口中的常用方法
+
+- 添加、删除、修改操作
+  - Object put(Object key, Object value) : 将指定key-value添加到（或修改）当前map对象中
+  - void putAll(Map m) : 将m中的所有key-value对存放到当前map中
+  - Object remove(Object key) : 移除指定key的key-value对，并返回value
+  - void clear() : 清空当前map中的所有数据
+- 元素查询的操作：
+  - Object get(Object key) : 获取指定key对应的value
+  - boolean containsKey(Object key) : 是否包含指定的key
+  - boolean containsValue(Objecct value) : 是否包含指定的value
+  - int size() : 返回map中key-value对的个数
+  - boolean isEmpty()：判断当前map是否为空
+  - boolean equals(Object obj) : 判断当前map和参数对象obj是否相等
+- 元视图操作的方法：
+  - Set keySet() : 返回所有key构成的Set集合
+  - Collection values()：返回所有value构成的Collection集合
+  - Set entrySet(): 返回所有key-value对构成的Set集合
+
+```java
+@Test
+    public void test01() {
+        /** 添加、删除、修改操作
+            1. - Object put(Object key, Object value) : 将指定key-value添加到（或修改）当前map对象中
+            2. - void putAll(Map m) : 将m中的所有key-value对存放到当前map中
+            3. - Object remove(Object key) : 移除指定key的key-value对，并返回value
+            4. - void clear() : 清空当前map中的所有数据
+        */
+        Map map = new HashMap();
+        // 1. 使用put方法进行元素的添加
+        map.put("AA", 123);
+        map.put("BB", 234);
+        map.put("CC", 456);
+        map.put("DD", 123);
+        map.put(999, 888);
+        System.out.println("使用put()方法进行添加：" + map);
+
+        // 2. 使用put方法进行元素的修改
+        map.put("AA", 111);
+        System.out.println("使用put()方法进行修改：" + map);
+
+        // 3. 使用remove方法移除指定key值的元素
+        map.remove(999);
+        System.out.println("调用remove()方法移除指定key的元素：" + map);
+
+        // 4. 调用clear()方法清空map中的数据
+        System.out.println("清空前 : " + map.size());
+        map.clear();
+        System.out.println("清空后 : " + map.size());
+    }
+
+    @Test
+    public void test02() {
+        /** 元素查询的操作：
+            1. Object get(Object key) : 获取指定key对应的value
+            2. boolean containsKey(Object key) : 是否包含指定的key
+            3. boolean containsValue(Objecct value) : 是否包含指定的value
+            4. int size() : 返回map中key-value对的个数
+            5. boolean isEmpty()：判断当前map是否为空
+            6. boolean equals(Object obj) : 判断当前map和参数对象obj是否相等
+         */
+        Map map = new HashMap();
+        map.put("AA", 123);
+        map.put("BB", 234);
+        map.put("CC", 456);
+        map.put("DD", 123);
+        map.put(999, 888);
+        System.out.println("原数据 : " + map);
+
+        // 1. Object get(Object key) : 获取指定key对应的value
+        Object o = map.get(999);
+        System.out.println("map中是否包含key为999的元素：" + o);  // 888
+        System.out.println("map中是否包含key为888的元素：" + map.get(888));  // null
+
+        // 2. boolean containsKey(Object key) : 是否包含指定的key
+        boolean cc = map.containsKey("CC");
+        boolean ccc = map.containsKey("CCC");
+        System.out.println("map.containsKey(\"CC\") = " + cc); // true
+        System.out.println("map.containsKey(\"CCC\") = " + ccc); // false
+
+        // 3. boolean containsValue(Objecct value) : 是否包含指定的value
+        boolean b1 = map.containsValue(123);
+        boolean b2 = map.containsValue(888);
+        System.out.println("map.containsValue(123) = " + b1); // true
+        System.out.println("map.containsValue(888) = " + b2); // false
+
+        // 4. 判断是否为空
+        System.out.println("map.isEmpty() = " + map.isEmpty());
+        map.clear();
+        System.out.println("-----调用map.clear()----");
+        System.out.println("map.isEmpty() = " + map.isEmpty());
+
+        // 5. equals(Object obj) : 判断当前map和参数对象obj是否相等
+    }
+
+    @Test
+    public void test03() {
+        /**（3） 元视图操作的方法：
+            1. Set keySet() : 返回所有key构成的Set集合
+            2. Collection values()：返回所有value构成的Collection集合
+            3. Set entrySet(): 返回所有key-value对构成的Set集合
+         */
+        Map map = new HashMap();
+        map.put("AA", 123);
+        map.put("BB", 234);
+        map.put(999, 888);
+        map.put("CC", 456);
+        map.put("DD", 123);
+        System.out.println("原数据 : " + map); // {AA=123, BB=234, CC=456, DD=123, 999=888}
+
+        // 1.Set keySet() : 返回所有key构成的Set集合
+        Set set = map.keySet();
+        System.out.println("map中的所有key构成的Set集合: " + set); // [AA, BB, CC, DD, 999]
+        System.out.println("使用Iterator查看Set中的元素: ");
+        Iterator iterator = set.iterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+        
+        // 2. Collection values()：返回所有value构成的Collection集合（此时可以包含重复的value）
+        Collection values = map.values();
+        System.out.println("map中所有value构成的集合: " + values); // [123, 234, 456, 123, 888]
+
+        Set value2 = new HashSet(); // 通过set集合可以去除重复元素
+        value2.addAll(values);
+        System.out.println("map中所有value构成的集合: " + value2); // [456, 888, 234, 123]
+
+        // 3. Set entrySet(): 返回所有key-value对构成的Set集合(此时得到的都是Entry对象)
+        Set set2 = map.entrySet();
+        System.out.println("map中所有key-value构成的Set集合 : " + set2); // [AA=123, BB=234, CC=456, DD=123, 999=888]
+        System.out.println("使用增强for循环遍历set2中的元素: ");
+        for (Object o : set2) {
+            Map.Entry entry = (Map.Entry) o;
+            System.out.println("key = " + entry.getKey() + ", value = " + entry.getValue());
+        }
+    }
+```
+
+
+
+## 10.12 TreeMap
+
+```java
+/**
+ * @ClassName: TreeMapTest
+ * @Description: Java - TreeMap测试
+ * @author: zhilx (zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/3/2 16:14
+ * @node:
+ *        1. 向TreeMap中添加key-value时，要求key必须是由同一个类创建的对象
+ *           因为要按照key值进行排序：自然排序和定制排序两种
+ */
+public class TreeMapTest {
+    @Test
+    public void test01() {
+        // 使用自然排序
+        System.out.println("使用自然排序：Collection中的重写compareTo()方法：指定按照姓名从大到小，年龄从小到大");
+        TreeMap map = new TreeMap();
+
+        Person p1 = new Person("Tom", 21);
+        Person p2 = new Person("Jack", 17);
+        Person p3 = new Person("Jerry", 34);
+        Person p4 = new Person("Smith", 19);
+        Person p5 = new Person("Meiko", 41);
+        Person p6 = new Person("Kity", 12);
+        Person p7 = new Person("Jack", 37);
+
+        map.put(p1, 98);
+        map.put(p2, 120);
+        map.put(p3, 87);
+        map.put(p4, 142);
+        map.put(p5, 99);
+        map.put(p6, 110);
+        map.put(p7, 99);
+
+        // 输出：
+        Set set = map.entrySet();
+        for (Object o : set) {
+            Map.Entry entry = (Map.Entry)o;
+            System.out.println("key = " + entry.getKey() + ", value = " + entry.getValue());
+        }
+    }
+
+    @Test
+    public void test02() {
+        System.out.println("使用定制排序：指定按照年龄从大到小，姓名从小到大");
+        Comparator comparator = new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                if (o1 instanceof Person && o2 instanceof Person) {
+                    Person p1 = (Person) o1;
+                    Person p2 = (Person) o2;
+
+                    int age = Integer.compare(p1.getAge(), p2.getAge());
+                    if (age != 0) {
+                        return -age;
+                    }
+
+                    return p1.getName().compareTo(p2.getName());
+                }
+                throw new RuntimeException("传输类型参数不匹配!");
+            }
+        };
+
+
+        TreeMap map = new TreeMap(comparator);
+
+        Person p1 = new Person("Tom", 21);
+        Person p2 = new Person("Jack", 17);
+        Person p3 = new Person("Jerry", 34);
+        Person p4 = new Person("Smith", 19);
+        Person p5 = new Person("Meiko", 41);
+        Person p6 = new Person("Kity", 12);
+        Person p7 = new Person("Jack", 37);
+
+        map.put(p1, 98);
+        map.put(p2, 120);
+        map.put(p3, 87);
+        map.put(p4, 142);
+        map.put(p5, 99);
+        map.put(p6, 110);
+        map.put(p7, 99);
+
+        // 输出：
+        Set set = map.entrySet();
+        for (Object o : set) {
+            Map.Entry entry = (Map.Entry)o;
+            System.out.println("key = " + entry.getKey() + ", value = " + entry.getValue());
+        }
+    }
+}
+```
+
+
+
+## 10.13 Map实现类之五：Properties
+
+- Properties类是Hashtable的子类，该对象用于处理属性文件	
+
+- 由于属性文件里的key、value都是字符串类型，**所以Properties里的key和value都是字符串类型**
+
+- 存取数据时，建议使用setProperty(String key, String value)方法和getProperty(String key)方法
+
+- ```java
+  Properties pros = new Properties();
+  pros.load(new FileInputStream("jdbc.properties"));
+  String user = pros.getProperty("user");
+  System.out.println(user);
+  ```
+
+  
+
+## 10.14 Collections工具类（操作数组的工具类Arrays）
+
+- Collections是一个操作Set、List和Map等集合的工具类
+- Collections中提供了一系列静态的方法对集合元素进行排序、查询和修改等操作，还提供了对集合对象设置不可变、对集合对象实现同步控制等方法。
+- 排序操作（均为static方法）：
+  - reverse(List) : 反转List中元素的顺序
+  - shuffle(List) : 对List集合元素进行随机排序
+  - sort(List) : 根据元素的自然顺序对指定List集合元素按升序排序
+  - sort(List,  Comparator) : 根据指定的Comparator产生的顺序对List集合元素进行排序
+  - swap(List, int, int) :  将指定list集合中的第i个元素和第j个元素进行交换
