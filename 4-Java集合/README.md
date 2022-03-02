@@ -488,11 +488,11 @@ class Person {
 
 - LinkedList：双向链表，内部没有声明数组，而是定义了Node类型的first和last，用于记录首末元素。同时，定义内部类Node，作为LinkedList中保存数据的基本结构。Node除了保存数据，还定义了两个变量：
 
-  - prev变量记录前一个元素的位置
+    - prev变量记录前一个元素的位置
 
-  - next变量记录下一个元素的位置
+    - next变量记录下一个元素的位置
 
-  - ```java
+    - ```java
     private static class Node<E> {
     	E item;
     	Node<E> next;
@@ -505,30 +505,30 @@ class Person {
     	}
     }
     ```
-
-  - ![image-20220226100821318](D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220226100821318-16458413188931.png)
+    
+    - ![image-20220226100821318](D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220226100821318-16458413188931.png)
 
 ### 3. ArrayList的源码分析：
 
 - jdk7下：
 
-  - ArrayList list = new ArrayList(); // 底层创建了长度是10的Object[]数组的elementData
+    - ArrayList list = new ArrayList(); // 底层创建了长度是10的Object[]数组的elementData
 
-  - list.add(123); // elementData[0] = new Integer(123);
+    - list.add(123); // elementData[0] = new Integer(123);
 
-    ...
+      ...
 
-    list.add(11); // 如果此次的添加导致底层elementData数组容量不够，则扩容：
+      list.add(11); // 如果此次的添加导致底层elementData数组容量不够，则扩容：
 
-  - **默认情况下，扩容为原来容量的1.5倍，同时需要将原有数组中的内容赋值到新的数组中**
+    - **默认情况下，扩容为原来容量的1.5倍，同时需要将原有数组中的内容赋值到新的数组中**
 
-  - 结论：建议开发中使用代餐的构造器：ArrayList list = new ArrayList(int capacity);
+    - 结论：建议开发中使用代餐的构造器：ArrayList list = new ArrayList(int capacity);
 
 - JDK8中的ArrayList变化：
-  - ArrayList list = new ArrayList(); // 底层Object[] elementData初始化为{}，并没有创建长度
-  - list.add(123); // 第一次调用add()时，底层才创建了长度为10的数组，并将123添加到elementData中
-  - ...
-  - 后续的添加可扩展操作与jdk 7 相同
+    - ArrayList list = new ArrayList(); // 底层Object[] elementData初始化为{}，并没有创建长度
+    - list.add(123); // 第一次调用add()时，底层才创建了长度为10的数组，并将123添加到elementData中
+    - ...
+    - 后续的添加可扩展操作与jdk 7 相同
 - 小结：jdk7中的ArrayList的创建对象类似于单例的饿汉式；而jdk8中的ArrayList的对象的创建类似于单例的懒汉式，延迟了数组的创建，节省内存。
 
 ### 4. LinkedList源码分析
@@ -567,7 +567,7 @@ class Person {
 
 - List除了从Collection集合继承的方法外，List集合里添加了一些根据索引来操作集合元素的方法。
 
-  - ```java
+    - ```java
     void add(int index, Object ele); // 在index位置插入ele元素
     boolean addAll(int index, Collection eles); // 从index位置开始将eles中的所有元素添加进来
     Object get(int index); // 获取指定index位置的元素
@@ -580,13 +580,13 @@ class Person {
 
 - 总结：常用方法
 
-  - 增： add(Object obj)
-  - 删： remove(int index) / remove(Object obj)
-  - 查： get(int index)
-  - 改： set(int index, Object ele)
-  - 插： add(int index, Object ele)
-  - 长度： size()
-  - 遍历： Iterator迭代器遍历\增强for循环\普通for循环
+    - 增： add(Object obj)
+    - 删： remove(int index) / remove(Object obj)
+    - 查： get(int index)
+    - 改： set(int index, Object ele)
+    - 插： add(int index, Object ele)
+    - 长度： size()
+    - 遍历： Iterator迭代器遍历\增强for循环\普通for循环
 
   ```java
   public void test02() {
@@ -681,9 +681,9 @@ public class ListTestQuestion {
 
 - HashSet具有以下特点：
 
-  - 不能保证元素的排列顺序
-  - HashSet不是线程安全的
-  - 集合元素可以是**null**
+    - 不能保证元素的排列顺序
+    - HashSet不是线程安全的
+    - 集合元素可以是**null**
 
 - **HashSet集合判断两个元素相等的标准：**两个对象通过hashCode()方法比较相等，并且两个对象的equals()方法返回值也相等。
 
@@ -700,7 +700,7 @@ public class ListTestQuestion {
    *            2. 不可重复性：保证添加的元素按照equals()判断时，不能返回true：即，相同的元素只能添加一个
   ```
 
-  
+
 
 ```java
 package src.SetTest;
@@ -762,16 +762,16 @@ public class SetTest1 {
 *            我们向HashSet中添加元素a，首先调用元素a所在类的hashCode()方法，计算元素a的哈希值，
 *            此哈希值接着通过某种散列算法（散列表+数组）计算出差在HashSet底层数组中的存放位置（即为，索引位置），
 * 判断数组此位置上是否已经有元素：
-  * 1). 如果此位置上没有元素，则元素a添加成功；
+    * 1). 如果此位置上没有元素，则元素a添加成功；
 
-  * 2). 如果存在其他元素b（或以链表形式存在多个元素），则比较元素a与元素b（或链表中的多个元素）的哈希值：
+    * 2). 如果存在其他元素b（或以链表形式存在多个元素），则比较元素a与元素b（或链表中的多个元素）的哈希值：
 
-  * 如果hash值不相同，则元素a添加成功；
+    * 如果hash值不相同，则元素a添加成功；
 
-    如果hash值相同，进而调用元素a所在类的equals()方法进行比较，如果返回true，则添加失败，如果返回false，则添加成功。
-    *
+      如果hash值相同，进而调用元素a所在类的equals()方法进行比较，如果返回true，则添加失败，如果返回false，则添加成功。
+        *
 
-  *              对于添加成功的情况2)和3)而言：元素a与已经存在指定索引位置上的数据以链表的形式存储：
+    *              对于添加成功的情况2)和3)而言：元素a与已经存在指定索引位置上的数据以链表的形式存储：
 * jdk7中：元素a放到数组中，指向原来的元素；jdk8中：原来的元素在数组中指向元素a。
 * 总结：七上八下。HashSet底层：数组+链表的结构
 
@@ -889,7 +889,7 @@ public class SetTest1 {
   
   ```
 
-  
+
 
 ## 10.8 Eclipse/IDEA工具里hashCode()的重写
 
@@ -903,7 +903,7 @@ public class SetTest1 {
 
 - 31是一个素数，素数作用就是如果我用一个数字来乘以这个素数，那么最终出来的结果只能被素数本身和被乘数1来整除！（减少冲突）
 
-  
+
 
 重写hashCode()方法的基本原则：
 
@@ -995,10 +995,10 @@ public void test02() {
 
 - 面试题：
 
-  1. HashMap的底层实现原理？
+    1. HashMap的底层实现原理？
 
-  2. HashMap和Hashtable的异同？
-  3. CurrentHaspMap 与 Hashtable的异同？
+    2. HashMap和Hashtable的异同？
+    3. CurrentHaspMap 与 Hashtable的异同？
 
 - ```java
   Map map = new HashMap();
@@ -1009,13 +1009,13 @@ public void test02() {
   map2.put(null, 123); // error, Hashtable不可以存储key或value为null的元素
   ```
 
-  
+
 
 <img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合\README.assets\image-20220301150739510-16461207409962.png" alt="image-20220301150739510" style="zoom:67%;" />
 
 
 
-### 2. Map接口中key-value的特点 
+### 2. Map接口中key-value的特点
 
 - Map中的key：无序的、不可重复的，使用Set存储是所有的key --> **要求key所在的类要重写eauqls()和hashCode()方法（以HashMap为例）**
 
@@ -1049,14 +1049,14 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 1. 在实例化以后，底层创建了一个长度为16的一维数组Entry[] table.
 2. ...可能执行过多次put...
-   1. `map.put(key1, value1);`
-   2. 首先，调用key1所在类的hashCode()计算key1的哈希值，此哈希值经过某种散列函数计算以后，得到在Entry数组中的存放位置。
-      1. (**情况一**) 如果此位置上的数据为空，此时的key1-value1添加成功；
-      2. 如果此位置上的数据不为空（意味着此位置上存在一个或多个数据（以链表形式存在）），然后比较key1和已经存在的一个或多个数据的哈希值：
-         - 如果key1 的哈希值与已经存在的数据的哈希值都不相同，此时key1-value1添加成功
-         - 如果key1的哈希值和已经存在的某一个元素(key2-value2)的哈希值相同，继续比较, 调用key1所在类的equals(key2) :
-           - (**情况二**) 如果equals()返回false，此时key1-value1添加成功
-           - (**情况三**) 如果equals()返回true，此时使用value1来替换value2
+    1. `map.put(key1, value1);`
+    2. 首先，调用key1所在类的hashCode()计算key1的哈希值，此哈希值经过某种散列函数计算以后，得到在Entry数组中的存放位置。
+        1. (**情况一**) 如果此位置上的数据为空，此时的key1-value1添加成功；
+        2. 如果此位置上的数据不为空（意味着此位置上存在一个或多个数据（以链表形式存在）），然后比较key1和已经存在的一个或多个数据的哈希值：
+            - 如果key1 的哈希值与已经存在的数据的哈希值都不相同，此时key1-value1添加成功
+            - 如果key1的哈希值和已经存在的某一个元素(key2-value2)的哈希值相同，继续比较, 调用key1所在类的equals(key2) :
+                - (**情况二**) 如果equals()返回false，此时key1-value1添加成功
+                - (**情况三**) 如果equals()返回true，此时使用value1来替换value2
 3. 补充：关于情况2和情况3：此时key1-value1和原来的数据以链表的方式存储。
 4. 在不断添加元素的过程中，会设计到扩容问题，默认的扩容方式：当插入元素key值不为null且数量超出threshold值时，扩容为原来的2倍，并将之前的数据拷贝进去。
 
@@ -1066,7 +1066,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
 2. jdk8底层的数组是：Node[]类型，而非Entry[]
 3. 首次调用put()方法时，底层会创建长度为16的数组
 4. jdk7底层结构只有**数组+链表**；jdk8中底层为 **数组+链表+红黑树**
-   - 当数组的某一个所有位置上的元素以链表形式存在的数据个数 > 8 且当前数组的长度超过64，此时此索引位置上的所有数据改为红黑树存储。
+    - 当数组的某一个所有位置上的元素以链表形式存在的数据个数 > 8 且当前数组的长度超过64，此时此索引位置上的所有数据改为红黑树存储。
 
 
 
@@ -1108,21 +1108,21 @@ static class Entry<K,V> extends HashMap.Node<K,V> {
 ## 10.11 Map接口中的常用方法
 
 - 添加、删除、修改操作
-  - Object put(Object key, Object value) : 将指定key-value添加到（或修改）当前map对象中
-  - void putAll(Map m) : 将m中的所有key-value对存放到当前map中
-  - Object remove(Object key) : 移除指定key的key-value对，并返回value
-  - void clear() : 清空当前map中的所有数据
+    - Object put(Object key, Object value) : 将指定key-value添加到（或修改）当前map对象中
+    - void putAll(Map m) : 将m中的所有key-value对存放到当前map中
+    - Object remove(Object key) : 移除指定key的key-value对，并返回value
+    - void clear() : 清空当前map中的所有数据
 - 元素查询的操作：
-  - Object get(Object key) : 获取指定key对应的value
-  - boolean containsKey(Object key) : 是否包含指定的key
-  - boolean containsValue(Objecct value) : 是否包含指定的value
-  - int size() : 返回map中key-value对的个数
-  - boolean isEmpty()：判断当前map是否为空
-  - boolean equals(Object obj) : 判断当前map和参数对象obj是否相等
+    - Object get(Object key) : 获取指定key对应的value
+    - boolean containsKey(Object key) : 是否包含指定的key
+    - boolean containsValue(Objecct value) : 是否包含指定的value
+    - int size() : 返回map中key-value对的个数
+    - boolean isEmpty()：判断当前map是否为空
+    - boolean equals(Object obj) : 判断当前map和参数对象obj是否相等
 - 元视图操作的方法：
-  - Set keySet() : 返回所有key构成的Set集合
-  - Collection values()：返回所有value构成的Collection集合
-  - Set entrySet(): 返回所有key-value对构成的Set集合
+    - Set keySet() : 返回所有key构成的Set集合
+    - Collection values()：返回所有value构成的Collection集合
+    - Set entrySet(): 返回所有key-value对构成的Set集合
 
 ```java
 @Test
@@ -1343,7 +1343,7 @@ public class TreeMapTest {
 
 ## 10.13 Map实现类之五：Properties
 
-- Properties类是Hashtable的子类，该对象用于处理属性文件	
+- Properties类是Hashtable的子类，该对象用于处理属性文件
 
 - 由于属性文件里的key、value都是字符串类型，**所以Properties里的key和value都是字符串类型**
 
@@ -1356,15 +1356,100 @@ public class TreeMapTest {
   System.out.println(user);
   ```
 
-  
+
 
 ## 10.14 Collections工具类（操作数组的工具类Arrays）
 
 - Collections是一个操作Set、List和Map等集合的工具类
+
 - Collections中提供了一系列静态的方法对集合元素进行排序、查询和修改等操作，还提供了对集合对象设置不可变、对集合对象实现同步控制等方法。
+
 - 排序操作（均为static方法）：
-  - reverse(List) : 反转List中元素的顺序
-  - shuffle(List) : 对List集合元素进行随机排序
-  - sort(List) : 根据元素的自然顺序对指定List集合元素按升序排序
-  - sort(List,  Comparator) : 根据指定的Comparator产生的顺序对List集合元素进行排序
-  - swap(List, int, int) :  将指定list集合中的第i个元素和第j个元素进行交换
+    - reverse(List) : 反转List中元素的顺序
+    - shuffle(List) : 对List集合元素进行随机排序
+    - sort(List) : 根据元素的自然顺序对指定List集合元素按升序排序
+    - sort(List,  Comparator) : 根据指定的Comparator产生的顺序对List集合元素进行排序
+    - swap(List, int, int) :  将指定list集合中的第i个元素和第j个元素进行交换
+    
+- 查找、替换：
+
+    - Object max(Collection) : 根据元素的自然顺序，返回给定集合中的最大元素
+    - Object max(Collection, Comparator) : 根据comparator指定的顺序，返回给定集合中的最大元素
+    - Object min(Collection) 
+    - Object min(Collection, Comparator) 
+    - int frequency(Collection, Object) ：返回指定集合中指定元素的出现次数
+    - void copy(List dest, List src) ： 将src中的内容赋值到dest中（需要dest中的长度大于src中的长度，即dest.size() >= src.size()）
+    - boolean replaceAll(List list, Object oldVal, Object newVal) : 使用新值替换List对象的所有的oldVa旧值。
+
+- ```java
+    public void test01() {
+            List list = new ArrayList();
+            for (int i = 0; i < 10; ++i) {
+                list.add((int)(Math.random()*100));
+            }
+    
+            System.out.println("原list : " + list);
+    
+            // 1. reverse(list)，反转list
+            Collections.reverse(list);
+            System.out.println("反转list : " + list);
+    
+            // 2. shuffle(List) : 对List集合元素进行随机排序
+            Collections.shuffle(list);
+            System.out.println("shuffle : " + list);
+    
+            // 3. sort(List) : 根据元素的自然顺序对指定List集合元素按升序排序
+            Collections.sort(list);
+            System.out.println("排序后: " + list);
+    
+            // 4. swap(List, int, int) :  将指定list集合中的第i个元素和第j个元素进行交换
+            Collections.swap(list, 0, 1);
+            System.out.println("swap(list, 0, 1) = " + list);
+    
+            // 5. max(Collection) : 根据元素的自然顺序，返回给定集合中的最大元素
+            list.add(133);
+            list.add(133);
+            list.add(133);
+            System.out.println("\nlist = " + list);
+            System.out.println("max(list) = " + Collections.max(list));
+            System.out.println("min(list) = " + Collections.min(list));
+    
+            // 6. int frequency(Collection, Object) ：返回指定集合中指定元素的出现次数
+            System.out.println("frequency(list, 133) = " + Collections.frequency(list, 133));
+            System.out.println("frequency(list, 125) = " + Collections.frequency(list, 125));
+    
+            // 7. note: void copy(List dest, List src) ： 将src中的内容赋值到dest中（需要dest中的长度大于src中的长度，即dest.size() >= src.size()）
+    
+            // 此时会报错（java.lang.IndexOutOfBoundsException: Source does not fit in dest），因为dest的长度小于list长度
+            // List dest = new ArrayList();
+            // Collections.copy(dest, list);
+    
+            // 正确的方法：
+            List dest = Arrays.asList(new Object[list.size()]); // 此时通过Arrays数组来指定dest的大小
+            System.out.println("\ndest = " + dest);
+            Collections.copy(dest, list);
+            System.out.println("dest = " + dest);
+    
+            // 8. 使用新值替换List对象的所有旧值。
+            Collections.replaceAll(dest, 133, -99);
+            System.out.println("replaceAll(dest, 133, -99) = " + dest);
+    
+            // 9. Collections常用方法：同步控制**
+            // *              Collections类中提供了多个synchronizedXxx()方法，该方法可使将指定集合包装成线程同步的集合，从而可以解决多线程并发访问集合时的线程安全问题。
+            // *              synchronizedCollection(Collection<T> c)、synchronizedList(List<T> list)、
+            /**此时得到的list1即为线程安全的List*/
+            List list1 = Collections.synchronizedList(list);
+    
+        }
+    ```
+
+    
+
+- **Collections常用方法：同步控制**
+
+    Collections类中提供了多个synchronizedXxx()方法，该方法可使将指定集合包装成线程同步的集合，从而可以解决多线程并发访问集合时的线程安全问题。
+
+    - synchronizedCollection(Collection<T> c)、synchronizedList(List<T> list)、synchronizedMap()、synchronizedSet(Set<T> s)、synchronizedSortedMap(SortedMap<K, V> m)、 synchronizedSortedSet(SortedSet<T> s);
+
+### Q1:Collection和Collections的区别？
+
