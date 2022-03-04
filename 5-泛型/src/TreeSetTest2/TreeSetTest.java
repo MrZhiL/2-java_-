@@ -60,7 +60,7 @@ public class TreeSetTest {
     }
 
     // 2. 创建TreeSet时传入Comparator对象，按生日日期的先后排序 : 使用泛型
-    public void test02(){
+    public void test02(){ 
         /** 不使用泛型的写法 */
 //        Comparator comparator = new Comparator() {
 //            @Override
