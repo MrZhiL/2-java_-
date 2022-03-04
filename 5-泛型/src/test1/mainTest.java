@@ -1,5 +1,8 @@
 package src.test1;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * @ClassName: src.test1
  * @Description: Java - 自定义泛型类测试
