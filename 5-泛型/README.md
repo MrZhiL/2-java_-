@@ -289,3 +289,103 @@ public void test01(){
 
 ### 1. 使用通配符后数据的读取和写入要求
 
+1. 使用类型**通配符： ？**
+
+   比如List<?>, Map<?>
+
+   List<?> 是List<String>, List<Object> 等各种泛型List的父类。
+
+2. 读取List<?>的对象list中的元素时，永远是安全的，因为不管list的真是类型是什么，它包含的都是Object
+
+3. 写入list中的元素时，不行。因为我们不知道c的元素类型，我们不能向其中添加对象
+
+   - 唯一例外的是null，它是所有类型的成员。
+
+     list.add("DD"); // error
+
+     list .add(null); // right
+
+4. **将任意元素加入到其中不是类型安全的：**
+
+   Collection<?> c = new ArrayList<String>();
+
+   c.add(new Object()); // 编译时错误
+
+   因为我们不知道c的元素类型，我们不能向其中添加对象。add方法有类型参数E作为集合的元素类型。我们传给add的任何参数都必须是一个未知类型的子类。因为我们不知道那是什么类型，所以我们无法传任何东西进去
+
+5. **唯一例外的是null，它是所有类型的成员。**
+
+6. **另一方面，我们可以调用get()方法并使用其返回值。返回值是一个位置的类型，但是我们知道，它总是一个Object。**
+
+### 2. 有限制条件的通配符的使用
+
+- <?>：允许所有泛型的引用调用
+- 通配符指定上限：
+  - 上限extends: 使用时指定的类型必须是继承某个类，或者实现某个接口，即 <= 
+- 通配符指定下限：
+  - 下限super: 使用时指定的类型不能小于操作的类，即 >=
+- 举例：
+  - <? extends Number> (无穷小，Number] ： 只允许泛型为Number及Number子类的引用调用
+  - <? super Number>  [Number, 无穷大) ：只允许泛型为Number及Number父类的引用调用
+    - <? extends Comparable> ：只允许泛型为实现Comparable接口的实现类的引用调用 
+
+```java
+/** 有限制条件的通配符的使用 */
+@Test
+public void test04() {
+    List<? extends Person> list1 = null; // (-inf, Person]
+    List<? super Person> list2 = null;   // [Person, +inf)
+
+    List<Student> list3 = new ArrayList<Student>();
+    List<Person> list4 = new ArrayList<Person>();
+    List<Object> list5 = new ArrayList<Object>();
+
+    list1 = list3;
+    list1 = list4;
+    // list1 = list5; // error, 因为Object类型大于Person，因此不可以赋值给list1
+
+    // list2 = list3; // error, 因为Student类型小于Person，因此不可赋值
+    list2 = list4;
+    list2 = list5;
+
+    /** 读取数据 */
+    list1 = list3;
+    Person p = list1.get(0);
+    // 编译不通过
+    // Student s = list1.get(0);
+
+    list2 = list4;
+    Object obj = list2.get(0);
+    // 编译不通过
+    // Person p1 = list2.get(0);
+
+    /** 写入数据 */
+    // 编译不通过
+    // list1.add(new Student()); error
+    list2.add(new Person()); // right
+    list2.add(new Student()); // right
+
+}
+```
+
+
+
+## 11.6 自定义泛型类练习
+
+1. 定义个泛型类 DAO<T>，在其中定义一个Map成员变量，Map的键为String类型，值为T类型。
+
+   分别创建以下方法：
+
+   - public void save(String id, T entity); 保存T类型的对象到Map成员变量中
+   - public T get(String id) : 从map中获取id对应的对象
+   - public void update(String id, T entity) : 替换map中key为id的内容，改为entity对象
+   - public List<T> list() : 返回map中存放的所有T对象
+   - public void delete(String id) : 删除指定id对象
+
+2. 定义一个User类：
+
+   该类包含： private 成员变量(int 类型) id, age; (String 类型)name
+
+3. 定义一个测试类：
+   1. 创建DAO类的对象，分别调用save\get\update\list\delete方法来操作User对象
+   2. 使用Junit单元测试类进行测试
