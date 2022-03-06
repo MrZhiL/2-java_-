@@ -237,6 +237,14 @@ public void test01(){
 
 - 如类A是类B的父类，G<A> 和 G<B> 是没有关系的，两者共同的父类是: G<?> 
 
+- 获取（读取）：允许读取数据，读取的数据类型为Object
+
+- 对于List<?>就不能向其内部添加数据，除了null之外：
+
+  list.add("DD"); // error
+
+  list .add(null); // right
+
 - ```java
   /** 通配符的使用 */
   @Test
@@ -250,6 +258,22 @@ public void test01(){
   
       print(list1); // right
       print(list2); // right
+      
+      List<String> list3 = new ArrayList<>();
+          list3.add("AA");
+          list3.add("BB");
+          list3.add("DD");
+          list3.add("CC");
+  
+          list = list3;
+          // 1. 对于List<?>就不能向其内部添加数据，除了null之外：
+          // list.add("EE"); // error
+          list.add(null); // right
+  
+          Object o = list.get(0);
+          System.out.println(o); // AA
+          System.out.println("----------------------------");
+          print(list); // right: AA BB DD CC null
   }
   
   public void print(List<?> list) {
@@ -262,3 +286,6 @@ public void test01(){
   ```
 
   
+
+### 1. 使用通配符后数据的读取和写入要求
+
