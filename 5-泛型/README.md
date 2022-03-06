@@ -164,3 +164,101 @@ note:泛型是一个类型，而不是一个变量，因此不可以使用基本
   ```
 
   
+
+## 11.4 泛型方法的使用场景
+
+如要对多个类似于的数据进行操作，如不同的数据库之间，数据库之间的不同表格，此时可以通过创建泛型创建一个通用的方法，然后分别让子类实现想要实现的功能。
+
+
+
+## 11.5 泛型在继承上的体现
+
+1. 若类A是类B的父类，则G<A> 和 G<B>两者不具备子父类关系，二者是并列关系
+
+2. 若类A是类B的父类，则A<G> B<G>两者具备子父类关系
+
+   ```java
+   public void test01() {
+   	List<Object> list1 = null;
+   	List<String> list2 = null;
+   	
+   	show(list1); // right
+   	show(list2); // error
+   	show1(list2); // right
+   }
+   
+   public void show(List<Object> list) {
+   	
+   }
+   
+   public void show1(List<String> list1) {
+   
+   }
+   
+   public void test02() {
+       List<String> list1 = null;
+       ArrayList<String> list2 = null;
+       
+       list1 = list2; // right, 相当于 List<String> list = new ArrayList<String>();
+   }
+   ```
+
+   
+
+### 1. 如果两个变量属于子父类关系，且这两个变量中null，则可以把子类赋给父类的变量：
+
+```java
+public void test01(){
+	Object obj = null;
+	String str = null;
+	obj = str; // right
+	str = obj; // error
+	
+	Object[] arr1 = null;
+	String[] arr2 = null;
+	arr1 = arr2; // right
+	
+	List<Object> list1 = null;
+	List<String> list2 = null;
+	list1 = list2; // error, 此时的list1和list2的类型不具有子父类关系
+	/* 若list1 = list2, 则此时list1.add(123)会添加成功，因此导致String中存入非String的数据，因此不可以赋值*/
+	
+	
+}
+
+
+```
+
+
+
+### 2. 通配符的使用
+
+- 通配符：？
+
+- 如类A是类B的父类，G<A> 和 G<B> 是没有关系的，两者共同的父类是: G<?> 
+
+- ```java
+  /** 通配符的使用 */
+  @Test
+  public void test03() {
+      List<Object> list1 = null;
+      List<String> list2 = null;
+  
+      List<?> list = null;
+      list = list1; // right
+      list = list2; // right
+  
+      print(list1); // right
+      print(list2); // right
+  }
+  
+  public void print(List<?> list) {
+      Iterator<?> iterator = list.iterator();
+      while (iterator.hasNext()) {
+          Object obj = iterator.next();
+          System.out.println(obj);
+      }
+  }
+  ```
+
+  
