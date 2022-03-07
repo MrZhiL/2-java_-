@@ -1,0 +1,198 @@
+# 十二 IO流
+
+1. File类的使用
+2. IO流原理及流的应用
+3. 节点流（或文件流）
+4. 缓冲流
+5. 转换流
+6. 标准输入、输出流
+7. 打印流
+8. 数据流
+9. 对象流
+10. 随机存取文件流
+11. NIO.2中Path、Paths、Files类的使用
+
+
+
+## 1. File类的使用
+
+- java.io.File类：**文件和文件目录路径**的抽象表示形式，与平台无关
+
+- File能新建、删除、重命名文件和目录，但File不能访问文件内容本身。
+
+  如果需要访问文件内容本身，则需要使用输入/输出流
+
+- **想要在Java程序中表示一个真是存在的文件或目录，那么必须有一个File对象，但是Java程序中的一个File对象，可能没有一个真是存在的文件或目录。**
+- File对象可以作为参数传递给流的构造器。
+
+### 1. 常用构造器
+
+- public File(String pathname)
+
+  以pathname为路径创建File对象，可以是**绝对路径或者相对路径**，如果pathname是相对路径，则默认的当前路径在系统属性user.dir中存储。
+
+  - 绝对路径：是一个固定的路径，从盘符开始
+  - 相对路径：是相对某个位置开始
+
+- public File(String parent, String chile)
+
+  以parent为父路径，child为子路径创建File对象
+
+- public File(File paren, String child)
+
+  根据一个父File对象和子文件路径创建File对象
+
+- 路径中的每级目录之间用一个**路径分隔符**隔开
+
+- 路径分隔符和系统有关：
+
+  - Windoes和DOS系统默认使用"\\"来表示
+  - UNIX和URL中使用"/"来表示
+
+- Java程序支持跨平台运行，因此路径分隔符要慎用。为了解决这个隐患，File类提供了一个常量：**public static final Striing separator**。根据操作系统，动态的提供分隔符，例如：
+
+  ```java
+  File file1 = new File("d:\\JavaProject\\hello.txt");
+  File file2 = new File("d:" + File.separator + "JavaProject" + File.separator + "hello.txt");
+  File file3 = new File("d:/javaProject")
+  ```
+
+  
+
+### 2. File的常用方法
+
+- File类的获取功能
+
+  ```java
+  public String getAbsolutePath(); // 获取绝对路径
+  public String getPath(); // 获取路径
+  public String getName(); // 获取名称
+  public String getParent(); // 获取上层次文件目录路径，若无，返回null
+  public long length(); // 获取文件长度（即，字节数）。不能获取目录的长度
+  public long lastModified(); // 获取最后一次的修改时间，毫秒值
+  
+  public String[] list(); // 获取指定目录下的所有文件或者文件目录的名称数组  ： 获取文件名，且可以获取到隐藏目录和隐藏文件
+  public File[] listFiles(); // 获取指定目录下的所有文件或者文件目录的File数组 ： 获取绝对路径，且可以获取到隐藏目录和隐藏文件
+  ```
+
+- File类的重命名功能
+
+  note: 比如file1.renameTo(file2)：**要想保证返回true，需要file1在硬盘中是存在的，且file2不能存在于硬盘中。**
+
+  当调用成功后，会将file1**移动**到file2所指定的位置。
+
+  ```java
+  public boolean renameTo(File dest); // 把文件重命名为指定的文件路径
+  
+  public void test04() {
+      File file1 = new File("hello.txt");
+      File file2 = new File("D:\\IO\\hi.txt");
+      
+      boolean remameTo = file1.renameTo(file2);
+      System.out.println(renameTo);
+  }
+  ```
+
+  
+
+- File类的判断功能
+
+  - public boolean isDirectory() : 判断是否为文件目录
+  - public boolean isFile() : 判断是否为文件
+  - public boolean exists() : 判断文件是否存在
+  - public boolean canRead() : 判断文件是否可读
+  - public boolean canWrite() : 判断是否可写
+  - public boolean isHidden() :  判断文件是否为隐藏文件
+
+  
+
+  ```java
+  @Test
+      // File的常用方法
+      public void test02() {
+          File file1 = new File("hello.txt");
+          File file2 = new File("D:\\Program Files (x86)\\JavaProject\\2-Java高级部分\\6-IO流\\src\\FileTest\\hello.txt");
+  
+          System.out.println(file1.getAbsoluteFile());
+          System.out.println(file1.getParent()); // null
+          System.out.println(file1.getName());   // hello.txt
+          System.out.println(file1.getParent()); // null
+          System.out.println(file1.length());
+          System.out.println(file1.lastModified());
+  
+          System.out.println("-----------------------");
+          System.out.println(file2.getAbsoluteFile());
+          System.out.println(file2.getParent());
+          System.out.println(file2.getName());
+          System.out.println(file2.getParent());
+          System.out.println(file2.length());
+          System.out.println(new Date(file2.lastModified()));
+      }
+  
+      @Test
+      public void test03() {
+          // public String[] list(); // 获取指定目录下的所有文件或者文件目录的名称数组
+          // public File[] listFiles(); // 获取指定目录下的所有文件或者文件目录的File数组
+          File file = new File("D:\\Program Files (x86)\\JavaProject\\2-Java高级部分");
+  
+          String[] list = file.list();
+          for (String l : list) {
+              System.out.println(l);
+          }
+  
+          System.out.println("---------------");
+          File[] files = file.listFiles();
+          for (File f : files) {
+              System.out.println(f);
+          }
+      }
+  
+  // test03()输出
+  .git
+  .gitignore
+  .idea
+  0-学习文档
+  1-多线程
+  10-Java9&10&11新特性
+  2-Java常用类
+  2-Java高级部分.iml
+  3-枚举类&注解
+  4-Java集合
+  5-泛型
+  6-IO流
+  7-网络编程
+  8-Java反射机制
+  9-Java8的其它新特性
+  IDEA快捷键.md
+  jdbc.properties
+  LICENSE
+  out
+  README.md
+  ---------------
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\.git
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\.gitignore
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\.idea
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\0-学习文档
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\1-多线程
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\10-Java9&10&11新特性
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\2-Java常用类
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\2-Java高级部分.iml
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\3-枚举类&注解
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\4-Java集合
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\5-泛型
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\6-IO流
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\7-网络编程
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\8-Java反射机制
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\9-Java8的其它新特性
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\IDEA快捷键.md
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\jdbc.properties
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\LICENSE
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\out
+  D:\Program Files (x86)\JavaProject\2-Java高级部分\README.md
+  
+  Process finished with exit code 0
+  
+  ```
+
+  
+
