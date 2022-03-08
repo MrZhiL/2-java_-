@@ -320,3 +320,58 @@ public class FileTest {
 
 ```
 
+
+
+
+
+## 2. IO流原理及流的分类
+
+### 1. Java IO原理
+
+- I/O是Input/Output的缩写，I/O技术使非常实用的技术，**用于处理设备之间的数据传输**。如读/写文件，网络通讯等。
+
+- Java程序中，对于数据的输入/输出操作以“流(stream)” 的方式进行。
+
+- java.io包下提供了各种“流”类和接口，用以获取不同中了的数据，并通过**标准的方法**输入或输出数据。
+
+  
+
+#### 1.1 流的分类：
+
+- 按操作**数据单位**不同分为：**字节流(8bit)，字符流(16bit)**
+
+- 按数据流的**流向**不同分为：**输入流，输出流**
+
+- 按流的**角色**的不同分为：**节点流，处理流**
+
+- | [抽象基类] | 字节流       | 字符流 |
+  | ---------- | ------------ | ------ |
+  | 输入流     | InputStream  | Reader |
+  | 输出流     | OutputStream | Writer |
+
+  
+
+1. Java的IO流共设计40多个类，实际上非常规则，都是从如下4个抽象基类派生的。
+2. 由这四个类派生出来的子类名称都是以其父类名作为子类名的后缀。
+
+
+
+#### 1.2 I/O流体系：
+
+| 分类       | 字节输入流              | 字节输出流             | 字符输入流            | 字符输出流             |
+| ---------- | ----------------------- | ---------------------- | --------------------- | ---------------------- |
+| 抽象基类   | **InputStream**         | **OutputStream**       | **Reader**            | **Writer**             |
+| 访问文件   | **FileInputStream**     | **FileOutputStream**   | **FileReader**        | **FileWriter**         |
+| 访问数组   | ByteArrayInputStream    | ByteArrayOutputStream  | CharArrayReader       | CharArrayWriter        |
+| 访问管道   | PipedInputStream        | PipedOutputStream      | PipedReader           | PipedWriter            |
+| 访问字符串 |                         |                        | StringReader          | StringWriter           |
+| 缓冲流     | **BufferedInputStream** | **PipedOutputStream**  | **BufferedReader**    | **BufferedWriter**     |
+| 转换流     |                         |                        | **InputStreamReader** | **OutputStreamWriter** |
+| 对象流     | **ObjectInutStream**    | **ObjectOutputStream** |                       |                        |
+|            | FilterInputStream       | FilterOutputStream     | FilterReader          | Filterwriter           |
+| 打印流     |                         | PrintStream            |                       | PrintWriter            |
+| 推回输入流 | PUshbackInputStream     |                        | PushbackReader        |                        |
+| 特殊流     | DateInputStream         | DateOutputStream       |                       |                        |
+
+
+
