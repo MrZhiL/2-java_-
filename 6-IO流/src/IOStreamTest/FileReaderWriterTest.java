@@ -35,7 +35,7 @@ public class FileReaderWriterTest {
     }
 
     @Test
-    // 将6-IO流中的hello。txt的文件内容读取并输出到控制台中
+    // 将6-IO流中的hello.txt的文件内容读取并输出到控制台中
     // note: 在处理IO流的时候，不建议使用throws抛出异常，因为此时如果抛出异常，会导致文件流无法关闭
     /**
      * 说明点: 1. read()的理解：返回读入的一个字符，如果达到文件末尾，则返回-1
@@ -78,6 +78,46 @@ public class FileReaderWriterTest {
                     fileReader.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    @Test
+    // 对test01()中的read()方法的改进，将hello.txt中的内容读取并输出到控制台中
+    public void test02() {
+        // 1. File类的实例化
+        // 2. FileReader流的实例化
+        // 3. 读入的操作
+        // 4. 资源的关闭
+
+        FileReader fr = null; // 创建FileReader的变量
+        try {
+            // 1. File类的实例化
+            File file = new File("hello.txt");
+
+            // 2. FileReader流的实例化
+            fr = new FileReader(file);
+
+            // 3. 读入的操作，使用read(char[] cbuf) : 返回这每次读入cbuf数组中的字符的个数。果到达文件末尾，则返回-1
+            char[] cbuf = new char[50];
+            int len = 0;
+            while ((len = fr.read(cbuf)) != -1) {
+                // System.out.print(new String(cbuf); // error，此时会把cbuf中的内容全部输出，导致结构错误
+                System.out.print(new String(cbuf, 0, len));
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // 4. 资源的关闭
+            if (fr != null) {
+                try {
+                    fr.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
