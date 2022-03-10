@@ -181,8 +181,12 @@ public class FileReaderWriterTest {
         FileWriter fw = null;
         try {
             // 1. File类的实例化
-            File srcFile = new File("hello.txt");
-            File destFile = new File("hello1.txt");
+            // File srcFile = new File("hello.txt");
+            // File destFile = new File("hello1.txt");
+
+            // note: 不能使用字符流来处理图片等字节数据
+            File srcFile = new File("photo.jpg");
+            File destFile = new File("photo1.jpg");
 
             // 2. IO流的实例化
             fr = new FileReader(srcFile);
