@@ -56,7 +56,7 @@ public class FileInputOutputStreamTest {
         FileOutputStream fos = null;
         try {
             File src = new File("photo.jpg");
-            File des = new File("photo1.jpg");
+            File des = new File("photo2.jpg");
 
             fis = new FileInputStream(src);
             fos = new FileOutputStream(des);

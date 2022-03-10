@@ -1,0 +1,7 @@
+流的体系结构
+
+抽象基类            节点流（或文件流）           缓冲流（处理流）
+InputStream        FileInputStream          BufferedInputStream
+OutputStream       FileOutputStream         BufferedOutputStream
+Reader             FileReader               BufferedReader
+Writer             FileWriter               BufferedWriter
