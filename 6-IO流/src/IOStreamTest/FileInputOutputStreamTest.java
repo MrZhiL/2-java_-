@@ -92,4 +92,58 @@ public class FileInputOutputStreamTest {
             }
         }
     }
+
+    @Test
+    public void testCopyFile() {
+        long start = System.currentTimeMillis();
+
+        myCopyFile("photo.jpg", "photo2.jpg");
+
+        long end = System.currentTimeMillis();
+        System.out.println("赋值操作花费的时间为：" + (end - start) + "us");
+    }
+
+    /** 使用字节流FileInputStream实现指定字节流文件的复制 */
+    public void myCopyFile(String srcPath, String destPath) {
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        try {
+            File src = new File(srcPath);
+            File des = new File(destPath);
+
+            fis = new FileInputStream(src);
+            fos = new FileOutputStream(des);
+
+            // 对于文本文件(.txt, .java, .c, .cpp, .md(Markdown))，要使用字符流来处理
+            // 对于非文本文件(.doc, .jpg, .mp4, .avi, .ppt, ...)，使用字节流处理
+            byte[] bytes = new byte[100];
+            int len = 0; // 记录每次读取文件的长度
+            while ((len = fis.read(bytes)) != -1) {
+                fos.write(bytes, 0, len);
+            }
+            System.out.println(src.getName() + " 成功写入到 " + des.getName());
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 }
