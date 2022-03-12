@@ -30,6 +30,7 @@ public class InputStreamReaderTest {
     @Test
     // 为了方便展示核心代码，我们这里进行了异常抛出，而没有处理。
     // 在实际编程中，一定要使用try-catch-finally进行处理
+    // note: InputStreamReader可以实现字节的输入流到字符的输入流的转换
     public void testInputStreamReader() throws IOException {
         FileInputStream fis = new FileInputStream("read.md");
 
@@ -48,6 +49,43 @@ public class InputStreamReaderTest {
 
         if (fis != null) {
             fis.close();
+        }
+    }
+
+    @Test
+    // 为了方便展示核心代码，我们这里进行了异常抛出，而没有处理。
+    // 在实际编程中，一定要使用try-catch-finally进行处理
+    // 综合使用InputStreamReader 和 OutputStreamWriter() 方法
+    // 使用InputStreamReader读取UTF-8编码的文件，并转化为字符流后；使用OutputStreamWriter()将读取的字符流转换为字节流，并存入GDK编码的文件中
+    public void testOutputStreamWriter() throws IOException {
+        FileInputStream fis = new FileInputStream("read.md");
+        FileOutputStream fos = new FileOutputStream("read_gbk.md");
+
+        InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+        OutputStreamWriter osr = new OutputStreamWriter(fos,"gbk");
+
+        char[] cbuf = new char[50];
+        int len = -1;
+
+        while ((len = isr.read(cbuf)) != -1) {
+            osr.write(cbuf, 0, len);
+        }
+        System.out.println("编码格式转换成功，并成功写入到");
+
+        if (osr != null) {
+            osr.close();
+        }
+
+        if (isr != null) {
+            osr.close();
+        }
+
+        if (fos != null) {
+            osr.close();
+        }
+
+        if (fis != null) {
+            osr.close();
         }
     }
 }
