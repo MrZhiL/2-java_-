@@ -31,8 +31,8 @@
 
   以pathname为路径创建File对象，可以是**绝对路径或者相对路径**，如果pathname是相对路径，则默认的当前路径在系统属性user.dir中存储。
 
-  - 绝对路径：是一个固定的路径，从盘符开始
-  - 相对路径：是相对某个位置开始
+    - 绝对路径：是一个固定的路径，从盘符开始
+    - 相对路径：是相对某个位置开始
 
 - public File(String parent, String chile)
 
@@ -46,8 +46,8 @@
 
 - 路径分隔符和系统有关：
 
-  - Windoes和DOS系统默认使用"\\"来表示
-  - UNIX和URL中使用"/"来表示
+    - Windoes和DOS系统默认使用"\\"来表示
+    - UNIX和URL中使用"/"来表示
 
 - Java程序支持跨平台运行，因此路径分隔符要慎用。为了解决这个隐患，File类提供了一个常量：**public static final Striing separator**。根据操作系统，动态的提供分隔符，例如：
 
@@ -57,7 +57,7 @@
   File file3 = new File("d:/javaProject")
   ```
 
-  
+
 
 ### 2. File的常用方法
 
@@ -93,34 +93,34 @@
   }
   ```
 
-  
+
 
 - File类的判断功能
 
-  - public boolean isDirectory() : 判断是否为文件目录
-  - public boolean isFile() : 判断是否为文件
-  - public boolean exists() : 判断文件是否存在
-  - public boolean canRead() : 判断文件是否可读
-  - public boolean canWrite() : 判断是否可写
-  - public boolean isHidden() :  判断文件是否为隐藏文件
+    - public boolean isDirectory() : 判断是否为文件目录
+    - public boolean isFile() : 判断是否为文件
+    - public boolean exists() : 判断文件是否存在
+    - public boolean canRead() : 判断文件是否可读
+    - public boolean canWrite() : 判断是否可写
+    - public boolean isHidden() :  判断文件是否为隐藏文件
 
-  
+
 
 - File类的创建功能：
 
-  - public boolean createNewFile(): 创建文件。若文件存在，则不创建，返回false
-  - public boolean mkdir() : 创建文件目录。如果此文件目录存在，则不创建；如果此文件目录的上层目录也不存在，则不创建
-  - public boolean mkdirs() : 创建文件目录，如果上层文件目录不存在，一并创建
-  - **注意事项**：**如果要创建的文件或者文件目录没有写盘符路径，则默认在项目路径下创建**。
+    - public boolean createNewFile(): 创建文件。若文件存在，则不创建，返回false
+    - public boolean mkdir() : 创建文件目录。如果此文件目录存在，则不创建；如果此文件目录的上层目录也不存在，则不创建
+    - public boolean mkdirs() : 创建文件目录，如果上层文件目录不存在，一并创建
+    - **注意事项**：**如果要创建的文件或者文件目录没有写盘符路径，则默认在项目路径下创建**。
 
 - File类的删除功能
 
-  - public boolean delete() : 删除文件或者文件夹
+    - public boolean delete() : 删除文件或者文件夹
 
-    **删除注意事项：：**
+      **删除注意事项：：**
 
-    - Java中的删除不走**回收站**
-    - 要删除一个文件目录，请注意该文件目录内不能包含文件或者文件目录
+        - Java中的删除不走**回收站**
+        - 要删除一个文件目录，请注意该文件目录内不能包含文件或者文件目录
 
   ```java
   @Test
@@ -210,17 +210,17 @@
   
   ```
 
-  
+
 
 ### 3. 练习
 
 1. 利用File构造器，new一个文件目录file
-   1. 在其中创建多个文件和目录
-   2. 编写方法，实现删除file中指定文件的操作
+    1. 在其中创建多个文件和目录
+    2. 编写方法，实现删除file中指定文件的操作
 2. 判断指定目录下是否有后缀名为.jpg的文件，如果有，就输出该文件名称
 3. 遍历指定目录所有文件名称，包括子文件目录中的文件。
-   - 扩展1：并计算指定目录占用空间的大小
-   - 扩展2：删除指定文件目录及其下的所有文件
+    - 扩展1：并计算指定目录占用空间的大小
+    - 扩展2：删除指定文件目录及其下的所有文件
 
 ```java
 package FIleTest2;
@@ -334,7 +334,7 @@ public class FileTest {
 
 - java.io包下提供了各种“流”类和接口，用以获取不同中了的数据，并通过**标准的方法**输入或输出数据。
 
-  
+
 
 #### 1.1 流的分类：
 
@@ -345,7 +345,7 @@ public class FileTest {
 - 按流的**角色**的不同分为：**节点流，处理流**
 
 - | [抽象基类] | 字节流       | 字符流 |
-  | ---------- | ------------ | ------ |
+    | ---------- | ------------ | ------ |
   | 输入流     | InputStream  | Reader |
   | 输出流     | OutputStream | Writer |
 
@@ -356,23 +356,23 @@ public class FileTest {
 
 - 输入流：
 
-  1. Java的IO流共设计40多个类，实际上非常规则，都是从如下4个抽象基类派生的。
-  2. 由这四个类派生出来的子类名称都是以其父类名作为子类名的后缀。
+    1. Java的IO流共设计40多个类，实际上非常规则，都是从如下4个抽象基类派生的。
+    2. 由这四个类派生出来的子类名称都是以其父类名作为子类名的后缀。
 
   note: 在处理IO流的时候，不建议使用throws抛出异常，因为此时如果抛出异常，会导致文件流无法关闭：
 
-  - read()的理解：返回读入的一个字符，如果达到文件末尾，则返回-1
+    - read()的理解：返回读入的一个字符，如果达到文件末尾，则返回-1
 
-     - 异常的处理：为了保证流资源一定可以执行关闭操作。需要使用try-catch-finally进行处理
-       否则会报FileNotFoundException
+        - 异常的处理：为了保证流资源一定可以执行关闭操作。需要使用try-catch-finally进行处理
+          否则会报FileNotFoundException
 
-   - 输出流：从内存中写出数据到硬盘中
+    - 输出流：从内存中写出数据到硬盘中
 
         - **输出操作，对应的File可以不存在，并不会报异常**：
-             - 对应的文件如果不存在，在输出的过程中，会自动创建此文件
-             - 对应的文件如果存在：
-                  - 如果流使用的构造器是：FileWriter(file, false) / FileWriter(file) : 此时会对原有的文件进行覆盖
-                  - 如果流使用的构造器是：FileWriter(file, true) : 不会对原有的文件进行覆盖，而是在后面追加
+            - 对应的文件如果不存在，在输出的过程中，会自动创建此文件
+            - 对应的文件如果存在：
+                - 如果流使用的构造器是：FileWriter(file, false) / FileWriter(file) : 此时会对原有的文件进行覆盖
+                - 如果流使用的构造器是：FileWriter(file, true) : 不会对原有的文件进行覆盖，而是在后面追加
 
 #### 1.2 I/O流体系：
 
@@ -629,7 +629,7 @@ public void testFileReadertoWriter() {
 
 2. 对于非文本文件(.doc, .jpg, .mp4, .avi, .ppt, ...)，使用字节流处理
 
-   
+
 
 ```java
 package IOStreamTest;
@@ -816,7 +816,7 @@ public class FileInputOutputStreamTest {
    }
    ```
 
-   
+
 
 ### 4. 缓冲流实现文本的复制
 
@@ -1201,62 +1201,169 @@ public class WordCountTest {
 
 2. Java API提供了两个转换流：（属于字符流）
 
-   - **InputStreamReader : 将inputStream转化为Reader**（将一个字节的输入流转换为字符的输入流）
+    - **InputStreamReader : 将inputStream转化为Reader**（将一个字节的输入流转换为字符的输入流）
 
-     ```java
-     InputStreamReader isr = new InputStreamReader(new FileInputStream("hello.txt")); // 此时使用系统默认的字符集
-     
-     /* InputStreamReader()方法的参数2可以指定字符集，但是具体使用那个字符集，取决于要读取的文件在保存的时候使用的字符集 */
-     InputStreamReader isr = new InputStreamReader(new FileInputStream("hello.txt"), "UFT-8"); // 此时使用指定的字符集：UTF-8
-     ```
+      ```java
+      InputStreamReader isr = new InputStreamReader(new FileInputStream("hello.txt")); // 此时使用系统默认的字符集
+      
+      /* InputStreamReader()方法的参数2可以指定字符集，但是具体使用那个字符集，取决于要读取的文件在保存的时候使用的字符集 */
+      InputStreamReader isr = new InputStreamReader(new FileInputStream("hello.txt"), "UFT-8"); // 此时使用指定的字符集：UTF-8
+      ```
 
-   - **OutputStreamWriter : 将Writer转换为OutputStream**（将一个字符的输出流转换为字节的输出流）
+    - **OutputStreamWriter : 将Writer转换为OutputStream**（将一个字符的输出流转换为字节的输出流）
 
 3. 字节流中的数据都是字符时，转化成字符流操作更高效
 
 4. 很多时候我们使用转换率来处理文件乱码的问题。实现编码和解码的功能。
 
-   - 解码：字节、字节数组 ---> 字符数组、字符串
-   - 解码：字符数组、字符串 ---> 字节、字节数组
+    - 解码：字节、字节数组 ---> 字符数组、字符串
+    - 解码：字符数组、字符串 ---> 字节、字节数组
 
-5. <img src="D:\Program Files (x86)\JavaProject\2-Java高级部分\6-IO流\README.assets\image-20220312162823005.png" alt="image-20220312162823005" style="zoom:67%;" />
+5. ![image-20220312162823005.png](README.assets/image-20220312162823005.png)
 
-   ```java
-   // 为了方便展示核心代码，我们这里进行了异常抛出，而没有处理。
-   // 在实际编程中，一定要使用try-catch-finally进行处理
-   // 综合使用InputStreamReader 和 OutputStreamWriter() 方法
-   // 使用InputStreamReader读取UTF-8编码的文件，并转化为字符流后；使用OutputStreamWriter()将读取的字符流转换为字节流，并存入GDK编码的文件中
-   public void testOutputStreamWriter() throws IOException {
-       FileInputStream fis = new FileInputStream("read.md");
-       FileOutputStream fos = new FileOutputStream("read_gbk.md");
-   
-       InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-       OutputStreamWriter osr = new OutputStreamWriter(fos,"gbk");
-   
-       char[] cbuf = new char[50];
-       int len = -1;
-   
-       while ((len = isr.read(cbuf)) != -1) {
-       	osr.write(cbuf, 0, len);
-       }
-       System.out.println("编码格式转换成功，并成功写入到");
-   
-       if (osr != null) {
-       	osr.close();
-       }
-   
-       if (isr != null) {
-       	osr.close();
-       }
-   
-       if (fos != null) {
-       	osr.close();
-       }
-   
-       if (fis != null) {
-       	osr.close();
-       }
-   }
-   ```
 
-   
+### 7. 字符集
+
+1. ASCII : 美国标准信息交换码，用一个字节的7位就可以表示
+2. ISO8859-1 : 拉丁码表，为欧洲码表。用一个字节的8位来表示
+3. GB2312 : 中国的中文编码表，最多两个字节，可以编码所有字符
+4. GBK : 中国的中文编码表升级版，融合了更多的中文文字符号（包括繁体字），最多使用两个字节进行编码
+
+   (note : 在计算机底层进行内存读取时，如果一个字节的首位为0，则表示存储了一个字节的信息；如果第一个字节首位为1，则表示使用两个字节进行了存储，需要连续读取两个字节。)
+5. Unicode : 国际标准码，融合了目前人类使用的所有字符。为每个字符分配唯一的字符吗。所有的文字都是用两个字节来表示。
+6. UTF-8 : 变长的编码方式，可用1-4个字节来表示一个字符。
+
+- **补充**：
+- Unicode不完美，这里就有三个问题：
+  - 一个是我们已经知道英文字母只用一个字节就可以表示，
+  - 第二个是如何才能区别Unicode和ASCII？计算机怎么知道两个字节表示一个字符，而不是分别表示两个符号呢？
+  - 第三个是如果和GBK等双字节编码方式一样，用最高位是1或0表示两个字节和一个字节，就少了很多值无法用于表示字符，导致不能表示所有字符。
+  - 因此导致Unicode在很长一段时间内无法推广，直到互联网的出现。
+  
+- 面向传输的众多UTF(UCS Transfer Format)标准出现了，顾名思义，UTF-8就是每次传输8个位传输数据，而UTF-16就是每次使用16个位传输。
+  这是为传输而设计的编码，并使编码无国界，这样就可以显式全世界上所有文化的字符了。
+
+- Unicode只是定义了一个庞大的、全球通用的字符集，并为每个字符规定了唯一确定的编号，具体存储成什么样的字节流，取决于字符编码方案。
+  推荐的Unicode编码是UTF-8和UTF-16。
+
+- ![img.png](README.assets/img.png)
+
+- ![img_1.png](README.assets/img_1.png)
+
+
+### 8. 标准输入、输出流
+
+- System.in 和 System.out 分别代表了系统标准的输入和输出设备
+- 默认输入设备是：键盘；输出设备是：显示器
+- System.in的类型为InputStream
+- System.out的类型是PrintStream，其是OutputStream的子类
+  FilterOutputStream的子类
+- 重定向：通过System类的setln, setOut方法对默认设备进行改变。
+  - `public static void setIn(InputStream in)`
+  - `public static void setOut(PrintStream out)`
+
+- 练习：从键盘输入字符串，要求将读取到的整行字符串转化成大写输出，然后继续进行输入操作。直到输入"e"或“exit"时，退出程序.
+```java
+public static void test01() {
+    // 方法一：使用Scanner实现，调用next()返回一个字符串
+    // 方法二：使用System.in实现；因为System.in为字节流，所以需要首先转换为字符流-->再使用缓冲流进行读取（BufferedReader.readLine()）
+
+    InputStreamReader isr = null;
+    try {
+        // 1. 创建输入字节流
+        // fis = new InputStreamReader(System.in);
+
+        // 1. 创建转换流
+        isr = new InputStreamReader(System.in);
+
+        // 2. 创建缓冲流
+        BufferedReader br = new BufferedReader(isr);
+
+        String data;
+        while (true) {
+            System.out.println("请输入数据：");
+            data = br.readLine();
+            // note: 为了避免空指针异常，建议使用"e".equals(data)方法，而不是data.equals("e");
+            if ("e".equalsIgnoreCase(data) || "exit".equalsIgnoreCase(data)) {
+                System.out.println("程序运行结束");
+                break;
+            }
+
+            System.out.println(data.toUpperCase(Locale.ROOT));
+            System.out.println(data);
+        }
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    } finally {
+        if (isr != null) {
+            try {
+                isr.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+}
+```
+
+- 练习二：Contain the methods for reading int, double, float, boolean, short, byte and string values from the keyboard
+```java
+package IOStreamTest;
+
+import javax.imageio.IIOException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+/**
+ * @ClassName: IOStreamTest
+ * @Description: Java - 标准输入输出测试
+ * @author: zhilx (zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/3/12 19:08
+ * @node:
+ *          MyInput.java: Contain the methods for reading int, double, float, boolean,
+ *                        short, byte and string values from the keyboard
+ */
+public class MyInput {
+    // Read a String from the keyboard
+    public static String readString() {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        // Declare and initialize the String
+        String str = "";
+
+        // Get the string from the keyboard
+        try {
+            str = br.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Return the String obtained from the keyboard
+        return str;
+    }
+
+    // Read a int from the keyboard
+    public static int readInt() {return Integer.parseInt(readString()); }
+
+    // Read a double from the keyboard
+    public static double readDouble() {return Double.parseDouble(readString()); }
+
+    // Read a float from the keyboard
+    public static float readFloat() {return Float.parseFloat(readString()); }
+
+    // Read a short from the keyboard
+    public static short readShort() {return Short.parseShort(readString()); }
+
+    // Read a byte from the keyboard
+    public static byte readByte() {return  Byte.parseByte(readString()); }
+
+    // Read a boolean from the keyboard
+    public static boolean readBoolean() {return Boolean.getBoolean(readString()); }
+}
+ 
+```
+
