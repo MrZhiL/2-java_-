@@ -113,4 +113,40 @@ public class otherStreamTest {
             }
         }
     }
+
+    /** 3. 数据流
+     *      3.1 DataInputStream 和 DataOutputStream
+     *      3.2 作用：用于读取或写出基本数据类型的变量或字符串
+     *
+     *      练习：将内存中的字符串、基本数据类型的变量写出到文件中
+     *
+     *      注意：处理异常的话，需要使用try-catch-finally，这里为了显示写入流程直接进行了抛出
+     */
+    @Test
+    public void DataOutputStreamTest() throws IOException {
+        DataOutputStream dos = new DataOutputStream(new FileOutputStream("dataoutputStreamTest.txt"));
+
+        // note：此时写入到文件中的数据不可以直接读取，会显示乱码。但是可以使用DataInputStream进行读取
+        dos.writeUTF("账号里尔");  dos.flush();
+        dos.writeInt(25);  dos.flush();
+        dos.writeBoolean(true);  dos.flush();
+
+        dos.close();
+
+    }
+
+    /* 将文件中存储的基本数据类型变量和字符串读取到内存中，保存在变量内 */
+    @Test
+    public void DataInputStreamTest() throws IOException {
+        DataInputStream dis = new DataInputStream(new FileInputStream("dataoutputStreamTest.txt"));
+
+        // note：在读取的时候需要按照写入的顺序进行读取，否则会乱码甚至报错
+        String name = dis.readUTF();
+        int age = dis.readInt();
+        boolean bool = dis.readBoolean();
+
+        System.out.println("name = " + name);
+        System.out.println("age = " + age);
+        System.out.println("bool = " + bool);
+    }
 }
