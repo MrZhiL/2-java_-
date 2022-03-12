@@ -1434,7 +1434,7 @@ public class MyInput {
 public void DataOutputStreamTest() throws IOException {
     DataOutputStream dos = new DataOutputStream(new FileOutputStream("dataoutputStreamTest.txt"));
     // note：此时写入到文件中的数据不可以直接读取，会显示乱码。但是可以使用DataInputStream进行读取
-    dos.writeUTF("账号里尔");  dos.flush();
+    dos.writeUTF("账号里尔");  dos.flush(); // 刷新操作，会直接将内存中的数据写入文件中
     dos.writeInt(25);  dos.flush();
     dos.writeBoolean(true);  dos.flush();
     dos.close();
