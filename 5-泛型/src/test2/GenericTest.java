@@ -24,8 +24,50 @@ import java.util.List;
  *          2.4 对于List<?>就不能向其内部添加数据，除了null之外：
  *              list.add("DD"); // error
  *              list .add(null); // right
+*
+ *      3. 有限制条件的通配符的使用
+ *          ? extends A: G<? extends A> 可以作为G<A>和G<B>的父类，其中B是A的子类
+ *
+ *          ? super A: G<? super A> 可以作为G<A>和G<B>的父类，其中B是A的父类
  */
 public class GenericTest {
+
+    /** 有限制条件的通配符的使用 */
+    @Test
+    public void test04() {
+        List<? extends Person> list1 = null; // (-inf, Person]
+        List<? super Person> list2 = null;   // [Person, +inf)
+
+        List<Student> list3 = new ArrayList<Student>();
+        List<Person> list4 = new ArrayList<Person>();
+        List<Object> list5 = new ArrayList<Object>();
+
+        list1 = list3;
+        list1 = list4;
+        // list1 = list5; // error, 因为Object类型大于Person，因此不可以赋值给list1
+
+        // list2 = list3; // error, 因为Student类型小于Person，因此不可赋值
+        list2 = list4;
+        list2 = list5;
+
+        /** 读取数据 */
+        list1 = list3;
+        Person p = list1.get(0);
+        // 编译不通过
+        // Student s = list1.get(0);
+
+        list2 = list4;
+        Object obj = list2.get(0);
+        // 编译不通过
+        // Person p1 = list2.get(0);
+
+        /** 写入数据 */
+        // 编译不通过
+        // list1.add(new Student()); error
+        list2.add(new Person()); // right
+        list2.add(new Student()); // right
+
+    }
 
     /** 通配符的使用 */
     @Test
