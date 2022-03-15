@@ -13,7 +13,10 @@ import java.io.*;
  * @node: 对象流的使用
  *          1. ObjectInputStream 和 ObjectOutputStream
  *          2. 作用：用于存储和读取**基本数据类型**或**对象**的处理流。它的强大之处就是可以把Java中的对象写入到数据源中，也能把对象从数据源还原出来。
- *          3.
+ *
+ *          3. 要想将自定义类实现序列化机制，则需要满足以下要去，否则会报java.io.NotSerializableException异常：
+ *              3.1 需要实现接口：Serializeable
+ *              3.2 需要在当前类中提供一个全局常量：serialVersionUID（这是为了对不同的类型进行区分，以防止报错）
  */
 public class ObjectInputOutputStream {
     /* 序列化： */
@@ -25,6 +28,11 @@ public class ObjectInputOutputStream {
             oos = new ObjectOutputStream(new FileOutputStream("object.dat"));
 
             oos.writeObject(new String("这是一个序列化的流，将其转换为二进制流"));
+            oos.flush(); // 刷新操作，将内存的数据写入到文件中
+
+            // 将自定义类序列化
+            oos.writeObject(new Person("张三", 26));
+            oos.flush();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -54,9 +62,13 @@ public class ObjectInputOutputStream {
             // 2. 进行读取
             Object read = ois.readObject();
 
+            // 读取自定义类的序列化
+            Object obj2 = ois.readObject();
+
             // 打印读取的的对象流
-            System.out.println(read);
+            // System.out.println(read);
             System.out.println((String) read); // 因为我们知道对象流的类型，因此可以直接进行强制转换
+            System.out.println((Person) obj2);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,5 +84,49 @@ public class ObjectInputOutputStream {
                 }
             }
         }
+    }
+}
+
+/** 创建自定义类，如果想要该类实现序列化机制，则需要满足以下要求
+ *  1. 需要实现接口：Serializeable
+ *  2. 需要在当前类中提供一个全局常量：serialVersionUID（这是为了对不同的类型进行区分，以防止报错）
+ */
+class Person implements Serializable{
+
+    public static final long serialVersionUID = 9213959829L;
+
+    private String name;
+    public int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
     }
 }
