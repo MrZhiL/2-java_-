@@ -1218,8 +1218,47 @@ public class WordCountTest {
 
     - 解码：字节、字节数组 ---> 字符数组、字符串
     - 解码：字符数组、字符串 ---> 字节、字节数组
+5. 
+    ```java
+    @Test
+    // 为了方便展示核心代码，我们这里进行了异常抛出，而没有处理。
+    // 在实际编程中，一定要使用try-catch-finally进行处理
+    // 综合使用InputStreamReader 和 OutputStreamWriter() 方法
+    // 使用InputStreamReader读取UTF-8编码的文件，并转化为字符流后；使用OutputStreamWriter()将读取的字符流转换为字节流，并存入GDK编码的文件中
+    public void testOutputStreamWriter() throws IOException {
+    FileInputStream fis = new FileInputStream("read.md");
+    FileOutputStream fos = new FileOutputStream("read_gbk.md");
+    
+            InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+            OutputStreamWriter osr = new OutputStreamWriter(fos,"gbk");
+    
+            char[] cbuf = new char[50];
+            int len = -1;
+    
+            while ((len = isr.read(cbuf)) != -1) {
+                osr.write(cbuf, 0, len);
+            }
+            System.out.println("编码格式转换成功，并成功写入到");
+    
+            if (osr != null) {
+                osr.close();
+            }
+    
+            if (isr != null) {
+                osr.close();
+            }
+    
+            if (fos != null) {
+                osr.close();
+            }
+    
+            if (fis != null) {
+                osr.close();
+            }
+        }
+    ```
 
-5. ![image-20220312162823005.png](README.assets/image-20220312162823005.png)
+7. ![image-20220312162823005.png](README.assets/image-20220312162823005.png)
 
 
 ### 7. 字符集
@@ -1452,3 +1491,13 @@ public void DataInputStreamTest() throws IOException {
     System.out.println("bool = " + bool);
 }
 ```
+
+### 11. 对象流 （处理流之六）
+- ObjectInputStream 和 ObjectOutputStream
+  - 用于存储和读取**基本数据类型**或**对象**的处理流。它的强大之处就是可以把Java中的对象写入到数据源中，也能把对象从数据源还原出来。
+- 序列化：用ObjectOutputStream类**保存**基本数据类型数据或对象的机制
+- 反序列化：用ObjectInputStream类**读取**基本类型数据或对象的机制
+- ObjectOutputStream和ObjectInputStream不能序列化 `static` 和`transient` 修饰的成员变量
+
+
+
