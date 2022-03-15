@@ -1673,3 +1673,167 @@ class Account implements Serializable{
 }
 
 ```
+
+### 12. 随机存取文件流（RandomAccessFile类）
+- RandomAccessFile声明在java.io下，单直接继承于java.lang.Object类。
+并且它实现了DataInput、DataOutput这两个接口，也就意味着这个类既可以读也可以写。
+- RandomAccessFile类支持“随机访问”的方式，程序可以直接跳到文件的任意地方进行**读、写文件**
+  - 支持只访问文件的部分内容
+  - 可以向已存在的文件后追加内容
+- RandomAccessFile 对象包含一个记录指针，用以表示当前读写处的位置。
+  
+  RandomAccessFile 类对象可以自由移动记录指针：
+  - `long getFilePointer()` : 获取文件记录指针的当前位置
+  - `void seek(long pos)` : 将文件记录指针定位到pos位置
+- 构造器
+  - public RandomAccessFile(File file, String mode);
+  - public RandomAccessFile(String name, String mode);
+
+- 创建RandomAccessFile 类实例需要指定一个mode参数，该参数指定RandomAccessFile 访问模式
+  - r: 以只读的方式打开
+  - rw: 打开以方便读取和写入
+  - rwd: 打开以方便读取和写入；同步文件内容的更新
+  - rws: 打开以方便读取和写入；同步文件内容和元数据的更新
+- 如果模式为只读r，则不会创建文件，而是会去读取一个已经存在的文件，如果读取的文件不存在则会抛出异常。
+- 如果模式为rw读写，如果文件不存在则会先创建文件，如果存在则不创建。
+
+- note: JDK 1.6上面写的每次write数据时，"rw"模式，数据不会立即写到硬盘中；而“rwd”数据会被立即写入硬盘。
+如果写数据过程中发生异常，“rwd”模式中已被write的数据被保存到硬盘，而“rw”则全部丢失。
+
+
+#### 代码测试
+```java
+package IOStreamTest;
+
+import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+
+/**
+ * @ClassName: IOStreamTest
+ * @Description: Java - RandomAccessFile类测试
+ * @author: zhilx (zhilx1997@sina.com)
+ * @version: v1.0
+ * @data: 2022/3/15 13:22
+ * @node:
+ *          1. RandomAccessFile直接继承与java.lang.Object类，实现了DataInput和DataOutput接口
+ *          2. RandomAccessFile既可以作为一个输入流，又可以作为一个输出流
+ *
+ *          3. RandomAccessFile 作为输出流时，写出到的文件如果不存在，则在执行过程中自动创建
+ *                              如果写出到的文件存在，则会对原有文件内容进行覆盖。 （默认情况下从头覆盖）
+ *             RandomAccessFile 作为输出流时，如果写出的文件不存在，则会报错
+ *          4. 可以通过相关操作，实现插入操作
+ */
+public class RandomAccessFileTest {
+    @Test
+    public void test01() {
+        RandomAccessFile raf = null;
+        RandomAccessFile raf2 = null;
+
+        try {
+            raf = new RandomAccessFile("photo1.jpg", "r");
+            raf2 = new RandomAccessFile("photo4.jpg", "rw");
+
+            byte[] data = new byte[1024];
+            int len = -1;
+
+            while ((len = raf.read(data)) != -1) {
+                raf2.write(data, 0, len);
+            }
+            System.out.println(raf.getFD() + " 复制成功 -> " + raf2.getFD());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (raf2 != null) {
+                try {
+                    raf2.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (raf != null) {
+                try {
+                    raf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Test
+    // 实现对文本文件的覆盖
+    public void test02() {
+        RandomAccessFile raf = null;
+        try {
+            raf = new RandomAccessFile("randomTest.txt", "rw");
+
+            //System.out.println("原文件内容：" + raf.readUTF());
+
+            // 此时会对文件的内容直接进行覆盖，默认从头开始
+            // 可以通过seek函数定位指针
+            raf.seek(3); // 将指针调到角标为3的位置
+            raf.write("123".getBytes(StandardCharsets.UTF_8));
+
+            //System.out.println("现文件内容：" + raf.readUTF());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (raf != null) {
+                try {
+                    raf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /* 使用RandomAccessFile实现数据的插入操作 */
+    /* 可以将StringBuilder修改为ByteArrayOutputStream */
+    @Test
+    public void test03() throws IOException {
+        RandomAccessFile raf = new RandomAccessFile("randomTest.txt", "rw");
+
+        raf.seek(3);
+
+        // 方法一：使用StringBuilder,缓冲要插入数据之后的所有元素
+        StringBuilder buffer = new StringBuilder((int) new File("randomTest.txt").length());
+        byte[] data = new byte[50];
+        int len = -1;
+        // 保存要插入数据之后的所有元素
+        while ((len = raf.read(data)) != -1) {
+            buffer.append(new String(data, 0, len));
+        }
+        // 插入想要得到的数据
+        raf.seek(3);
+        raf.write("123".getBytes(StandardCharsets.UTF_8));
+        // 将插入元素之前的数据追加到后面
+        raf.write(buffer.toString().getBytes(StandardCharsets.UTF_8));
+
+
+        // 方法二：使用StringBuilder,缓冲要插入数据之后的所有元素 （避免出现乱码）
+        raf.seek(3);
+        ByteArrayOutputStream buffer2 = new ByteArrayOutputStream();
+        byte[] data2 = new byte[50];
+        int len2 = -1;
+        // 保存要插入数据之后的所有元素
+        while ((len2 = raf.read(data2)) != -1) {
+            buffer2.write(data2, 0, len2);
+        }
+        // 插入想要得到的数据
+        raf.seek(3);
+        raf.write("123".getBytes(StandardCharsets.UTF_8));
+
+        // 将插入元素之前的数据追加到后面
+        raf.write(buffer2.toByteArray());
+    }
+}
+
+```
+
+
