@@ -17,6 +17,9 @@ import java.io.*;
  *          3. 要想将自定义类实现序列化机制，则需要满足以下要去，否则会报java.io.NotSerializableException异常：
  *              3.1 需要实现接口：Serializeable
  *              3.2 需要在当前类中提供一个全局常量：serialVersionUID（这是为了对不同的类型进行区分，以防止报错）
+ *              3.3 除了保证当前类需要实现Serializable接口之外，还必须保证其内部所有属性也必须是可序列化的  （默认情况，基本数据类型是可序列化的）
+ *
+ *          4. note: ObjectInputStream和ObjectOutputStream不能序列化static和transient修饰的成员变量 （该变量不会被保存，而是使用null赋值）
  */
 public class ObjectInputOutputStream {
     /* 序列化： */
@@ -90,13 +93,19 @@ public class ObjectInputOutputStream {
 /** 创建自定义类，如果想要该类实现序列化机制，则需要满足以下要求
  *  1. 需要实现接口：Serializeable
  *  2. 需要在当前类中提供一个全局常量：serialVersionUID（这是为了对不同的类型进行区分，以防止报错）
+ *  3. 除了保证当前类需要实现Serializable接口之外，还必须保证其内部所有属性也必须是可序列化的
+ *  4. 如果使用static and transiene修饰，则这些变量不会被序列化，在保存的时候将会使用null值进行赋值，因此读取出来的值也为null
  */
 class Person implements Serializable{
 
     public static final long serialVersionUID = 9213959829L;
 
     private String name;
-    public int age;
+    // note: 如果使用static and transiene修饰，则这些变量不会被序列化，在保存的时候将会使用null值进行赋值，因此读取出来的值也为null
+    // private static String name;
+    // private transient String name;
+    private int age;
+    private Account acct; // 此时该类必须也是可靠序列化的，否则会报错
 
     public Person() {
     }
@@ -129,4 +138,10 @@ class Person implements Serializable{
                 ", age=" + age +
                 '}';
     }
+}
+
+class Account implements Serializable{
+    private float money;
+
+    public static final long serialVersionUID = 92113959829L;
 }
