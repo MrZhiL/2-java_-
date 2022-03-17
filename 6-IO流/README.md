@@ -1836,4 +1836,72 @@ public class RandomAccessFileTest {
 
 ```
 
+### 13. NIO.2中Path、Paths、Files类的使用-
+- java NIO (New IO, Non-Blocking IO) 是从Java 1.4版本开始引入的一套新的IO API，可以替代标准Java IO API。
+NIO 与原来的IO有同样的作用和目的，但是使用的方式完全不同，NIO支持面向缓冲区的(IO是面向流的)、基于通道的IO操作。
+**NIO将以更加高效的方式进行文件的读写操作**
+- Java API中提供了两套NIO，一套是针对标准输入输出NIO，另一套就是网络编程NIO。
+  - |-----java.nio.channels.Channel
+    - |-----FileChannel : 处理本地文件
+    - |-----SocketChannel: TCP网络编程的客户端的Channel
+    - |-----ServerSocketChannel： TCP网络编程的服务器的Channel
+    - |-----DatagramChannel: UDP网络编程中发送端和接收端的Channel
 
+#### NIO.2
+- 随着JDK 7的发布，Java对NIO进行了极大的扩展，增强了对文件处理和文件系统特性的支持，以至于我们称他们为NIO.2。
+因为NIO提供的一些功能，NIO已经称为文件处理中越来越重要的部分。
+
+#### Path、Paths和Files核心API
+- 早期的Java只提供了一个File类来访问文件系统，但File类的功能比较有限，所以提供的方法性能也不高。
+而且，大多数文件在出错时仅返回失败，并不会提供异常信息。
+- NIO.2为了弥补这种不足，引入了Path接口，代表一个平台无关的平台路径，描述了目录结构中文件的位置。
+Path可以看成是File类的升级版本，实际引用的资源也可以不存在。
+- 此时我们可以这样写
+    ```java
+    // import java.io.File;
+    // File file = new File("index.xml");
+    
+    import java.nio.file.Path;
+    import java.nio.file.Paths;
+    Path path = Paths.get("index.html");
+    ```
+- 同时，NIO.2在java.nio.file包下还提供了Files、Paths工具类，Files包含了大量静态的工具方法来操作文件；
+Paths则包含了两个返回Path的静态工厂方法。
+- Paths 类提供的静态get()方法用来获取Path对象；
+  - static Path get(String first, String ... more); 用于将多个字符串串联成路径
+  - static Path get(URI uri); 返回指定uri对应的path路径
+
+- Path的常用方法
+    ```java
+    int compareTo(Path other) 按字典顺序比较两条抽象路径。
+    default boolean endsWith(String other) 测试此路径是否以 Path ，通过转换给定的路径字符串构造，完全按照 endsWith(Path)方法指定的方式。
+    boolean endsWith(Path other) 测试此路径是否以给定路径结束。
+    boolean equals(Object other) 测试此路径是否与给定对象相等。
+    Path getFileName() 返回此路径表示为 Path对象的文件或目录的名称。
+    FileSystem getFileSystem() 返回创建此对象的文件系统。
+    Path getName(int index) 以 Path对象的形式返回此路径的名称元素。
+    int getNameCount() 返回路径中的名称元素数。
+    Path getParent() 返回 父路径 ，如果此路径没有 父路径 ，则返回 null 。
+    Path getRoot() 返回此路径的根组分作为 Path对象，或 null如果该路径不具有根组件。
+    int hashCode() 计算此路径的哈希码。
+    boolean isAbsolute() 判断此路径是否绝对。
+    default Iterator<Path> iterator() 返回此路径的name元素的迭代器。
+    Path normalize() 返回此路径的路径，其中删除了冗余名称元素。
+    static Path of(String first, String... more) 通过转换路径字符串或连接时形成路径字符串的字符串序列，返回 Path 。
+    static Path of(URI uri) 通过转换URI返回 Path 。
+    default WatchKey register(WatchService watcher, WatchEvent.Kind<?>... events) 使用监视服务注册此路径所在的文件。
+    WatchKey register(WatchService watcher, WatchEvent.Kind<?>[] events, WatchEvent.Modifier... modifiers) 使用监视服务注册此路径所在的文件。
+    Path relativize(Path other) 构造此路径与给定路径之间的相对路径。
+    default Path resolve(String other) 一个给定的路径字符串转换为 Path并解析它针对此 Path在完全按规定的方式 resolve方法。
+    Path resolve(Path other) 根据此路径解析给定路径。
+    default Path resolveSibling(String other) 将给定的路径字符串转换为 Path并按照 resolveSibling方法指定的方式将其解析为此路径的 parent路径。
+    default Path resolveSibling(Path other) 根据此路径的路径 parent解析给定路径。
+    default boolean startsWith(String other) 测试此路径是否以 Path ，通过转换给定的路径字符串构造，完全按照 startsWith(Path)方法指定的方式。
+    boolean startsWith(Path other) 测试此路径是否以给定路径开头。
+    Path subpath(int beginIndex, int endIndex) 返回一个相对 Path ，它是此路径的name元素的子序列。
+    Path toAbsolutePath() 返回表示此路径的绝对路径的 Path对象。
+    default File toFile() 返回表示此路径的File对象。
+    Path toRealPath(LinkOption... options) 返回现有文件的 实际路径。
+    String toString() 返回此路径的字符串表示形式。
+    URI toUri() 返回表示此路径的URI。
+    ```
