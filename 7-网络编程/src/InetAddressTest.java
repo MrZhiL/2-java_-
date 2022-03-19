@@ -18,6 +18,9 @@ import java.net.UnknownHostException;
  *              5.1 getByName(String host)
  *              5.2 getLocalHost();
 *           6. 两个常用方法：getHostName() / getHostAddress() : 获取域名和Ip地址
+ *
+ *          7. 端口号：要求不同的进程有不同的端口号：0~65535
+ *
  */
 public class InetAddressTest {
     @Test
