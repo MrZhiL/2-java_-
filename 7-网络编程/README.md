@@ -94,7 +94,7 @@ public class InetAddressTest {
 - 可以广播发送
 - 发送数据结束时无序释放资源，开销小，速度快
 
-### 3.3 TCP代码测试
+#### 3.3 TCP代码测试
 - Server端
 ```java
 public void server() {
@@ -251,4 +251,61 @@ public void server() throws IOException {
 
 }
 ```
+#### 3.5 TCP测试三：当服务端收到通知后回复客户端
+- note: 需要注意的是，因为read()为阻塞式的，因此服务端需要知道客户端什么时候发送结束。
+- 因此在客户端需要使用socket.shutdownOutput()方法
 
+```java
+@Test
+public void client() throws IOException {
+    Socket sc = new Socket( InetAddress.getByName("127.0.0.1"), 8001);
+
+    OutputStream outputStream = sc.getOutputStream();
+
+    outputStream.write("栋梁栋梁！这里是Clinet客户端，收到请回复!".getBytes(StandardCharsets.UTF_8));
+    // 当客户端想要接收数据时，需要告诉服务端什么时候发送完成
+    // 因为read()为阻塞式的
+    sc.shutdownOutput();
+
+    InputStream inputStream = sc.getInputStream();
+    byte[] buffer = new byte[1024];
+    int len = -1;
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    while ((len = inputStream.read(buffer)) != -1) {
+        baos.write(buffer, 0, len);
+    }
+    System.out.println(baos.toString());
+
+    baos.close();
+    inputStream.close();
+    outputStream.close();
+    sc.close();
+}
+
+@Test
+public void server() throws IOException {
+    ServerSocket serverSocketc = new ServerSocket(8001);
+
+    Socket socket = serverSocketc.accept();
+
+    InputStream inputStream = socket.getInputStream();
+
+    byte[] buffer = new byte[1024];
+    int len = -1;
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    while ((len = inputStream.read(buffer)) != -1) {
+        baos.write(buffer, 0, len);
+    }
+    System.out.println(baos);
+
+    OutputStream outputStream = socket.getOutputStream();
+    outputStream.write("收到回复!".getBytes(StandardCharsets.UTF_8));
+    System.out.println("已回复");
+
+    outputStream.close();
+    inputStream.close();
+    socket.close();
+    serverSocketc.close();
+
+}
+```
