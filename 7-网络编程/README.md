@@ -443,5 +443,55 @@ datagramSocket = new DatagramSocket();
       }
       }
   ```
+
+- 从指定页面下载文件
+```java
+// 2. URL编程实现网络资源的下载
+// TCP、UDP的博客中的图片： https://img-blog.csdnimg.cn/56b8a4e4777c4b4ba632cbf9cbeaac5e.png
+public void test02(){
+    InputStream inputStream = null;
+    FileOutputStream fos = null;
+    try {
+      // 1. 指定URL的指定文件位置
+      URL url = new URL(" https://img-blog.csdnimg.cn/56b8a4e4777c4b4ba632cbf9cbeaac5e.png");
   
+      // 2. 获取URL连接
+      HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+  
+      // 3. 建立连接（一定要有这个步骤）
+      urlConnection.connect();
+  
+      // 4. 下载数据
+      inputStream = urlConnection.getInputStream();
+      fos = new FileOutputStream("7-网络编程\\src\\figure1.png");
+  
+      // 5. 将数据写入到文件中
+      byte[] buffer = new byte[1024];
+      int len = -1;
+      while ((len = inputStream.read(buffer)) != -1) {
+          fos.write(buffer, 0, len);
+      }
+  
+      System.out.println("文件下载完成!");
+    } catch (IOException e) {
+        e.printStackTrace();
+    } finally {// 6. 关闭流和套接字
+      if (fos != null) {
+          try {
+            fos.close();
+          } catch (IOException e) {
+          e.printStackTrace();
+          }
+      }
+  
+      if (inputStream != null) {
+          try {
+            inputStream.close();
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+        }
+    }
+} 
+```
 
