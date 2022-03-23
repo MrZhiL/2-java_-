@@ -91,70 +91,100 @@
    System.out.println(c10 == c11); // true
    ```
 
-#### 2.3 代码测试
+#### 2.3 Class对应结构代码测试
 ```java
-//  1. 反射之前，对于Person的操作
-@Test
-public void test01() {
-    // 创建Person类的对象
-    Person p1 = new Person("Tom", 21);
-
-    // 通过对象，调用其内部的属性、方法
-    p1.setAge(22);
-    System.out.println(p1.toString());
-
-    p1.show();
-
-    // note: 在Person类外部，不可以通过Person类的对象调用其内部私有结构。
-    // 比如：name、showNation()以及私有的构造器
-}
-
-// 2. 使用反射之后，对于Person的操作
-@Test
-public void test02() throws Exception{
-    System.out.println("---------通过反射调用非私有结构------------");
-    // 2.1 通过反射来创建Person类对象
-    Class classPerson = Person.class;
-    Constructor cons = classPerson.getConstructor(String.class, int.class);
-    Object obj = cons.newInstance("Tom", 21);
-    Person p = (Person) obj;
-    p.setAge(22);
-    System.out.println(p.toString());
-
-
-    // 2.2 通过反射，调用对象指定的属性、方法
-    // 调用属性getDeclaredField, 只能调用非私有化的属性和方法
-    Field age = classPerson.getDeclaredField("age");
-    age.set(p, 20);     // 调用Field的set()方法来设置指定属性
-    System.out.println(p.toString());
-
-    // 调用方法getDeclaredMethod：只能调用非私有化的方法
-    Method method = classPerson.getDeclaredMethod("show");
-    method.invoke(p);   // 通过调用Method的invoke()方法来调用类的方法
-
-    // 2.3 通过反射，可以调用Person类的私有结构：如私有的构造器、方法和属性
-    // 调用私有的构造器
-    Constructor const1 = classPerson.getDeclaredConstructor(String.class);
-    const1.setAccessible(true);    // 需要设置为可访问的, 否则不可访问私有结构
-    Person person2 = (Person) const1.newInstance("Jack");
-    System.out.println(person2);
-
-    // 调用私有的属性
-    Field name = classPerson.getDeclaredField("name");
-    name.setAccessible(true);
-    name.set(person2, "Tom");   // 通过调用set()方法来修改私有属性
-    System.out.println(person2);
-
-    // 调用私有的方法
-    Method showNation = classPerson.getDeclaredMethod("showNation", String.class);
-    showNation.setAccessible(true);
-    String nation = (String) showNation.invoke(person2,"中国"); // 相当于 String nation = person.showNation("中国");
-    System.out.println(nation);
-}
+    //  1. 反射之前，对于Person的操作
+    @Test
+    public void test01() {
+        // 创建Person类的对象
+        Person p1 = new Person("Tom", 21);
+    
+        // 通过对象，调用其内部的属性、方法
+        p1.setAge(22);
+        System.out.println(p1.toString());
+    
+        p1.show();
+    
+        // note: 在Person类外部，不可以通过Person类的对象调用其内部私有结构。
+        // 比如：name、showNation()以及私有的构造器
+    }
+    
+    // 2. 使用反射之后，对于Person的操作
+    @Test
+    public void test02() throws Exception{
+        System.out.println("---------通过反射调用非私有结构------------");
+        // 2.1 通过反射来创建Person类对象
+        Class classPerson = Person.class;
+        Constructor cons = classPerson.getConstructor(String.class, int.class);
+        Object obj = cons.newInstance("Tom", 21);
+        Person p = (Person) obj;
+        p.setAge(22);
+        System.out.println(p.toString());
+    
+    
+        // 2.2 通过反射，调用对象指定的属性、方法
+        // 调用属性getDeclaredField, 只能调用非私有化的属性和方法
+        Field age = classPerson.getDeclaredField("age");
+        age.set(p, 20);     // 调用Field的set()方法来设置指定属性
+        System.out.println(p.toString());
+    
+        // 调用方法getDeclaredMethod：只能调用非私有化的方法
+        Method method = classPerson.getDeclaredMethod("show");
+        method.invoke(p);   // 通过调用Method的invoke()方法来调用类的方法
+    
+        // 2.3 通过反射，可以调用Person类的私有结构：如私有的构造器、方法和属性
+        // 调用私有的构造器
+        Constructor const1 = classPerson.getDeclaredConstructor(String.class);
+        const1.setAccessible(true);    // 需要设置为可访问的, 否则不可访问私有结构
+        Person person2 = (Person) const1.newInstance("Jack");
+        System.out.println(person2);
+    
+        // 调用私有的属性
+        Field name = classPerson.getDeclaredField("name");
+        name.setAccessible(true);
+        name.set(person2, "Tom");   // 通过调用set()方法来修改私有属性
+        System.out.println(person2);
+    
+        // 调用私有的方法
+        Method showNation = classPerson.getDeclaredMethod("showNation", String.class);
+        showNation.setAccessible(true);
+        String nation = (String) showNation.invoke(person2,"中国"); // 相当于 String nation = person.showNation("中国");
+        System.out.println(nation);
+    }
 ```
 
+#### 2.4 Class实例化代码测试
+```java
+    /* 获取CLass的实例的方式 */
+    public void test03() throws ClassNotFoundException {
+        // 方式一：调用运行时类的属性：.class
+        Class<Person> clazz1 = Person.class;
+        System.out.println(clazz1); // class ReflectionTest.Person
+    
+        // 方式二：通过运行时类的对象
+        Person p1 = new Person();
+        Class clazz2 = p1.getClass();
+        System.out.println(clazz2); // class ReflectionTest.Person
+    
+        // 方式三：调用Class的静态方法：forName(String classPath)，此时需要指明类的详细路径
+        Class clazz3 = Class.forName("ReflectionTest.Person");
+        System.out.println(clazz3); // class ReflectionTest.Person
+        System.out.println(Class.forName("java.lang.String")); // class java.lang.String
+    
+        // 加载到内准中的运行时类，会缓存一定的时间。在此时间之内，我们可以通过不同的方式来获取此运行时类
+        System.out.println(clazz1 == clazz2); // true
+        System.out.println(clazz1 == clazz3); // true
+        System.out.println(clazz2 == clazz3); // true
+    
+        // 方式四：使用类的加载器： ClassLoader （了解）
+        ClassLoader classLoader = ReflectionTest.class.getClassLoader();
+        Class clazz4 = classLoader.loadClass("ReflectionTest.Person");
+        System.out.println(clazz4); // class ReflectionTest.Person
+        System.out.println(clazz4 == clazz1); // true
+    }
+```
 
-### 3. 类的加载与ClassLoader的理解 (Class)
+## 3. 类的加载与ClassLoader的理解 (Class)
 
 #### 3.1关于java.lang.Class类的理解
 
@@ -166,36 +196,127 @@ Class: 通常称为反射的源头
 3. 换句话说，Class的实例就对应这一个运行时类。
 4. 加载到内准中的运行时类，会缓存一定的时间。在此时间之内，我们可以通过不同的方式来获取此运行时类
 
-#### 3.2 代码测试
-```java
-/* 获取CLass的实例的方式 */
-public void test03() throws ClassNotFoundException {
-    // 方式一：调用运行时类的属性：.class
-    Class<Person> clazz1 = Person.class;
-    System.out.println(clazz1); // class ReflectionTest.Person
+#### 3.2 类的加载过程
+当程序主动使用某个类时，如果该类还未被加载到内存中，则系统会通过如下三个步骤来对该类进行初始化。
 
-    // 方式二：通过运行时类的对象
-    Person p1 = new Person();
-    Class clazz2 = p1.getClass();
-    System.out.println(clazz2); // class ReflectionTest.Person
+- 加载：将class文件字节码内容加载到内存中，并将这些静态数据转换为方法区的运行时数据结构，然后
+生产一个代表这个类的`java.lang.Class`对象，作为方法区中类数据的访问入口（即引用地址）。所有
+需要访问和使用类数据只能通过这个Class对象。这个加载的过程需要类加载器参与。
 
-    // 方式三：调用Class的静态方法：forName(String classPath)，此时需要指明类的详细路径
-    Class clazz3 = Class.forName("ReflectionTest.Person");
-    System.out.println(clazz3); // class ReflectionTest.Person
-    System.out.println(Class.forName("java.lang.String")); // class java.lang.String
+- 链接：将Java类的二进制代码合并到JVM的运行状态之中的过程。
+  - 验证：确保加载的类信息符合JVM规范，例如：以cafe开头，没有安全方面的问题
+  - 准备：正式为类变量（static）分配内存并**设置类变量默认初始值**的阶段，这些内存都将在方法区中进行分配
+  - 解析：虚拟机常量池内的符号引用（常量名）替换为直接引用（地址）的过程
 
-    // 加载到内准中的运行时类，会缓存一定的时间。在此时间之内，我们可以通过不同的方式来获取此运行时类
-    System.out.println(clazz1 == clazz2); // true
-    System.out.println(clazz1 == clazz3); // true
-    System.out.println(clazz2 == clazz3); // true
+- 初始化：
+  - 执行`类构造器<clinit>()`方法的过程。`类构造器<clinit>()`方法是由编译器自动收集类中的锁喉类变量的赋值动作
+  和静态代码块中的语句合并产生的。（类构造器是构造类信息的，不是构造该类对象的构造器）。
+  - 当初始化一个类的时候，如果发现其父类还没有进行初始化，则需要其出法其父类的初始化。
+  - 虚拟机会保证一个类的\<clinit>() 方法在多线程环境中被正确加锁和同步。
 
-    // 方式四：使用类的加载器： ClassLoader （了解）
-    ClassLoader classLoader = ReflectionTest.class.getClassLoader();
-    Class clazz4 = classLoader.loadClass("ReflectionTest.Person");
-    System.out.println(clazz4); // class ReflectionTest.Person
-    System.out.println(clazz4 == clazz1); // true
-}
-```
+    ![img.png](README.assert/img2.png)
+
+- code test:
+    ```java
+    public class ClassLoadingTest {
+        public static void main(String[] args) {
+            System.out.println(A.m); // 100
+        }
+    } 
+    
+    class A {
+        static {
+            m = 300;
+        }
+        
+        static int m = 100;
+    }
+    
+    // 第二步：链接初始化后 m = 0;
+    // 第三步：初始化后，m的值有<clinit>()方法执行决定
+    //        这个A的类构造器<clinit>()方法由类变量的赋值和静态代码块中的语句按照顺序合并产生，类似于：
+    //        <clinit>() {
+    //            m = 300;
+    //            m = 100;
+    //        }
+    ```
+
+
+#### 3.3 类加载器的作用
+- 类加载的作用：将class文件字节码内容加载到内存中，并将这些静态数据局转换成方法区的运行时数据结构，然后
+在堆中生成一个代表这个类的java.lang.Class对象，作为方法区中类数据的访问入口。
+- 类缓存：标准的JavaSE类加载器可以按照要求查找类，但一旦某个类被加载到类加载器中，它将维持加载（缓存）一段时间。
+不过JVM垃圾回收机制可以回收这些Class对象
+- ![img.png](README.assert/img3.png)
+
+
+#### 3.4 ClassLoader(了解)
+类加载器作死是用来把类(class)装载进内存的。JVM规范定义了如下类型的类的加载器。
+![img.png](README.assert/img4.png)
+
+- code test:
+  ```java
+    @Test
+    public void test01() {
+        // 1. 对于自定义类，使用系统类加载器进行加载
+        ClassLoader classLoader1 = ClassLoaderTest.class.getClassLoader();
+        System.out.println(classLoader1); // jdk.internal.loader.ClassLoaders$AppClassLoader@2437c6dc
+
+        // 2. 调用系统类加载的getParent() 可以扩展类加载器
+        ClassLoader classLoader2 = classLoader1.getParent();
+        System.out.println(classLoader2); // jdk.internal.loader.ClassLoaders$PlatformClassLoader@7e0e6aa2
+
+        // 3. 调用扩展类加载器的getParent()：无法获取引导类加载器
+        // note: 引导类加载器主要负责加载java的核心类库，无法加载自定义类的。
+        ClassLoader classLoader3 = classLoader2.getParent();
+        System.out.println(classLoader3);
+
+        ClassLoader classLoader4 = String.class.getClassLoader();
+        System.out.println(classLoader4); // null; 可以说明String为扩展类
+    }
+  
+     /** Properties: 用来读取配置文件
+     * 使用两种方式来读取配置文件
+     */
+    @Test
+    public void test02() {
+        // 1. 创建配置文件类
+        Properties pros = null;
+        FileInputStream fis = null;
+        try {
+            pros = new Properties();
+
+            // 2. 读取配置文件方式一：
+            // 此时FileInputStream在Test下的默认路径为当前Module下
+            fis = new FileInputStream("jdbc.properties");
+            pros.load(fis);
+
+            String name = pros.getProperty("name");
+            String age = pros.getProperty("age");
+            System.out.println("name = " + name + ", age = " + age); // name = 孙悟空, age = 999
+
+            // 3. 读取配置文件方式二：使用反射
+            // note: 此时使用反射机制时，默认读取文件的路径为当前Module/src目录下
+            ClassLoader classLoader = ClassLoaderTest.class.getClassLoader();
+            InputStream resourceAsStream = classLoader.getResourceAsStream("jdbc2.properties");
+            pros.load(resourceAsStream);
+            name = pros.getProperty("name");
+            age = pros.getProperty("age");
+            System.out.println("name = " + name + ", age = " + age); // name = 猪八戒, age = 888
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+  ```
 
 ### 4. 创建运行时类的对象
 
