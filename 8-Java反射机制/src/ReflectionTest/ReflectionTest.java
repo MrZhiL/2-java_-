@@ -77,4 +77,43 @@ public class ReflectionTest {
         System.out.println(nation);
 
     }
+
+    /** java.lang.Class类的理解
+     * 1. 类的加载过程：程序在经过javac.exe命令以后，会生成一个或多个字节码文件（.class结尾），接着我们使用java.exe命令对某个字节码文件进行解释运行。
+     * 相当于将某个字节码文件加载到内存中，此过程就称为类的加载。
+     *
+     * 2. 加载到内存中的类，我们就称为运行时类，此运行时类就作为Class的一个实例。
+     *
+     * 3. 换句话说，Class的实例就对应这一个运行时类。
+     *
+     * 4. 加载到内准中的运行时类，会缓存一定的时间。在此时间之内，我们可以通过不同的方式来获取此运行时类
+     */
+    @Test
+    /* 获取CLass的实例的方式 */
+    public void test03() throws ClassNotFoundException {
+        // 方式一：调用运行时类的属性：.class
+        Class<Person> clazz1 = Person.class;
+        System.out.println(clazz1); // class ReflectionTest.Person
+
+        // 方式二：通过运行时类的对象
+        Person p1 = new Person();
+        Class clazz2 = p1.getClass();
+        System.out.println(clazz2); // class ReflectionTest.Person
+
+        // 方式三：调用Class的静态方法：forName(String classPath)，此时需要指明类的详细路径
+        Class clazz3 = Class.forName("ReflectionTest.Person");
+        System.out.println(clazz3); // class ReflectionTest.Person
+        System.out.println(Class.forName("java.lang.String")); // class java.lang.String
+
+        // 加载到内准中的运行时类，会缓存一定的时间。在此时间之内，我们可以通过不同的方式来获取此运行时类
+        System.out.println(clazz1 == clazz2); // true
+        System.out.println(clazz1 == clazz3); // true
+        System.out.println(clazz2 == clazz3); // true
+
+        // 方式四：使用类的加载器： ClassLoader （了解）
+        ClassLoader classLoader = ReflectionTest.class.getClassLoader();
+        Class clazz4 = classLoader.loadClass("ReflectionTest.Person");
+        System.out.println(clazz4); // class ReflectionTest.Person
+        System.out.println(clazz4 == clazz1); // true
+    }
 }

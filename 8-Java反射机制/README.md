@@ -49,7 +49,20 @@
 
 ### 2. 理解Class类并获取Class实例
 
-#### 2.1 代码测试
+#### 2.1 疑问：
+1. 反射机制与面向对象中的封装性是不是矛盾的？如何看待两个技术？
+    
+   答：不矛盾。 封装性是指建议如何操作，如不建议操作private属性，私有方法等。
+而反射机制则表示的是能不能做，能不能调用类中的结构，而其实直接调用类的私有结构，
+与调用public结构没有区别，因为public中的方法也会对私有方法进行调用等操作。
+
+2. 通过直接new的方式或反射的方式都可以调用公共的结构，开发中到底用那个？什么时候使用反射的方式？
+
+    答：建议用直接new的方法；如果在运行之前不能确定new那个类，则就需要使用反射的机制。
+      
+    **反射的特性：动态性**
+
+#### 2.2 代码测试
 ```java
 //  1. 反射之前，对于Person的操作
 @Test
@@ -112,8 +125,48 @@ public void test02() throws Exception{
 ```
 
 
-### 3. 类的加载与ClassLoader的理解
+### 3. 类的加载与ClassLoader的理解 (Class)
 
+#### 3.1关于java.lang.Class类的理解
+
+Class: 通常称为反射的源头
+
+1. 类的加载过程：程序在经过javac.exe命令以后，会生成一个或多个字节码文件（.class结尾），接着我们使用java.exe命令对某个字节码文件进行解释运行。
+相当于将某个字节码文件加载到内存中，此过程就称为类的加载。
+2. 加载到内存中的类，我们就称为运行时类，此运行时类就作为Class的一个实例。
+3. 换句话说，Class的实例就对应这一个运行时类。
+4. 加载到内准中的运行时类，会缓存一定的时间。在此时间之内，我们可以通过不同的方式来获取此运行时类
+
+#### 3.2 代码测试
+```java
+/* 获取CLass的实例的方式 */
+public void test03() throws ClassNotFoundException {
+    // 方式一：调用运行时类的属性：.class
+    Class<Person> clazz1 = Person.class;
+    System.out.println(clazz1); // class ReflectionTest.Person
+
+    // 方式二：通过运行时类的对象
+    Person p1 = new Person();
+    Class clazz2 = p1.getClass();
+    System.out.println(clazz2); // class ReflectionTest.Person
+
+    // 方式三：调用Class的静态方法：forName(String classPath)，此时需要指明类的详细路径
+    Class clazz3 = Class.forName("ReflectionTest.Person");
+    System.out.println(clazz3); // class ReflectionTest.Person
+    System.out.println(Class.forName("java.lang.String")); // class java.lang.String
+
+    // 加载到内准中的运行时类，会缓存一定的时间。在此时间之内，我们可以通过不同的方式来获取此运行时类
+    System.out.println(clazz1 == clazz2); // true
+    System.out.println(clazz1 == clazz3); // true
+    System.out.println(clazz2 == clazz3); // true
+
+    // 方式四：使用类的加载器： ClassLoader （了解）
+    ClassLoader classLoader = ReflectionTest.class.getClassLoader();
+    Class clazz4 = classLoader.loadClass("ReflectionTest.Person");
+    System.out.println(clazz4); // class ReflectionTest.Person
+    System.out.println(clazz4 == clazz1); // true
+}
+```
 
 ### 4. 创建运行时类的对象
 
