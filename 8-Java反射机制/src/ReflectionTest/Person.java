@@ -50,10 +50,11 @@ public class Person {
     }
 
     public void show() {
-        System.out.println("pubic void show()" + this.toString());
+        System.out.println("pubic void show() : " + this.toString());
     }
 
-    private void showNation(String nation) {
-        System.out.println("public void show(nation)  :  " + nation);
+    private String showNation(String nation) {
+        System.out.println("public void show(nation) : " + nation);
+        return nation;
     }
 }

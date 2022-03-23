@@ -70,6 +70,7 @@ public void test01() {
 // 2. 使用反射之后，对于Person的操作
 @Test
 public void test02() throws Exception{
+    System.out.println("---------通过反射调用非私有结构------------");
     // 2.1 通过反射来创建Person类对象
     Class classPerson = Person.class;
     Constructor cons = classPerson.getConstructor(String.class, int.class);
@@ -88,6 +89,25 @@ public void test02() throws Exception{
     // 调用方法getDeclaredMethod：只能调用非私有化的方法
     Method method = classPerson.getDeclaredMethod("show");
     method.invoke(p);   // 通过调用Method的invoke()方法来调用类的方法
+
+    // 2.3 通过反射，可以调用Person类的私有结构：如私有的构造器、方法和属性
+    // 调用私有的构造器
+    Constructor const1 = classPerson.getDeclaredConstructor(String.class);
+    const1.setAccessible(true);    // 需要设置为可访问的, 否则不可访问私有结构
+    Person person2 = (Person) const1.newInstance("Jack");
+    System.out.println(person2);
+
+    // 调用私有的属性
+    Field name = classPerson.getDeclaredField("name");
+    name.setAccessible(true);
+    name.set(person2, "Tom");   // 通过调用set()方法来修改私有属性
+    System.out.println(person2);
+
+    // 调用私有的方法
+    Method showNation = classPerson.getDeclaredMethod("showNation", String.class);
+    showNation.setAccessible(true);
+    String nation = (String) showNation.invoke(person2,"中国"); // 相当于 String nation = person.showNation("中国");
+    System.out.println(nation);
 }
 ```
 
