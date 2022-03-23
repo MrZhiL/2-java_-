@@ -62,7 +62,36 @@
       
     **反射的特性：动态性**
 
-#### 2.2 代码测试
+#### 2.2 Class 实例对应的结构说明
+##### 1. 哪些类型可以有Class对象？
+1. class: 外部类，成员（成员内部类，静态内部类），局部内部类，匿名内部类
+2. interface: 接口
+3. [] : 数组
+4. enum: 枚举
+5. annotation: 注解@interface
+6. primitive type: 基本数据类型
+7. void
+8. ```java
+   Class c1 = Object.class;        // class java.lang.Object 
+   Class c2 = Comparable.class;    // interface java.lang.Comparable 
+   Class c3 = String[].class;      // class [Ljava.lang.String; 
+   Class c4 = int[][].class;       // class [[I 
+   Class c5 = ElementType.class;   // class java.lang.annotation.ElementType     
+   Class c6 = Override.class;      // interface java.lang.Override 
+   Class c7 = int.class;           // int 
+   Class c8 = void.class;          // void 
+   Class c9 = Class.class;         // class java.lang.Class 
+   
+   int[] a = new int[10];           
+   int[] b = new int[100];          
+   Class c10 = a.getClass();       // class [I     
+   Class c11 = b.getClass();            
+   
+   // 只要元素类型与维度一样，就是同一个Class
+   System.out.println(c10 == c11); // true
+   ```
+
+#### 2.3 代码测试
 ```java
 //  1. 反射之前，对于Person的操作
 @Test

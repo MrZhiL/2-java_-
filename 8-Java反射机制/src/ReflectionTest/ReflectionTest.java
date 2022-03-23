@@ -2,6 +2,7 @@ package ReflectionTest;
 
 import org.junit.Test;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -115,5 +116,38 @@ public class ReflectionTest {
         Class clazz4 = classLoader.loadClass("ReflectionTest.Person");
         System.out.println(clazz4); // class ReflectionTest.Person
         System.out.println(clazz4 == clazz1); // true
+    }
+
+    // Class实例可以是哪些结构的说明：
+    @Test
+    public void test04() {
+        Class c1 = Object.class;
+        Class c2 = Comparable.class;
+        Class c3 = String[].class;
+        Class c4 = int[][].class;
+        Class c5 = ElementType.class;
+        Class c6 = Override.class;
+        Class c7 = int.class;
+        Class c8 = void.class;
+        Class c9 = Class.class;
+
+        System.out.println(c1);
+        System.out.println(c2);
+        System.out.println(c3);
+        System.out.println(c4);
+        System.out.println(c5);
+        System.out.println(c6);
+        System.out.println(c7);
+        System.out.println(c8);
+        System.out.println(c9);
+
+        int[] a = new int[10];
+        int[] b = new int[100];
+        Class c10 = a.getClass();
+        Class c11 = b.getClass();
+        System.out.println(c10);
+
+        // 只要数组元素类型与维度一样，就是同一个Class
+        System.out.println(c10 == c11); // true
     }
 }
