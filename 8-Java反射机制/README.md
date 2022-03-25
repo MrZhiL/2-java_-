@@ -393,9 +393,97 @@ Class: 通常称为反射的源头
     }
 ```
 
-
-
 ### 5. 获取运行时类的完整结构
+``java
+@Test
+    public void test01() {
+        Class clazz = Person.class;
+
+        // 获取属性结构
+        // getFields(): 获取当前运行时类及其父类中声明为public访问权限的属性
+        System.out.println("*******getFields()**************");
+        Field[] fields = clazz.getFields();
+        for (Field f : fields) {
+            System.out.println(f);
+        }
+
+        // getDeclaredFields(): 获取当前运行时类中声明的所有属性，包括private属性（不包含父类中声明的属性）
+        // 获取权限修饰符  类型  变量名
+        System.out.println("\n*******getDeclaredFields()**************");
+        Field[] fields1 = clazz.getDeclaredFields();
+        for (Field f : fields1) {
+            System.out.println(f);
+
+            // 1. 获取权限修饰符
+            int modifiers = f.getModifiers();
+            System.out.print("权限修饰符： " + Modifier.toString(modifiers) + "\t");
+
+            // 2. 获取类型
+            Class<?> type = f.getType();
+            System.out.print("类型： " + type.getName() + "\t");
+
+            // 3. 获取属性名
+            String name = f.getName();
+            System.out.print("属性名： " + name);
+
+            System.out.println();
+        }
+    }
+
+@MyAnnotation(value = "Person")
+public class Person extends Creature<String> implements Comparable, MyInterface{
+
+    private String name;
+    int age;
+    public int id;
+
+    public Person() {}
+
+    @MyAnnotation(value = "Person(name)")
+    private Person(String name) {
+        this.name = name;
+    }
+
+    Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @MyAnnotation(value = "show")
+    public String show(String nation) {
+        System.out.println("国籍： " + nation);
+        return nation;
+    }
+
+    public String display(String interests) {
+        System.out.println("interest: " + interests);
+        return interests;
+    }
+
+    @Override
+    public void info() {
+        System.out.println("I am a person!");
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return 0;
+    }
+}
+
+public class Creature<T> implements Serializable {
+    private char gender;
+    public double weight;
+
+    private void breath() {
+        System.out.println("所有生物需要进行呼吸");
+    }
+
+    public void eat() {
+        System.out.println("生物可以吃东西");
+    }
+}
+```
 
 
 ### 6. 调用运行时类的指定结构
