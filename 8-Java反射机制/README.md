@@ -646,6 +646,39 @@ public int ReflectionTest2.Person.id
     }
 ```
 
+#### 5.4 通过反射获取运行时类的接口、所在包、注解等
+```java
+    /* 通过反射获取运行时类的接口、所在包、注解等 */
+    public void test05() {
+        Class clazz = Person.class;
+
+        // 1. 获取运行时类的接口
+        Class[] interfaces = clazz.getInterfaces();
+        for (Class c : interfaces) {
+            System.out.println(c);
+        }
+
+        System.out.println();
+        // 获取运行时类的所在父类的接口
+        Class[] interfaces1 = clazz.getSuperclass().getInterfaces();
+        for (Class c : interfaces1) {
+            System.out.println(c);
+        }
+
+        System.out.println();
+        // 2. 获取运行时类的所在包
+        Package pack = clazz.getPackage();
+        System.out.println(pack);
+
+        System.out.println();
+        // 3. 获取运行时类的注解
+        Annotation[] annotations = clazz.getAnnotations();
+        for (Annotation anno : annotations) {
+            System.out.println(anno);
+        }
+    }
+```
+
 ### 6. 调用运行时类的指定结构
 
 
