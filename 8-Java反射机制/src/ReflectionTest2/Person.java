@@ -28,14 +28,14 @@ public class Person extends Creature<String> implements Comparable, MyInterface{
     }
 
     @MyAnnotation(value = "show")
-    public String show(String nation) {
+    private String show(String nation) {
         System.out.println("国籍： " + nation);
         return nation;
     }
 
-    public String display(String interests) {
+    public String display(String interests, int age) throws NullPointerException, RuntimeException, ClassCastException {
         System.out.println("interest: " + interests);
-        return interests;
+        return interests + age;
     }
 
     @Override
