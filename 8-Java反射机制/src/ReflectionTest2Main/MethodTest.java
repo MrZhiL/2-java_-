@@ -4,6 +4,7 @@ import ReflectionTest2.Person;
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -89,5 +90,25 @@ public class MethodTest {
 
             System.out.println("\n");
         }
+    }
+
+    @Test
+    /* 获取构造器结构 */
+    public void otherTest() {
+        Class clazz = Person.class;
+
+        // 1. getConstructor(): 获取当前运行时类中声明为public的构造器
+        Constructor[] constructor = clazz.getConstructors();
+        for (Constructor con : constructor) {
+            System.out.println(con);
+        }
+        System.out.println();
+        
+        // 2. getDeclaredConstructors() : 获取当前运行时类中声明的所有构造器
+        Constructor[] declaredConstructors = clazz.getDeclaredConstructors();
+        for (Constructor dec : declaredConstructors) {
+            System.out.println(dec);
+        }
+
     }
 }

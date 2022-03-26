@@ -415,6 +415,99 @@ Class: 通常称为反射的源头
 ```
 
 ```java
+    @Test
+    /**获取方法的参数和注解
+     * @xxx
+     * 权限修饰符    返回值类型   方法名(参数类型1 形参名1, 参数类型2, ...) throws xxxException{}
+     */
+    public void test02() {
+        Class clazz = Person.class;
+        Method[] declaredMethods = clazz.getDeclaredMethods();
+        for (Method m : declaredMethods) {
+            System.out.println(m);
+
+            // 1. 获取运行时类的方法的注解
+            Annotation[] anno = m.getAnnotations();
+            for (Annotation a : anno) {
+                System.out.println(a);
+            }
+
+            // 2. 获取运行时类的方法的权限修饰符
+            System.out.print(Modifier.toString(m.getModifiers()) + ";\t");
+
+            // 3. 获取运行时类的方法的返回值类型
+            System.out.print(m.getReturnType() + "; \t");
+
+            // 4. 获取方法名
+            System.out.print(m.getName() + "(");
+
+            // 5. 获取形参列表
+            Class[] parameterTypes = m.getParameterTypes();
+            if (!(parameterTypes == null && parameterTypes.length == 0)) {
+//            if (parameterTypes.length > 0) {
+                for (int i = 0; i < parameterTypes.length; ++i) {
+                    if (i == parameterTypes.length - 1) {
+                        System.out.print(parameterTypes[i].getName() + " args_" + i);
+                        break;
+                    }
+                    System.out.print(parameterTypes[i].getName() + " args_" + i + ", ");
+                }
+            }
+            System.out.print(")");
+
+            // 6. 获取抛出的异常
+            Class[] exceptionTypes = m.getExceptionTypes();
+            if (exceptionTypes.length > 0) {
+                System.out.println(" throws ");
+                for (int i = 0; i < exceptionTypes.length; ++i) {
+                    if (i == exceptionTypes.length - 1) {
+                        System.out.print(exceptionTypes[i].getName());
+                        break;
+                    }
+                    System.out.print(exceptionTypes[i].getName() + ", ");
+                }
+            }
+
+            System.out.println("\n");
+        }
+    }
+
+    @Test
+    /* 获取构造器结构 */
+    public void otherTest() {
+        Class clazz = Person.class;
+    
+        // 1. getConstructor(): 获取当前运行时类中声明为public的构造器
+        Constructor[] constructor = clazz.getConstructors();
+        for (Constructor con : constructor) {
+            System.out.println(con);
+        }
+        System.out.println();
+
+        // 2. getDeclaredConstructors() : 获取当前运行时类中声明的所有构造器
+        Constructor[] declaredConstructors = clazz.getDeclaredConstructors();
+        for (Constructor dec : declaredConstructors) {
+            System.out.println(dec);
+        }
+    }
+
+-------输出：------------
+public int ReflectionTest2.Person.compareTo(java.lang.Object)
+public;	int; 	compareTo(java.lang.Object args_0)
+
+public void ReflectionTest2.Person.info()
+public;	void; 	info()
+
+public java.lang.String ReflectionTest2.Person.display(java.lang.String,int) throws java.lang.NullPointerException,java.lang.RuntimeException,java.lang.ClassCastException
+public;	class java.lang.String; 	display(java.lang.String args_0, int args_1) throws
+        java.lang.NullPointerException, java.lang.RuntimeException, java.lang.ClassCastException
+
+private java.lang.String ReflectionTest2.Person.show(java.lang.String)
+@ReflectionTest2.MyAnnotation(value="show")
+private;	class java.lang.String; 	show(java.lang.String args_0)
+```
+
+```java
 @Test
 public void test01() {
     Class clazz = Person.class;
@@ -470,14 +563,14 @@ public class Person extends Creature<String> implements Comparable, MyInterface{
     }
 
     @MyAnnotation(value = "show")
-    public String show(String nation) {
+    private String show(String nation) {
         System.out.println("国籍： " + nation);
         return nation;
     }
 
-    public String display(String interests) {
+    public String display(String interests, int age) throws NullPointerException, RuntimeException, ClassCastException {
         System.out.println("interest: " + interests);
-        return interests;
+        return interests + age;
     }
 
     @Override
