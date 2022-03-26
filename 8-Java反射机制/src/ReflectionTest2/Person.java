@@ -47,4 +47,17 @@ public class Person extends Creature<String> implements Comparable, MyInterface{
     public int compareTo(Object o) {
         return 0;
     }
+
+    private static void showDesc() {
+        System.out.println("I am a static func()");
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", id=" + id +
+                '}';
+    }
 }
