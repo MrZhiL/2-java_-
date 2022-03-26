@@ -394,41 +394,61 @@ Class: 通常称为反射的源头
 ```
 
 ### 5. 获取运行时类的完整结构
-``java
-@Test
+```java
+    @Test
     public void test01() {
         Class clazz = Person.class;
 
-        // 获取属性结构
-        // getFields(): 获取当前运行时类及其父类中声明为public访问权限的属性
-        System.out.println("*******getFields()**************");
-        Field[] fields = clazz.getFields();
-        for (Field f : fields) {
-            System.out.println(f);
+        // 1.getMethods() : 获取当前运行时类及其所有父类中声明为public权限的方法
+        Method[] method = clazz.getMethods();
+        for (Method m : method) {
+            System.out.println(m);
         }
 
-        // getDeclaredFields(): 获取当前运行时类中声明的所有属性，包括private属性（不包含父类中声明的属性）
-        // 获取权限修饰符  类型  变量名
-        System.out.println("\n*******getDeclaredFields()**************");
-        Field[] fields1 = clazz.getDeclaredFields();
-        for (Field f : fields1) {
-            System.out.println(f);
-
-            // 1. 获取权限修饰符
-            int modifiers = f.getModifiers();
-            System.out.print("权限修饰符： " + Modifier.toString(modifiers) + "\t");
-
-            // 2. 获取类型
-            Class<?> type = f.getType();
-            System.out.print("类型： " + type.getName() + "\t");
-
-            // 3. 获取属性名
-            String name = f.getName();
-            System.out.print("属性名： " + name);
-
-            System.out.println();
+        System.out.println("\n*******************");
+        // 2.getDeclaredMethods(): 获取当前运行时类中声明的所有方法，包含private方法，不包含父类中的方法
+        Method[] declaredMethods = clazz.getDeclaredMethods();
+        for (Method m : declaredMethods) {
+            System.out.println(m);
         }
     }
+```
+
+```java
+@Test
+public void test01() {
+    Class clazz = Person.class;
+
+    // 获取属性结构
+    // getFields(): 获取当前运行时类及其父类中声明为public访问权限的属性
+    System.out.println("*******getFields()**************");
+    Field[] fields = clazz.getFields();
+    for (Field f : fields) {
+        System.out.println(f);
+    }
+
+    // getDeclaredFields(): 获取当前运行时类中声明的所有属性，包括private属性（不包含父类中声明的属性）
+    // 获取权限修饰符  类型  变量名
+    System.out.println("\n*******getDeclaredFields()**************");
+    Field[] fields1 = clazz.getDeclaredFields();
+    for (Field f : fields1) {
+        System.out.println(f);
+
+        // 1. 获取权限修饰符
+        int modifiers = f.getModifiers();
+        System.out.print("权限修饰符： " + Modifier.toString(modifiers) + "\t");
+
+        // 2. 获取类型
+        Class<?> type = f.getType();
+        System.out.print("类型： " + type.getName() + "\t");
+
+        // 3. 获取属性名
+        String name = f.getName();
+        System.out.print("属性名： " + name);
+
+        System.out.println();
+    }
+}
 
 @MyAnnotation(value = "Person")
 public class Person extends Creature<String> implements Comparable, MyInterface{
@@ -483,6 +503,20 @@ public class Creature<T> implements Serializable {
         System.out.println("生物可以吃东西");
     }
 }
+
+------------输出------------
+        
+*******getFields()**************
+public int ReflectionTest2.Person.id
+public double ReflectionTest2.Creature.weight
+
+*******getDeclaredFields()**************
+private java.lang.String ReflectionTest2.Person.name
+权限修饰符： private	类型： java.lang.String	属性名： name
+int ReflectionTest2.Person.age
+权限修饰符： 	类型： int	属性名： age
+public int ReflectionTest2.Person.id
+权限修饰符： public	类型： int	属性名： id
 ```
 
 
