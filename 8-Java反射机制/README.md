@@ -414,6 +414,7 @@ Class: 通常称为反射的源头
     }
 ```
 
+#### 5.1 获取运行时类的方法参数、注解、构造器
 ```java
     @Test
     /**获取方法的参数和注解
@@ -507,6 +508,7 @@ private java.lang.String ReflectionTest2.Person.show(java.lang.String)
 private;	class java.lang.String; 	show(java.lang.String args_0)
 ```
 
+#### 5.2 获取运行时类的属性结构，权限修饰符、类型和变量名
 ```java
 @Test
 public void test01() {
@@ -612,6 +614,37 @@ public int ReflectionTest2.Person.id
 权限修饰符： public	类型： int	属性名： id
 ```
 
+#### 5.3 获取运行时类的父类及其泛型
+```java
+@Test
+    // 获取运行时 类的父类及其父类的泛型
+    public void test04() {
+        Class clazz = Person.class;
+
+        // 1. getSuperclass() : 获取运行时类的父类
+        Class superclass = clazz.getSuperclass();
+        System.out.println(superclass); // class ReflectionTest2.Creature
+
+        // 2. getGenericSuperclass() : 获取运行时类的带泛型的父类
+        Type genericSuperclass = clazz.getGenericSuperclass();
+        System.out.println(genericSuperclass); // ReflectionTest2.Creature<java.lang.String>
+
+        // 3. 获取运行时类的带泛型的父类的泛型
+        // 获取泛型结构
+        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        for (Type type : actualTypeArguments) {
+            System.out.println(type);   // 方法一 ：class java.lang.String
+            System.out.println(type.getTypeName()); // 方法二 ： java.lang.String
+            System.out.println(((Class)type).getName()); // 方法三 ：java.lang.String
+        }
+
+        // 4. 获取其父类的方法
+        for (Field field : superclass.getFields()) {
+            System.out.println(field); // public double ReflectionTest2.Creature.weight
+        }
+    }
+```
 
 ### 6. 调用运行时类的指定结构
 

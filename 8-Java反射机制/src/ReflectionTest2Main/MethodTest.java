@@ -4,9 +4,7 @@ import ReflectionTest2.Person;
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 
 /**
  * @ClassName: ReflectionTest2Main
@@ -109,6 +107,34 @@ public class MethodTest {
         for (Constructor dec : declaredConstructors) {
             System.out.println(dec);
         }
+    }
 
+    @Test
+    // 获取运行时 类的父类及其父类的泛型
+    public void test04() {
+        Class clazz = Person.class;
+
+        // 1. getSuperclass() : 获取运行时类的父类
+        Class superclass = clazz.getSuperclass();
+        System.out.println(superclass);
+
+        // 2. getGenericSuperclass() : 获取运行时类的带泛型的父类
+        Type genericSuperclass = clazz.getGenericSuperclass();
+        System.out.println(genericSuperclass);
+
+        // 3. 获取运行时类的带泛型的父类的泛型
+        // 获取泛型结构
+        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        for (Type type : actualTypeArguments) {
+            System.out.println(type);   // 方法一 ：class java.lang.String
+            System.out.println(type.getTypeName()); // 方法二 ： java.lang.String
+            System.out.println(((Class)type).getName()); // 方法三 ：java.lang.String
+        }
+
+        // 4. 获取其父类的方法
+        for (Field field : superclass.getFields()) {
+            System.out.println(field);
+        }
     }
 }
