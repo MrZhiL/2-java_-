@@ -1,28 +1,3 @@
-# Java8中的新特性
-1. Lambda表达式
-2. 函数式（Functional）接口
-3. 方法引用与构造器引用
-4. 强大的Stream API
-5. Optional类
-
-## 1. Java8 的新特性
-- 速度更快
-- 代码更少（增加了新的语法：Lambda表达式）
-- 强大的Stream API
-- 便于并行
-  - 并行流就是把一个内容分成多个数据块，并用不同的线程分别处理每个数据块的流。
-    相比于串行的流，并行的流可以很大程度上提高程序的执行效率。
-  - Java 8中将并行进行了优化，我们可以很容易的对数据进行并行操作。Stream API可以声明性地
-    通过parallel()与sequential()在并行流与顺序流之间进行切换。
-- 最大化减少空指针异常：Optional
-- Nashorn引擎，运行JVM上运行JS应用
-
-## 2. Lambda表达式
-Lambda 是一个匿名函数，我们可以把Lambda表达式理解为时一段可以传递的代码（将代码像数据一样传递）。
-使用它可以写出更简洁、更灵活的代码。作为一种更紧凑的代码风格，使Java的语言表达能力得到了提升。
-
-### 2.1 Lambda代码测试1：
-```java
 package LambdaTest;
 
 import org.junit.Test;
@@ -78,6 +53,3 @@ public class LambdaTest {
         System.out.println(c3.compare(11, 11));
     }
 }
-```
-
-
