@@ -43,8 +43,9 @@ import java.util.function.Consumer;
  *              4.6. 语法格式六：当Lambda体只有一条语句时，return 与大括号若有，都可以省略。
  *                 `Comparator<Integer> com = (x,y) -> Integer.compare(x,y);`
  *
- *          5. Lambda表达式的本质：作为接口的实例，而不是函数
- *          6. 总结：
+ *          5. Lambda表达式的本质：作为函数式接口的实例，而不是函数
+ *          6. 如果一个接口中，只声明了一个抽象方法，则此接口就称为函数式接口
+ *          7. 总结：
  *              Lambda左边：Lambda形参列表的参数类型可以省略（类型推断）；如果Lambda形参列表只有一个参数，则这一对()也可以省略。
  *              Lambda右边：Lambda方法体应该使用一对{}包裹；如果Lambda体只有一条执行语句（可能是return语句），则可以省略这一对{}和return
  */

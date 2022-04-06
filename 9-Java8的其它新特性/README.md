@@ -224,3 +224,57 @@ public class LambdaTest {
     }
 ```
 
+
+## 3. 函数式（Functional）接口
+
+### 3.1 函数式接口概念
+1. 只包含一个抽象方法的接口，称为函数式接口
+2. 你可以通过Lambda表达式来创建该接口的对象。（若Lambda表达式抛出一个受检异常(即：非运行时异常)，那么该异常需要在
+目标接口的抽象方法上进行声明）。
+3. 我们可以在一个接口上使用 `@FunctionalInterface` 注解，这样做可以检查它是否是一个函数式接口。
+   同时javadoc也会包含一条声明，说明这个接口是一个函数式接口。
+4. 在`java.util.function`包下定义了Java 8的丰富的函数式接口。
+
+5. 代码测试
+    ```java
+       @FunctionalInterface
+       public interface MyInterface {
+       void method1();
+       // void method2(); // error, 函数式抽象接口中只能定义一个抽象方法
+       }
+    ```
+
+### 3.2 如何理解函数式接口
+- Java 从诞生日起就一直倡导“一切皆对象”，在Java里面 面向对象（OOP）编程是一切。但是随着Python、
+scala等语言的兴起和新技术的挑战，Java不得不做出调整以支持更加广泛的技术要求，也即java不但支持OOP
+还可以支持OOF(面向函数编程)
+- 在函数式编程语言中，函数被当做一等公民对待。在将函数作为一等公民的编程语言中，Lambda表达式的类型是函数。
+  但是在Java8中，有所不同。在Java8中，Lambda表达式是对象，而不是函数，它们必须依附于一类特别的对象类型——函数式接口
+- 简单的说，在Java8中，**Lambda表达式就是一个函数式接口的实例**。这就是Lambda表达式和函数式接口的关系。
+  也就是说，只要一个对象时函数式接口的实例，那么该对象就可以用Lambda表达式来表示。
+- **所有以前用匿名实现类表示的现在都可以用Lambda表达式来写。**
+
+### 3.3 Java内置四大核心函数式接口
+
+| 函数式接口                     | 参数类型 | 返回类型 | 用途                                                  |
+|------------------------------|--------|---------|-----------------------------------------------------|
+| Consumer<T> <br/>消费型接口    | T      | void    | 对类型为T的对象应用操作，包含方法，void accept(T t)                  |
+| Supplier<T> <br/>供给型接口    | 无     | T       | 返回类型为T的对象，包含方法：T get()                              |
+| Function<T, R><br/> 函数式接口 | T      | R       | 对类型为T的对象应用操作，并返回为R类型对象的结果。 包含方法：R apply(T t)        |
+| Predicate<T> <br/> 断定型接口  | T      | boolean | 确定类型为T的对象是否满足某约束，并返回boolean值。包含方法：boolean test(T t) |
+
+#### 1. 其他接口
+
+| 函数式接口                                                           | 参数类型                      | 返回类型                      | 用途                                                  |
+|-----------------------------------------------------------------|---------------------------|---------------------------|-----------------------------------------------------|
+| BiFunction<T, U, R>                                             | T, U                      | R                         | 对类型为T, U参数应用操作，返回R类型的结果。包含方法： R apply(T t)          |
+| UnaryOperator<T> <br/>Function子接口                             | T                         | T                         | 对类型为T的对象进行一元运算，并返回T类型的结果。包含方法： T apply(T t)         |
+| BinaryOperator<T> <br/> (BiFunction 子接口)                      | T, T                      | R                         | 对类型为T的对象进行二元运算，并返回T类型的结果。包含方法为：T apply(T t1, T t2); |
+| BiConsumer<T, U>                                                | T, U                      | void                      | 对类型为T, U参数对应操作。 包含方法为： void accept(T t, U u);       |
+| BiPredicate<T, U>                                               | T, U                      | boolean                   | 包含方法为： boolean test(T t, U u);                      |
+| TolnFunction<T><br/> ToLongFunction<T><br/> ToDoubleFunction<T> | T                         | int<br/> long<br/> double | 分别计算int、long、double值的函数                             |
+| IntFunction<R><br/>  LongFunction<R><br/> DoubleFunction<R>     | int<br/> long<br/> double | R                         | 参考分别为int、long、double类型的函数                           |
+
+
+
+
