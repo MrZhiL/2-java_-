@@ -537,7 +537,12 @@ public void test07() {
 }
 ```
 
-### 4.2 构造器引用和方法引用
+### 4.2 构造器引用和数组引用
+1. 构造器引用：
+   和方法引用类似，函数式接口的抽象方法的形参列表要和构造器的形参列表一致。
+   抽象方法的返回值类型即为构造器所属的类的类型
+2. 数组引用
+   如果把数组看做是一个特殊的类，则写法与构造器引用一致。
 ```java
 package MethodReferenceTest;
 
@@ -582,7 +587,8 @@ public class ConstructorRefTest {
         // 2. Lambda表达式
         // Supplier<Employee> supplier2 = () -> new Employee(1001, "jack", 23, 1231.123); // 这个也可以实现
         Supplier<Employee> supplier2 = () -> new Employee();
-        System.out.println(supplier2.get()); // 相当于 44,45行：Employee employee = supplier3.get(); System.out.println(employee);
+        System.out.println(supplier2.get()); 
+        // 相当于 44,45行：Employee employee = supplier3.get(); System.out.println(employee);
         System.out.println("**************************");
 
         // 3. 构造器引用
@@ -654,4 +660,135 @@ public class ConstructorRefTest {
 
 ```
 
+
+## 5. 强大的Stream API
+
+- Java8 中有两个最为重要的改变。第一个是Lambda表达式；另外一个则是Stream API
+
+
+- Stream API (java.util.stream) 把真正的函数式编程风格引入到Java中。这是目前
+为止对Java类库最好的补充，因为Stream API可以极大提供Java程序员的生产力，让程序员写出高效、干净、简洁的代码
+
+
+- Stream 是Java8 中处理集合的关键抽象概念，它可以指定你希望对集合进行的操作，可以执行非常复杂的查找、
+过滤和映射数据等操作。使用Stream API来并行执行操作，就类似于使用API使用SQL执行的数据库查询。
+也可以使用Stream API来并行执行操作。简言之，Stream API提供了一种高效且易于使用的处理数据的方式。
+
+1. 为什么要使用Stream API ?
+   - 实际开发中，项目中多数数据源都来自Mysql、Qracle等。但现在数据源可以更多了，有MongDB, Radis等，而这些
+   NoSQL的数据就需要Java层面去处理。
+
+   - Stream和Collection集合的区别：Collection是一种静态的内存数据结构，而Stream是有关计算的。
+   前者是主要面向内存，存储在内存中，后者主要是面向CPU，通过CPU实现计算。
+
+
+2. 什么是Stream
+   - Stream 就是数据渠道，用于操作数据源（集合、数组等）所生成的元素序列。
+   
+   - “集合讲的是数据，Stream讲的是计算”
+
+3. 注意：
+   - Stream自己不会存储元素。
+   - Stream不会改变源对象。相反，他们会返回一个持有结果的新的Stream
+   - Stream操作时延迟执行的。这意味着他们会等到需要结果的时候才执行。
+
+### 5.1 Stream 操作的三个步骤
+
+1. 创建Stream：一个数据源（如：集合、数组），获取一个流
+2. 中间操作：一个中间操作链，对数据源的数据进行处理
+3. 终止操作（终端操作）：一旦执行终止操作，就执行中间操作链，并产生结果。之后不会再被使用。
+
+![img.png](README.assert/img_1.png)
+
+### 5.2 创建Stream方式一：通过集合
+
+Java8 中的 Collection 接口被扩展，提供了两个获取流的方法：
+- `default Stream<E> stream()` : 返回一个顺序流
+- `defalut Stream<E> parallelStream()` : 返回一个并行流
+- 代码测试：
+  ```java
+    // 创建Stream方式一：通过集合
+    @Test
+    public void test01(){
+        List<Employee> employees = EmployeeData.getEmployees();
+
+        // default Stream<E> stream() : 返回一个顺序流
+        Stream<Employee> stream = employees.stream();
+        Object[] employeeps = stream.toArray(); // 将stream流转换为Object数组
+
+        long t1 = System.currentTimeMillis();
+        for (Object o : employeeps) {
+            System.out.println(o);
+        }
+        long t2 = System.currentTimeMillis();
+        System.out.println(t2 - t1); // 17 ms
+        System.out.println("**************************\n");
+
+        // default Stream<E> parallelStream() : 返回一个并行流
+        Stream<Employee> employeeStream = employees.parallelStream();
+        Object[] objects = employeeStream.toArray();
+        t1 = System.currentTimeMillis();
+        for (Object o : objects) {
+            System.out.println(o);
+        }
+        System.out.println(System.currentTimeMillis() - t1); // 0 ms
+    }
+  ```
+
+### 5.3 创建Stream方式二：通过数组
+
+Java8中的Arrays的静态方法 stream() 可以获取数组流
+
+- `static <T> Stream<T> stream(T[] array)` : 返回一个流
+
+重载形式，能够处理对应基本类型的数组：
+- `public static IntStream stream(int[] array)`
+- `public static LongStream stream(long[] array)`
+- `public static DoubleStream stream(double[] array)`
+- 代码测试：
+  ```java
+    // 创建Stream方式二：通过数组
+    @Test
+    public void test02() {
+        // 调用Arrays类的 static <T> stream<T> stream(int[] array)：返回一个流
+
+        int[] arr = new int[] {1,2,3,4,5,6};
+        IntStream stream = Arrays.stream(arr);
+        System.out.println(stream.sum()); // 21
+
+        Employee e1 = new Employee(1, "jack");
+        Employee e2 = new Employee(2, "lisi");
+        Employee[] arr2 = new Employee[]{e1, e2};
+        Stream<Employee> stream2 = Arrays.stream(arr2);
+        System.out.println(stream2.toString());
+    }
+  ```
+
+### 5.4 创建Stream方式三：通过Stream的of()
+- 可以调用Stream类静态方法of()， 通过显式值创建一个流。它可以接收任意数量的参数。
+- `public static<T> Stream<T> of(T... values)` : 返回一个流
+- 代码测试：
+  ```java
+    // 创建Stream方式三：通过Stream的of()
+    @Test
+    public void test03() {
+        Stream<Integer> integerStream = Stream.of(1, 2, 3, 4, 5, 6);
+    }
+  ```
+
+### 5.5 创建Stream方式四：创建无限流
+可以使用静态方法 Stream.iterate() 和 Stream.generate()创建无限流
+- 迭代：`public static<T> Stream<T> iterate(final T seed, final UnaryOperator<T> f)`
+- 生成：`public static<T> Stream<T> generate(Supplier<T> s)`
+- 代码测试：
+  ```java
+    // 创建Stream方式四：创建无限流
+    public void test04() {
+        // 1. 迭代Stream.iterate()，遍历前10个偶数
+        Stream.iterate(0, t -> t + 2).limit(10).forEach(System.out::println);
+
+        // 2. 使用生产函数来产生10个随机数
+        Stream.generate(Math::random).limit(10).forEach(System.out::println);
+    }
+  ```
 
