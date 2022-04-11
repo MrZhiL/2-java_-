@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.io.PrintStream;
 import java.util.Comparator;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -20,10 +21,10 @@ import java.util.function.Supplier;
  *          2. 方法引用：本质上就是Lambda表达式，而Lambda表达式作为函数式接口的实例。所以方法引用，也就是函数式接口的实例
  *          3. 使用格式： 类(或对象) :: 方法名
  *          4. 具体分为如下三种情况：
- *              对象::非静态方法
- *              类::静态方法
- *              类::非静态方法
- *          5. 方法引用使用的要求：要求接口中的抽象方法的参数列表和返回值类型与方法引用的方法的形参列表和返回值类型相同
+ *              情况1： 对象::非静态方法
+ *              情况2： 类::静态方法
+ *              情况3： 类::非静态方法
+ *          5. 方法引用使用的要求：要求接口中的抽象方法的参数列表和返回值类型与方法引用的方法的形参列表和返回值类型相同 （针对前两种情况）
  */
 public class MethodRefTest {
 
@@ -128,30 +129,53 @@ public class MethodRefTest {
 
     /** 情况三：类::实例方法 (有难度) */
     // Comparator中int compare(T t1, T t2)
-    // String 中的 int t1.copareTo(t2)
+    // String 中的 int t1.compareTo(t2)
     @Test
     public void test05() {
-        Comparator<Integer> comparator1 = new Comparator<Integer>() {
+        // 1. 非Lambda表达式
+        Comparator<String> comparator1 = new Comparator<String>() {
             @Override
-            public int compare(Integer o1, Integer o2) {
+            public int compare(String o1, String o2) {
                 return o1.compareTo(o2);
             }
         };
-        System.out.println(comparator1.compare(11, 22)); // -1
+        System.out.println(comparator1.compare("a", "e")); // a - e =  -4
 
-        Comparator<Integer> comparator2 = (o1, o2) -> o1.compareTo(o2);
-        System.out.println(comparator1.compare(22, 22)); // 0
+        // 2. Lambda表达式
+        Comparator<String> comparator2 = (o1, o2) -> o1.compareTo(o2);
+        System.out.println(comparator1.compare("cde", "zbd")); // cde - abd = c - z = -23
 
-        Comparator<Integer> comparator3 = Integer::compareTo;
-        System.out.println(comparator1.compare(22, 11)); // 1
-
-
+        // 3. 方法引用
+        Comparator<String> comparator3 = String::compareTo;
+        System.out.println(comparator1.compare("22", "22")); // 0
     }
 
     // BiPredicate中boolean test(T t1, T t2);
     // String 中的boolean t1.equals(t2)
     @Test
     public void test06() {
+        // 1. Lambda表达式
+        BiPredicate<String, String> biPredicate1 = (s1, s2) -> s1.equals(s2);
+        System.out.println(biPredicate1.test("abc", "abc")); // true
 
+        // 2. 方法引用
+        BiPredicate<String, String> biPredicate2 = String::equals;
+        System.out.println(biPredicate2.test("abc", "abd")); // false
+        System.out.println(biPredicate2.test("abc", "abc")); // true
+    }
+
+    // Functions的 R apply(T t)
+    // Employee中的String getName();
+    @Test
+    public void test07() {
+        Employee employee = new Employee(1002, "Merry", 24, 8000);
+
+        // 1. 使用Lambda
+        Function<Employee, String> function1 = e -> e.getName();
+        System.out.println(function1.apply(employee)); // Merry
+
+        // 2. 使用方法引用
+        Function<Employee, String> function2 = Employee::getName;
+        System.out.println(function2.apply(employee)); // Merry
     }
 }

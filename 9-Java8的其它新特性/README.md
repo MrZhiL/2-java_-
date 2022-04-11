@@ -482,7 +482,57 @@ public void test04() {
     System.out.println(function3.apply(231.132)); // 231
 }
 
-/** 情况三：类::实例方法 */
+/** 情况三：类::实例方法 (有难度) */
+// Comparator中int compare(T t1, T t2)
+// String 中的 int t1.compareTo(t2)
+@Test
+public void test05() {
+    // 1. 非Lambda表达式
+    Comparator<String> comparator1 = new Comparator<String>() {
+    @Override
+    public int compare(String o1, String o2) {
+        return o1.compareTo(o2);
+        }
+    };
+    System.out.println(comparator1.compare("a", "e")); // a - e =  -4
+
+    // 2. Lambda表达式
+    Comparator<String> comparator2 = (o1, o2) -> o1.compareTo(o2);
+    System.out.println(comparator1.compare("cde", "zbd")); // cde - abd = c - z = -23
+
+    // 3. 方法引用
+    Comparator<String> comparator3 = String::compareTo;
+    System.out.println(comparator1.compare("22", "22")); // 0
+}
+
+// BiPredicate中boolean test(T t1, T t2);
+// String 中的boolean t1.equals(t2)
+@Test
+public void test06() {
+    // 1. Lambda表达式
+    BiPredicate<String, String> biPredicate1 = (s1, s2) -> s1.equals(s2);
+    System.out.println(biPredicate1.test("abc", "abc")); // true
+
+    // 2. 方法引用
+    BiPredicate<String, String> biPredicate2 = String::equals;
+    System.out.println(biPredicate2.test("abc", "abd")); // false
+    System.out.println(biPredicate2.test("abc", "abc")); // true
+}
+
+// Functions的 R apply(T t)
+// Employee中的String getName();
+@Test
+public void test07() {
+    Employee employee = new Employee(1002, "Merry", 24, 8000);
+
+    // 1. 使用Lambda
+    Function<Employee, String> function1 = e -> e.getName();
+    System.out.println(function1.apply(employee)); // Merry
+
+    // 2. 使用方法引用
+    Function<Employee, String> function2 = Employee::getName;
+    System.out.println(function2.apply(employee)); // Merry
+}
 ```
 
 
