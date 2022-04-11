@@ -366,7 +366,124 @@ public class LambdaTest2 {
 
 ## 4. 方法引用与构造器引用
 
+- 当要传递给Lambda体的操作，已经有实现的方法了 ，可以使用方法引用！
+- 方法引用可以看做是Lambda表达式深层次的表达。换句话说，方法引用就是Lambda表达式，也就是函数式接口的一个实例，
+通过方法的名字来指向一个方法，可以认为是Lambda表达式的一个语法糖。
+- 要求：实现接口的抽象方法的参数列表和返回值类型，必须与方法引用的方法的参数列表和返回值类型保持一致！
+- 格式：使用操作符 “::” 将类（或对象）与方法名分隔开来。
+- 如下三种主要使用情况：
+  - 对象::实例方法名
+  - 类::静态方法名
+  - 类：实例方法名
 
+- 方法引用，本质上就是Lambda表达式，而Lambda表达式作为函数式接口的实例。所以方法引用，也就是函数式接口的实例。
+
+### 4.1 方法引用的代码测试1
+```java
+// note: Employee包含：id, String name, int age, double salary变量
+//       以及包含四个变量的get,set方法，toString,equal(),hashCode()等方法
+
+
+/** 1. 情况一：对象::实例方法名 */
+// Consumer中的void accept(T t)
+// PrintStream中的void println(T t)
+public void test01() {
+    // 1. 非Lambda表达式
+    Consumer<String> con1 = new Consumer<String>() {
+        @Override
+        public void accept(String s) {
+            System.out.println(s);
+        }
+    };
+    con1.accept("北京1");
+
+    // 2. Lambda表达式
+    Consumer<String> con2 = s -> System.out.println(s);
+    con2.accept("北京2");
+
+    // 3. 方法引用
+    PrintStream ps = System.out;
+    Consumer<String > con3 = ps::println;
+    con3.accept("beijing");
+}
+
+// Supplier中的 T get();
+// Employee中的 String getName()
+@Test
+public void test2() {
+    Employee employee = new Employee(001, "jack", 34, 2200.123);
+
+    // 1. 不使用Lambda表达式
+    Supplier<String> supplier1 = new Supplier<String>() {
+    @Override
+    public String get() {
+            return employee.getName();
+        }
+    };
+    System.out.println(supplier1.get()); // jack
+
+    // 2. Lambda表达式方法
+    Supplier<String> supplier2 = () -> employee.getName();
+    System.out.println(supplier2.get()); // jack
+
+    // 3. 方法引用
+    Supplier<String> supplier3 = employee::getName;
+    System.out.println(supplier3.get()); // jack
+}
+
+/** 2. 情况情况二：类::静态方法 */
+// Comparator中int compare(T t1, T t2)
+// Integer 中int compare(T t1, T t2)
+@Test
+public void test03() {
+    // 1. 非Lambda表达式
+    Comparator<Integer> comparator1 = new Comparator<>() {
+    @Override
+    public int compare(Integer o1, Integer o2) {
+            return Integer.compare(o1, o2);
+        }
+    };
+    System.out.println(comparator1.compare(10, 11)); // -1
+
+    // 2. Lambda表达式1
+    Comparator<Integer> comparator2 = (o1, o2) -> {
+        return Integer.compare(o1, o2);
+    };
+    System.out.println(comparator1.compare(11, 11)); // 0
+
+    // 3. Lambda表达式2
+    Comparator<Integer> comparator3 = (o1, o2) -> Integer.compare(o1, o2);
+    System.out.println(comparator1.compare(12, 11)); // 1
+
+    // 4. 方法引用
+    Comparator<Integer> comparator4 = Integer::compare;
+        System.out.println(comparator4.compare(12, 11)); // 1
+    }
+
+// Function中的R apply(T t)
+// Math中的Long round(Double d);
+@Test
+public void test04() {
+    // 1. 非Lambda表达式
+    Function<Double, Long> function1 = new Function<Double, Long>() {
+    @Override
+    public Long apply(Double d) {
+            return Math.round(d);
+        }
+    };
+    System.out.println(function1.apply(123.321)); // 123
+
+    // 2. Lambda表达式
+    Function<Double, Long> function2 = d -> Math.round(d);
+    System.out.println(function1.apply(321.123)); // 321
+
+    // 3. 方法引用
+    Function<Double, Long> function3 = Math::round;
+    System.out.println(function3.apply(231.132)); // 231
+}
+
+/** 情况三：类::实例方法 */
+```
 
 
 
