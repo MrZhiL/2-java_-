@@ -105,4 +105,29 @@ public class StreamAPITest2 {
 
         return list.stream();
     }
+
+    /** 3. 排序
+     * sorted() - 自然排序
+     * sorted(Comparator com) - 定制排序
+     */
+    @Test
+    public void test03() {
+        // 1. sorted() - 自然排序
+        List<Integer> integers = Arrays.asList(10, 3, 90, -10, 38, 74, 26, 29);
+        integers.stream().sorted().forEach(System.out::println); // -10, 3, 10, 26, 29, 38, 74, 90
+
+        // 2. sorted(Comparator com) - 定制排序
+        // 如果想要对自定义数据排序，则需要在自定义数据中实现Comparable接口 或者使用 Comparator接口
+        List<Employee> employees = EmployeeData.getEmployees();
+        employees.stream().sorted((e1, e2) -> {
+            // 首先按照年龄从大到小排序，如果年龄相同则按照薪资从小到大排序
+            int age = -Integer.compare(e1.getAge(), e2.getAge());
+            if (age != 0) {
+                return age;
+            } else {
+                return Double.compare(e1.getSalary(), e2.getSalary());
+            }
+
+        }).forEach(System.out::println);
+    }
 }
