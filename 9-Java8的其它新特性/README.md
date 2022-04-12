@@ -1137,5 +1137,76 @@ public void test03() {
 ```
 
 #### 3. 收集
+| 方法                   | 描述                                              |
+|----------------------|-------------------------------------------------|
+| collect(Collector c) | 将流转换为其他形式。接收一个Collector接口的实现，用于给Stream中元素做汇总的方法 |
 
+- Collector接口中方法的实现决定了如何对流执行收集操作（如收集到List、Set、Map）。
 
+- 另外，Collectors实用类提供了很多静态方法，可以方便地创建常见收集器实例，具体方法与实例如下表：
+
+| 方法                                                           | 返回类型                 | 作用                      |
+|--------------------------------------------------------------|----------------------|-------------------------|
+| toList                                                       | List<T>              | 把流中元素收集到List            |
+| toSet                                                        | Set<T>               | 把流中元素收集到Set             |
+| toCollection                                                 | Collection<T>        | 把流中元素收集到创建的集合中          |
+| counting                                                     | Long                 | 计算流中元素的个数               |
+| summingInt                                                   | Integer              | 对六种元素的整数属性求和            |
+| averagingInt                                                 | Double               | 计算流中元素Integer属性的平均值     |
+| summarizingInt                                               | IntSummaryStatistics | 收集流中Integer属性的统计值。如：平均值 |
+
+  1. List<Employee> emps = list.stream().collect(Collectors.toList())
+  2. Set<Employee> emps = list.stream().collect(Collectors.toSet());
+  3. Collection<Employee> emps = list.stream().collect(Collectors.toCollection(ArrayList::new));
+  4. long count = list.stream().collect(Collectors.counting);
+  5. int total = list.stream().collect(Collectors.summingInt(Employee::getSalary));
+  6. double avg = list.stream().collect(Collectors.averagingInt(Employee::getSalary));
+  7. int SummaryStatistics = list.stream().collect(Collectors.summarizingInt(Employee::getSalary));
+
+- 代码测试：
+```java
+public void test04() {
+    System.out.println("----- 练习：查找工资大于9000的员工，结果返回一个为List或Set的集合 -----");
+
+    List<Employee> employees = EmployeeData.getEmployees();
+    List<Employee> list = employees.stream().filter(e -> e.getSalary() > 9000).collect(Collectors.toList());
+    list.forEach(System.out::println);
+
+    System.out.println("----- 遍历Set集合 -----");
+    Set<Employee> set = employees.stream().filter(e -> e.getSalary() > 9000).collect(Collectors.toSet());
+    Iterator<Employee> iterator = set.iterator();
+    while (iterator.hasNext()) {
+        System.out.println(iterator.next());
+    }
+
+    double total = employees.stream().collect(Collectors.summingDouble(Employee::getSalary));
+    System.out.println(total); // 71761.246
+
+    System.out.println("----- 使用averagingDouble计算流中元素属性的平均值 -----");
+    double avg = employees.stream().collect(Collectors.averagingDouble(Employee::getSalary));
+    System.out.println(avg); // 7973.471777777778
+
+    System.out.println("----- 使用summarizingDouble 收集流中元素属性的统计值，如计算平均值 -----");
+    // DoubleSummaryStatistics{count=9, sum=71761.246000, min=1234.000000, average=7973.471778, max=11112.000000}
+    DoubleSummaryStatistics collect = employees.stream().collect(Collectors.summarizingDouble(Employee::getSalary));
+    System.out.println(collect);
+}
+/** 输出
+ ----- 练习：查找工资大于9000的员工，结果返回一个为List或Set的集合 -----
+ Employee{id=1002, name='马云', age=54, salary=10000.0}
+ Employee{id=1003, name='雷军', age=52, salary=9091.0}
+ Employee{id=1006, name='扎克伯格', age=40, salary=9983.123}
+ Employee{id=1007, name='比尔盖茨', age=58, salary=11112.0}
+ ----- 遍历Set集合 -----
+ Employee{id=1007, name='比尔盖茨', age=58, salary=11112.0}
+ Employee{id=1002, name='马云', age=54, salary=10000.0}
+ Employee{id=1006, name='扎克伯格', age=40, salary=9983.123}
+ Employee{id=1003, name='雷军', age=52, salary=9091.0}
+ 71761.246
+ ----- 使用averagingDouble计算流中元素属性的平均值 -----
+ 7973.471777777778
+ ----- 使用summarizingInt 收集流中元素属性的统计值，如计算平均值 -----
+ DoubleSummaryStatistics{count=9, sum=71761.246000, min=1234.000000, average=7973.471778, max=11112.000000}
+
+ */
+```

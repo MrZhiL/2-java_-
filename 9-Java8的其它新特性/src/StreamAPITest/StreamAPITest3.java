@@ -4,10 +4,9 @@ import MethodReferenceTest.Employee;
 import MethodReferenceTest.EmployeeData;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.LongAccumulator;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName: StreamAPITest3
@@ -106,5 +105,37 @@ public class StreamAPITest3 {
         System.out.println("----- 练习：使用reduce(BinaryOperator p)计算1-10的自然数的和-----");
         System.out.println(integers.stream().reduce( Integer::sum)); // Optional[55]
 
+    }
+
+    /** 3. 收集
+     * collect(Collector c) | 将流转换为其他形式。接收一个Collector接口的实现，用于给Stream中元素做汇总的方法
+     */
+    @Test
+    public void test04() {
+        System.out.println("----- 练习：查找工资大于9000的员工，结果返回一个为List或Set的集合 -----");
+
+        List<Employee> employees = EmployeeData.getEmployees();
+        List<Employee> list = employees.stream().filter(e -> e.getSalary() > 9000).collect(Collectors.toList());
+        list.forEach(System.out::println);
+
+        System.out.println("----- 遍历Set集合 -----");
+        Set<Employee> set = employees.stream().filter(e -> e.getSalary() > 9000).collect(Collectors.toSet());
+        // set.forEach(System.out::println);
+        Iterator<Employee> iterator = set.iterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+
+        double total = employees.stream().collect(Collectors.summingDouble(Employee::getSalary));
+        System.out.println(total); // 71761.246
+
+        System.out.println("----- 使用averagingDouble计算流中元素属性的平均值 -----");
+        double avg = employees.stream().collect(Collectors.averagingDouble(Employee::getSalary));
+        System.out.println(avg); // 7973.471777777778
+
+        System.out.println("----- 使用summarizingDouble 收集流中元素属性的统计值，如计算平均值 -----");
+        // DoubleSummaryStatistics{count=9, sum=71761.246000, min=1234.000000, average=7973.471778, max=11112.000000}
+        DoubleSummaryStatistics collect = employees.stream().collect(Collectors.summarizingDouble(Employee::getSalary));
+        System.out.println(collect);
     }
 }
