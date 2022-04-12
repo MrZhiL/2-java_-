@@ -4,7 +4,10 @@ import MethodReferenceTest.Employee;
 import MethodReferenceTest.EmployeeData;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.LongAccumulator;
 
 /**
  * @ClassName: StreamAPITest3
@@ -77,5 +80,31 @@ public class StreamAPITest3 {
         // 使用集合的遍历操作
         System.out.println("----- 使用集合的遍历操作 -----");
         employees.forEach(System.out::println);
+    }
+
+    /** 2. 规约
+     * reduce(T iden, BinaryOperator b) : 可以将流中元素反复结合起来，得到一个值。返回T
+     * reduce(BinaryOperator b)         : 可以将流中元素反复结合起来，得到一个值。返回Optional<T>
+     */
+    @Test
+    public void test03() {
+        // 1. reduce(T iden, BinaryOperator b) : 可以将流中元素反复结合起来，得到一个值。返回T
+        // iden表示一个初始值，这里设置为0
+        System.out.println("----- 练习：计算1-10的自然数的和-----");
+        List<Integer> integers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        System.out.println(integers.stream().reduce(0, (i1, i2) -> i1 + i2)); // 55
+        System.out.println(integers.stream().reduce(0, Integer::sum)); // 55
+
+        // 2. reduce(BinaryOperator b): 可以将流中元素反复结合起来，得到一个值。返回Optional<T>
+        System.out.println("-----计算公司所有员工的工资的总和 -----");
+        List<Employee> employees = EmployeeData.getEmployees();
+        // employees.stream().reduce((e1, e2) -> e1.getSalary() + e2.getSalary()); // 需要使用map进行映射，取出其中的salary
+        Optional<Double> reduce = employees.stream().map(Employee::getSalary).reduce(Double::sum); // 和下面语句的作用一样
+        reduce = employees.stream().map(e -> e.getSalary()).reduce((d1, d2) -> d1 + d2); // Optional[71761.246]
+        System.out.println(reduce); // Optional[71761.246]
+
+        System.out.println("----- 练习：使用reduce(BinaryOperator p)计算1-10的自然数的和-----");
+        System.out.println(integers.stream().reduce( Integer::sum)); // Optional[55]
+
     }
 }
