@@ -4,7 +4,10 @@ import MethodReferenceTest.Employee;
 import MethodReferenceTest.EmployeeData;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 /**
@@ -51,5 +54,55 @@ public class StreamAPITest2 {
         list.add(new Employee(1010, "jack", 44, 8000.00));
         list.add(new Employee(1010, "jack", 44, 8000.00));
         list.stream().distinct().forEach(System.out::println);
+    }
+
+
+    /**
+     * 2. 映射
+     * | 方法                             | 描述                                         |
+     * |---------------------------------|--------------------------------------------|
+     * | map(Function f)                 | 接收一个函数作为参数，该函数会被应用到每个元素上，并将其映射成一个新的函数，相当于list.add()|
+     * | mapToDouble(ToDoubleFunction f) | 接收一个函数作为参数，该函数会被应用到每个元素上，产生一个新的DoubleStream |
+     * | mapToInt(ToIntFunction f)       | 接收一个函数作为参数，该函数会被应所有到每个元素上，产生一个新的IntStream  |
+     * | mapToLong(ToLongFunction f)     | 接收一个函数作为参数，该函数会被应所有到每个元素上，产生一个新的LongStream |
+     * | flatMap(Function f)             | 接收一个函数作为参数，将流中的每个值都换成另一个流，然后把所有流都连接成一个流，相当于list.addAll()|
+     */
+    @Test
+    public void test02() {
+        // map(Function f) : 接收一个函数作为参数，该函数会被应用到每个元素上，并将其映射成一个新的函数。相当于list.add()
+        List<String> list = Arrays.asList("aa", "bb", "cc", "dd");
+        // 将list中的所有元素转换为大写
+        list.stream().map(str -> str.toUpperCase(Locale.ROOT)).forEach(System.out::println);
+        System.out.println();
+
+        // 练习1：获取员工姓名长度大于3的员工的姓名
+        System.out.println("----- 获取员工姓名长度大于3的员工的姓名 -----");
+        List<Employee> employees = EmployeeData.getEmployees();
+        // e -> getName() 可以写成: Employee::getName
+        // employees.stream().map(e -> e.getName()).filter(name -> name.length() > 3).forEach(System.out::print ln);
+        employees.stream().map(Employee::getName).filter(name -> name.length() > 3).forEach(System.out::println);
+
+        // 练习2：使用自定义的函数
+        System.out.println("----- 使用自定义函数 -----");
+        Stream<Stream<Character>> arrayListStream = list.stream().map(StreamAPITest2::fromStringToStream);
+        arrayListStream.forEach(s -> {
+            s.forEach(System.out::println);
+        });;
+
+        // flatMap(Function f) : 接收一个函数作为参数，将流中的每个值都换成另一个流，然后把所有流都连接成一个流。相当于list.addAll()
+        System.out.println("-----------");
+        Stream<Character> stream = list.stream().flatMap(StreamAPITest2::fromStringToStream);
+        stream.forEach(System.out::println);
+
+    }
+
+    // 将字符串中的多个字符构成的集合转换为对应的Stream实例
+    public static Stream<Character> fromStringToStream(String str) {
+        ArrayList<Character> list = new ArrayList<>();
+        for (Character c : str.toCharArray()) {
+            list.add(c);
+        }
+
+        return list.stream();
     }
 }
