@@ -15,15 +15,15 @@ public class EmployeeData {
     public static List<Employee> getEmployees() {
         List<Employee> list = new ArrayList<>();
 
-        list.add(new Employee(1001, "马化腾", 44, 400000000) );
-        list.add(new Employee(1002, "马云", 54, 2318293) );
-        list.add(new Employee(1003, "雷军", 52, 12543234) );
-        list.add(new Employee(1004, "刘强东", 48, 12312341) );
-        list.add(new Employee(1005, "李彦宏", 43, 901281233.31) );
-        list.add(new Employee(1006, "扎克伯格", 40, 99899123.123) );
-        list.add(new Employee(1007, "比尔盖茨", 58, 841909312) );
-        list.add(new Employee(1008, "马斯克", 45, 8907813) );
-        list.add(new Employee(1009, "李想", 34, 1231234) );
+        list.add(new Employee(1001, "马化腾", 44, 8000) );
+        list.add(new Employee(1002, "马云", 54, 10000) );
+        list.add(new Employee(1003, "雷军", 52, 9091) );
+        list.add(new Employee(1004, "刘强东", 48, 4521) );
+        list.add(new Employee(1005, "李彦宏", 43, 8917.123) );
+        list.add(new Employee(1006, "扎克伯格", 40, 9983.123) );
+        list.add(new Employee(1007, "比尔盖茨", 58, 11112) );
+        list.add(new Employee(1008, "马斯克", 45, 8903) );
+        list.add(new Employee(1009, "李想", 34, 1234) );
 
         return list;
     }
