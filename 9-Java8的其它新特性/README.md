@@ -700,7 +700,8 @@ public class ConstructorRefTest {
 
 ![img.png](README.assert/img_1.png)
 
-### 5.2 创建Stream方式一：通过集合
+### 5.2 创建Stream的四种方式
+#### 1. 创建Stream方式一：通过集合
 
 Java8 中的 Collection 接口被扩展，提供了两个获取流的方法：
 - `default Stream<E> stream()` : 返回一个顺序流
@@ -735,7 +736,7 @@ Java8 中的 Collection 接口被扩展，提供了两个获取流的方法：
     }
   ```
 
-### 5.3 创建Stream方式二：通过数组
+#### 2. 创建Stream方式二：通过数组
 
 Java8中的Arrays的静态方法 stream() 可以获取数组流
 
@@ -764,7 +765,7 @@ Java8中的Arrays的静态方法 stream() 可以获取数组流
     }
   ```
 
-### 5.4 创建Stream方式三：通过Stream的of()
+#### 3. 创建Stream方式三：通过Stream的of()
 - 可以调用Stream类静态方法of()， 通过显式值创建一个流。它可以接收任意数量的参数。
 - `public static<T> Stream<T> of(T... values)` : 返回一个流
 - 代码测试：
@@ -776,7 +777,7 @@ Java8中的Arrays的静态方法 stream() 可以获取数组流
     }
   ```
 
-### 5.5 创建Stream方式四：创建无限流
+#### 4. 创建Stream方式四：创建无限流
 可以使用静态方法 Stream.iterate() 和 Stream.generate()创建无限流
 - 迭代：`public static<T> Stream<T> iterate(final T seed, final UnaryOperator<T> f)`
 - 生成：`public static<T> Stream<T> generate(Supplier<T> s)`
@@ -791,4 +792,122 @@ Java8中的Arrays的静态方法 stream() 可以获取数组流
         Stream.generate(Math::random).limit(10).forEach(System.out::println);
     }
   ```
+
+
+### 5.3 Stream的中间操作
+
+多个中间操作可以连接起来形成一个流水线，除非流水线上触发终止操作，否则中间操作不会执行任何的处理！
+而在终止操作时一次性全部处理，称为“惰性求值”。
+
+#### 1. 筛选与切片
+| 方法                 | 描述                                                |
+|---------------------|---------------------------------------------------|
+| filter(Predicate p) | 接口Lambda，从流中排出某些元素                                |
+| distinct()          | 筛选，通过流所生成元素的hashCode()和equals()去除重复元素             |
+| limit(long maxSize) | 截断流，使其元素不超过给定数量                                   |
+| skip(long n)        | 跳过元素，返回一个扔掉了前n个元素的流。若流中元素不足n个，则返回一个空流。与limit(n)互补 |
+
+- 代码测试：
+```java
+package StreamAPITest;
+
+import MethodReferenceTest.Employee;
+import MethodReferenceTest.EmployeeData;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+/**
+* @ClassName: StreamAPITest2
+* @Description: Java - Stream API的中间操作
+* @author: zhilx
+* @version: v1.0
+* @data: 2022/4/12 9:15
+* @node: 测试Stream的中间操作：
+*
+*/
+public class StreamAPITest2 {
+
+    // 1. 筛选与切片
+    @Test
+    public void test01() {
+        List<Employee> list = EmployeeData.getEmployees();
+        System.out.println("list中元素的数量：" + list.size());
+        /**
+         * note：对流进行终止操作后，该流就被关闭，相等于Iterator的调用，关闭后必须创新创建或打开才可以继续使用。
+         */
+
+        // filter(Predicate p) : 接口Lambda，从流中排出某些元素
+        // 练习：查询员工表中年龄小于45的员工信息
+        System.out.println("-----打印表中年龄大于45的CEO的数量-----");
+        Stream<Employee> stream = list.stream();
+        stream.filter(e -> e.getAge() > 45).forEach(System.out::println);
+
+        // note: forEach()表示Stream的终止操作，当调用该条件时已经将Stream关闭，因此后面的流无法指向相应的操作
+        //       如果想要执行，则必须重新创建Stream流
+        System.out.println("\n-----截断表中的前5个元素-----");
+        // limit(long maxSize) : 截断流，使其元素不超过给定数量
+        list.stream().limit(5).forEach(System.out::println);
+
+        System.out.println("\n-----跳过表中的前5个元素，打印剩下的元素-----");
+        // skip(long n)        : 跳过元素，返回一个扔掉了前n个元素的流。若流中元素不足n个，则返回一个空流。与limit(n)互补
+        list.stream().skip(5).forEach(System.out::println);
+
+        System.out.println("\n-----使用distince()去除表中重复的元素-----");
+        // distinct()          : 筛选，通过流所生成元素的hashCode()和equals()去除重复元素
+        list.add(new Employee(1010, "jack", 44, 8000.00));
+        list.add(new Employee(1010, "jack", 45, 8000.00)); // age为45，所以该元素和其余的4个元素的的hashCode不相同，因此会重复打印
+        list.add(new Employee(1010, "jack", 44, 8000.00));
+        list.add(new Employee(1010, "jack", 44, 8000.00));
+        list.add(new Employee(1010, "jack", 44, 8000.00));
+        list.stream().distinct().forEach(System.out::println);
+    }
+}
+
+/**-----输出：-------
+ 
+ list中元素的数量：9
+ -----打印表中年龄大于45的CEO的数量-----
+ Employee{id=1002, name='马云', age=54, salary=2318293.0}
+ Employee{id=1003, name='雷军', age=52, salary=1.2543234E7}
+ Employee{id=1004, name='刘强东', age=48, salary=1.2312341E7}
+ Employee{id=1007, name='比尔盖茨', age=58, salary=8.41909312E8}
+
+ -----截断表中的前5个元素-----
+ Employee{id=1001, name='马化腾', age=44, salary=4.0E8}
+ Employee{id=1002, name='马云', age=54, salary=2318293.0}
+ Employee{id=1003, name='雷军', age=52, salary=1.2543234E7}
+ Employee{id=1004, name='刘强东', age=48, salary=1.2312341E7}
+ Employee{id=1005, name='李彦宏', age=43, salary=9.0128123331E8}
+
+ -----跳过表中的前5个元素，打印剩下的元素-----
+ Employee{id=1006, name='扎克伯格', age=40, salary=9.9899123123E7}
+ Employee{id=1007, name='比尔盖茨', age=58, salary=8.41909312E8}
+ Employee{id=1008, name='马斯克', age=45, salary=8907813.0}
+ Employee{id=1009, name='李想', age=34, salary=1231234.0}
+
+ -----使用distince()去除表中重复的元素-----
+ [Ljava.lang.Object;@4f51b3e0
+ Employee{id=1001, name='马化腾', age=44, salary=4.0E8}
+ Employee{id=1002, name='马云', age=54, salary=2318293.0}
+ Employee{id=1003, name='雷军', age=52, salary=1.2543234E7}
+ Employee{id=1004, name='刘强东', age=48, salary=1.2312341E7}
+ Employee{id=1005, name='李彦宏', age=43, salary=9.0128123331E8}
+ Employee{id=1006, name='扎克伯格', age=40, salary=9.9899123123E7}
+ Employee{id=1007, name='比尔盖茨', age=58, salary=8.41909312E8}
+ Employee{id=1008, name='马斯克', age=45, salary=8907813.0}
+ Employee{id=1009, name='李想', age=34, salary=1231234.0}
+ Employee{id=1010, name='jack', age=44, salary=8000.0}
+ Employee{id=1010, name='jack', age=45, salary=8000.0}
+
+ Process finished with exit code 0
+
+/
+```
+
+
+
+
+
 
