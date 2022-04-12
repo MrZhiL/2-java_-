@@ -101,6 +101,7 @@ public class StreamAPITest3 {
         Optional<Double> reduce = employees.stream().map(Employee::getSalary).reduce(Double::sum); // 和下面语句的作用一样
         reduce = employees.stream().map(e -> e.getSalary()).reduce((d1, d2) -> d1 + d2); // Optional[71761.246]
         System.out.println(reduce); // Optional[71761.246]
+        System.out.println(reduce.get()); // 71761.246
 
         System.out.println("----- 练习：使用reduce(BinaryOperator p)计算1-10的自然数的和-----");
         System.out.println(integers.stream().reduce( Integer::sum)); // Optional[55]

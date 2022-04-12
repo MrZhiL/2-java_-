@@ -1210,3 +1210,140 @@ public void test04() {
 
  */
 ```
+
+
+## 6. Optional类
+- 到目前为止，空指针异常时导致Java应用程序失败的最常见的原因。以前，为了解决空指针异常，
+Google公司猪妹的Guava项目引入了Optional类，Guava通过检查控制的方式来防止代码污染，他
+鼓励程序员写更干净的代码。收到Google Guava的启发，Optional类已经称为了Java 8类库的一部分。
+
+
+- Optional<T> 类(java.util.Optional)是一个容器类，它可以保存类型T的值，代表这个值存在。
+或者仅仅保存null，表示这个值不存在。原来用null表示一个值不存在，现在Optional可以更好的表达这个
+概念。并且可以避免空指针异常。
+
+
+- Optional类的javadoc描述如下：这是一个可以为null的容器对象。如果值存在则isPresent()方法会
+返回true，调用get()方法会返回该对象。
+
+### 6.1 Optional中的方法
+
+- Optional提供很多有用的方法，这样我们就不用显示进行空值检测
+- 创建Optional类对象的方法：
+  - Optional.of(T t) : 创建一个Optional实例，t必须非空
+  - optional.empty() ：创建一个空的Optional实例
+  - Optional.ofNullable(T t) : t可以为null
+- 判断Optional容器中是否包含对象：
+  - boolean isPresent() : 判断是否包含对象
+  - void ifPresent(Consumer<? super T> consumer) : 如果有值，就执行Consumer 接口的实现代码，并且该值会作为参数传递给它
+- 获取Optional容器的对象：
+  - T get() : 如果调用对象包含值，返回该值，否则抛出异常
+  - T orElse(T other) : 如果有值则将其返回，否则返回指定的而other对象
+  - T orElseGet(Supplier<? extends T> other) : 如果有值则将其返回，否则返回由Supplier接口实现提供的对象
+  - T orElseThrow(Supplier<? extends X> exceptionSupplier) : 
+  如果有值则将其返回，否则抛出Supplier接口实现提供的异常。
+
+### 代码测试：
+```java
+package OptionalTest;
+
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+/**
+ * @ClassName: OptionalTest
+ * @Description: Java - Optional类的介绍
+ * @author: zhilx
+ * @version: v1.0
+ * @data: 2022/4/12 16:23
+ * @node:
+ *      Optional类：为了在程序中避免出现空指针异常而创建的。
+ */
+public class OptionalTest {
+    @Test
+    /** 创建Optional类对象的方法：
+     - Optional.of(T t) : 创建一个Optional实例，t必须非空
+     - optional.empty() ：创建一个空的Optional实例
+     - Optional.ofNullable(T t) : t可以为null
+     - Optional.orElse(T t1): 如果当前的Optional内部封装的t是非空的，则返回内部的t；
+     如果内部为空，则返回orElse()方法中的参数t1
+     */
+    public void test01() {
+        // 1. Optional.of(T t): t必须为非空
+        Girl girl = new Girl();
+        // girl = null; // error, 此时会报空指针异常
+        Optional<Girl> girl1 = Optional.of(girl);
+        System.out.println(girl1); // Optional[Girl{name='null'}]
+
+        // 2. Optional.ofNullable(T t) : t可以为null
+        girl = null;
+        Optional<Girl> girl2 = Optional.ofNullable(girl);
+        System.out.println(girl2); // Optional.empty
+
+        // 3. optional.empty() ：创建一个空的Optional实例
+        Optional<Object> empty = Optional.empty();
+        System.out.println(empty); // Optional.empty
+
+        // 4. Optional.orElse(T t1): 如果当前的Optional内部封装的t是非空的，则返回内部的t；
+        // 如果内部为空，则返回orElse()方法中的参数t1
+        Girl girl3 = girl2.orElse(new Girl("name is not exist!"));
+        System.out.println(girl3); // Girl{name='name is not exist!'}
+    }
+
+    // 优化以前的代码，此时如果没有初始化boy和girl容易出现空指针异常
+    public String getGirlName(Boy boy) {
+        return boy.getGirl().getName();
+    }
+
+    // 优化以后避免空指针的异常
+    public String getGirlName1(Boy boy) {
+        if (boy != null) {
+            if (boy.getGirl() != null) {
+                return boy.getGirl().getName();
+            }
+        }
+
+        return null;
+    }
+
+    // 使用Optional类的getGirlName2()
+    public String getGirlName2(Boy boy) {
+
+        Optional<Boy> boyOptional = Optional.ofNullable(boy);
+
+        // Optional.orElse(T t1): 如果当前的Optional内部封装的t是非空的，则返回内部的t；
+        // 如果内部为空，则返回orElse()方法中的参数t1
+        // 此时的boy1一定非空
+        Boy boy1 = boyOptional.orElse(new Boy(new Girl("gril is not exist!")));
+
+        Girl girl = boy1.getGirl();
+        Optional<Girl> girlOptional = Optional.ofNullable(girl);
+        // 此时的girl1一定非空
+        Girl girl1 = girlOptional.orElse(new Girl("our name"));
+
+        return girl1.getName();
+    }
+
+    @Test
+    public void test02() {
+        Boy boy = new Boy();
+        // String name = getGirlName(boy); // 此时会报空指针异常
+        String name = getGirlName1(boy); // name = null
+        System.out.println(name);
+
+        String name2 = getGirlName2(boy);
+        System.out.println(name2); // our name
+
+        String name3 = getGirlName2(null);
+        System.out.println(name3); // gril is not exist!
+
+        String name4 = getGirlName(new Boy(new Girl("jack")));
+        System.out.println(name4); // jack
+    }
+
+}
+
+
+```
