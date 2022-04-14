@@ -698,7 +698,7 @@ public class ConstructorRefTest {
 2. 中间操作：一个中间操作链，对数据源的数据进行处理
 3. 终止操作（终端操作）：一旦执行终止操作，就执行中间操作链，并产生结果。之后不会再被使用。
 
-![img.png](README.assert/img_1.png)
+![img.png](15-Java8的新特性.assert/img_1.png)
 
 ### 5.2 创建Stream的四种方式
 #### 1. 创建Stream方式一：通过集合
