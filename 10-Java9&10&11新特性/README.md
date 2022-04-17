@@ -84,9 +84,76 @@ Java 8中规定接口中的方法除了抽象方法之外，还可以定义静�
 在Java 9中，接口更加的灵活和强大，连方法的访问权限修饰符都可以声明为private的了，
 此时方法将不会成为你对外暴露的API的一部分。
 
+```java
+/**
+ * @ClassName: PACKAGE_NAME
+ * @Description: Java
+ * @author: zhilx
+ * @version: v1.0
+ * @data: 2022/4/17 8:56
+ * @node:
+ */
+public interface MyInterface {
+    // 接口中如果不声明，则默认为public权限
+    // 如下的三个方法的权限修饰符都是public
+    void methodAbstract();
+
+    static void methodStatic() {
+        System.out.println("接口中的静态方法");
+    }
+
+    default void methodDefault() {
+        System.out.println("接口中的默认方法");
+    }
+
+    // jdk9 及以后允许接口中定义私有方法
+    private void methodPrivate() {
+        System.out.println("接口中的私有方法");
+    }
+}
 
 
+public class MyInterfaceImpl implements MyInterface{
 
+   @Override
+   public void methodAbstract() {
+      System.out.println("实现类实现抽象接口");
+   }
+
+   // 默认方法可以不用重写，但是抽象方法必须重写
+   @Override
+   public void methodDefault() {
+      System.out.println("实现类重写默认方法");
+   }
+
+   public static void main(String[] args) {
+      // 1. 接口中的静态方法只能由接口自己调用, 接口的实现类不能调用接口的静态方法
+      MyInterface.methodStatic(); // 接口中的静态方法
+      // MyInterfaceImpl.methodStatic();
+
+      // 2. 实现类可以调用非静态方法
+      MyInterfaceImpl myInterface = new MyInterfaceImpl();
+      myInterface.methodAbstract(); // 实现类实现抽象接口
+      myInterface.methodDefault();  // 实现类重写默认方法
+      // myInterface.methodStatic(); //error, 不可以调用静态方法
+      // myInterface.methodPrivate(); // error，不可以调用私有方法
+   }
+}
+
+```
+
+### 1.5 语法改进：钻石操作符使用升级
+我们将能够与匿名实现类共同使用钻石操作符（diamond operator） 在Java 8中如下的操作是会报错的：
+```java
+Comparator<Object> com = new Comparator<>() {
+    @Override
+    public int compare(Object o1, Object o2) {
+        return 0;        
+    }
+}
+
+// 编译报错信息：Cannot use "<>" with anonymous inner classes
+```
 
 
 
