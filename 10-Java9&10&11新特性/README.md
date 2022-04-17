@@ -394,8 +394,26 @@ public class Java9Test2 {
 
 
 
+### 1.9 InputStream加强
+InputStream终于有了一个非常有用的方法：transferTo，可以用来将数据直接传输到OutputStream，
+这是在处理原始数据流时非常常见的一种用法，如下所示：
+```java
+// java9新特性九： InputStream加强
+@Test
+public void test05() {
+     ClassLoader cl = this.getClass().getClassLoader();
+     
+     try(InputStream is = cl.getResourceAsStream("hello.txt");
+        OutputStream os = new FileOutputStream("src\\hello1.txt")) {
+            
+        is.transferTo(os); // 把输入流中的所有数据直接自动地复制到输出流中
+     } catch (IOException e) {
+        e.printStackTrace();
+     }
 
-
+     System.out.println("复制完成");
+}
+```
 
 
 
