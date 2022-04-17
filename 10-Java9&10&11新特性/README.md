@@ -259,3 +259,147 @@ public class Java9Test {
 
 ### 1.7 String 存储结构的变更
 
+1. Motivation
+
+   The current implementation of the String class stores characters in a char array, using two 
+bytes (sixteen bits) for each character. Data gathered from many different applications indicates
+thst strings are a major component of heap usage and, morevoer, that most String objects
+contain only Latin-1 characters. Such characters require only one byte of storage, hence half
+of the space in the internal char arrays of such String objects is going unused.
+
+
+2. Description
+   We propose to change the internal representation of the String class from a UTF-16 char 
+array to a byte array plus an encoding-flag field. The new String class will store characters
+encoded either as ISO-8859-1/Latin-1 (one byte per character), or as UTF-16 (two bytes per character)
+, based upon the contents of the string. The encoding flag will indicate which encoding is used.
+
+
+- 结论：String再也不用 char[] 来存储了，改成了 byte[] 加上编码标记，节约了一些空间。
+```java
+public final class String implements java.io.Serializable, Comparable<Stirng>, CharSequence {
+    @Stable
+   private final byte[] value;
+}
+```
+
+
+- 那StringBuffer 和 StringBuilder 是否仍无动于衷呢？
+
+   String-related classes such as AbstractStringBuilder, StringBuilder, and StringBuffer
+will be updated to use the same representation, as will the HotSpot VM's intrinsic string operations.
+
+
+### 1.8 集合工厂方法：快速创建只读集合
+要创建一个只读、不可改变的集合，必须构造和分配它，然后添加元素，最后包装成一个不可修改的集合。
+
+```java
+List<String> nameList = new ArrayList<>();
+nameList.add("joe");
+nameList.add("Bob");
+nameList.add("Bill");
+nameList.add("jack");
+
+nameList = Collections.unmodifiableList(nameList);
+System.out.println(nameList);
+
+// 缺点：需要写入多行，不可以表达成单个表达式
+```
+
+java 9中因此引入了方便的方法，这使得类似的事情更容易表达。
+
+| 方法名                                                                               | 表达  |
+|-----------------------------------------------------------------------------------|-----|
+| static <E> List<E> of()                                                           |  返回包含零元素的不可修改列表。   |
+| static <E> List<E> of(E e1)                                                       |返回包含一个元素的不可修改列表。  |
+| static <E> List<E> of(E... elements)                                              | 返回包含任意数量元素的不可修改列表。  |
+| static <E> List<E> of(E e1, E e2)                                                 | 返回包含两个元素的不可修改列表。  |
+| static <E> List<E> of(E e1, E e2, E e3)                                           | 返回包含三个元素的不可修改列表。  |
+| static <E> List<E> of(E e1, E e2, E e3, E e4)                                     | 返回包含四个元素的不可修改列表。  |
+| static <E> List<E> of(E e1, E e2, E e3, E e4, E e5)                               | 返回包含五个元素的不可修改列表。  |
+| static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6)                         | 返回包含六个元素的不可修改列表。  |
+| static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7)                   | 返回包含七个元素的不可修改列表。  |
+| static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8)             | 返回包含八个元素的不可修改列表。  |
+| static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9)       | 返回包含九个元素的不可修改列表。  |
+| static <E> List<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9, E e10) | 返回包含十个元素的不可修改列表。 |
+   
+
+- 代码测试：
+```java
+public class Java9Test2 {
+   // java9新特性八：集合工厂方法：创建只读集合。
+   @Test
+   public void test04() {
+      List<Integer> integers = List.of(1, 2, 3, 4, 5);
+      // integers.add(6); // error, integers为只读集合，不可以修改
+      System.out.println(integers); // [1, 2, 3, 4, 5]
+
+      Set<Integer> integers1 = Set.of(12, 432, 342, 9, 1, 52, 42, 28); // 此时需要主要的是Set集合中不可以添加重复元素，否则会报错
+      // integers1.add(5); // error, 不可以添加元素
+      System.out.println(integers1); // [12, 42, 9, 342, 52, 1, 432, 28]
+
+      Map<String, Integer> map = Map.of("Tom", 21, "jack", 19, "Jerry", 21);
+      // map.put("Hrei", 23); // java.lang.UnsupportedOperationException
+      System.out.println(map); // {Tom=21, Jerry=21, jack=19}
+
+      Map<String, Integer> map2 = Map.ofEntries(Map.entry("tom", 21), Map.entry("jack", 19), Map.entry("jerry", 23));
+      // map2.put("hrri", 21);
+      System.out.println(map2); // {tom=21, jerry=23, jack=19}
+   }
+
+   @Test
+   public void test03() {
+      // 此时得到的集合也是一个只读集合
+      List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+
+      // list.add(6); // error, list不可以添加元素 （java.lang.UnsupportedOperationException）
+   }
+
+   @Test
+   public void test02() {
+      List<String> list = Collections.unmodifiableList(Arrays.asList("a", "b", "c", "d"));
+      Set<String> set = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("a", "b", "c", "D")));
+
+      // 如下操作不适用于jdk 8及以前的版本，适用于jdk9之后的版本
+      Map<String, Integer> map = Collections.unmodifiableMap(new HashMap<String, Integer>() {
+         {
+            put("a", 1);
+            put("b", 2);
+            put("c", 3);
+            put("d", 4);
+         }
+      });
+      map.forEach((k, v) -> System.out.println(k + "; " + v));
+   }
+
+   // java8中的写法：
+   @Test
+   public void test01() {
+      // 缺点：需要写入多行，不可以表达成单个表达式
+      List<String> nameList = new ArrayList<>();
+      nameList.add("joe");
+      nameList.add("Bob");
+      nameList.add("Bill");
+      nameList.add("jack");
+
+      // unmodifiableList返回一个只读的集合
+      nameList = Collections.unmodifiableList(nameList);
+      // nameList.add("tom"); // 此时已经不可以再修改了
+      System.out.println(nameList);
+
+   }
+}
+ 
+```
+
+
+
+
+
+
+
+
+
+
+
+
