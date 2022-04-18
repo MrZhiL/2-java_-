@@ -415,8 +415,85 @@ public void test05() {
 }
 ```
 
+### 1.10 增强的Stream API
+- java的Stream API是java标准库最好的改进之一。让开发者能够快速运算，从而能够有效的利用数据的并行计算。
+java 8提供的Steam能够利用多核架构实现声明式的数据处理。
+
+- 在Java 9中，Stream API接口中添加了4个新的方法；takeWhile, dropWhile, ofNullable, 还有个iterator
+方法的新重载方法，可以提供一个Predicate(判断条件)来指定什么时候结束迭代。
+
+- 除了对Stream本身的扩展，Optional和Stream直接的结合也得到了改进。现在可以通过Optional的新方法 stream() 
+将一个Optional对象转换为一个（可能是空的）Stream对象。
+
+#### 1. takeWhile()和dropwhile() 的使用
+   
+1. takeWhile(): 用于从Stream中获取一部分数据，接收一个Predicate来进行选择。在有序的Stream中，takeWhile返回从头开始的尽量多的元素。
+2. dorpWhile(): 与takeWhile()相反，返回剩余的元素
+
+```java
+// java 9的新特性十：增强Stream API
+public void test01() {
+     List<Integer> list = Arrays.asList(45, 43, 76, 87, 42, 77, 90, 73, 67, 88);
+     list.stream().takeWhile(x -> x < 50).forEach(System.out::println); // 45, 43
+
+     System.out.println();
+
+     list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
+     list.stream().takeWhile(x -> x < 5).forEach(System.out::println); // 1 2 3 4
+}
+```
+
+#### 2. ofNullable() 的使用
+Java 8中Stream不能完全为null，否则会报空指针异常。而Java 9中的ofNullable()方法允许我们创建一个单元素Stream，
+可以包含一个非空元素，也可以创建一个空的Stream。
+
+note: ofNullable(T t)：中的参数只能存在一个, 不可以存在多个元素；因为存在多个元素的时候和of()方法就一样了，没必要创建多个
+
+```java
+public void test02() {
+     Stream<Integer> integerStream = Stream.of(1, 2, 3, null);
+     integerStream.forEach(System.out::println); // 1 2 3 null
 
 
+     // Stream<Object> stream2 = Stream.of(null); // 不可以存在只有一个null值，否则会报空指针异常
+     // stream2.forEach(System.out::println); // 1 2 3 null
+     Stream<Object> stream11 = Stream.of(null, null); // of()参数不能存储单个null值，但是可以存储多个
+     System.out.println(stream11.count()); // 2
+
+     // 报NullPointerException
+     // Stream<Object> stream1 = Stream.of(null);
+     // System.out.println(stream1.count());
+     // 不报异常，可以通过
+     Stream<String> stringStream = Stream.of("AA", "BB", null);
+     System.out.println(stringStream.count()); // 3
+
+     // 不报异常，允许通过
+     List<String> list = new ArrayList<>();
+     list.add("AA");
+     list.add(null);
+     System.out.println(list.stream().count()); // 2
+
+     // ofNullable() : 允许值为null
+     Stream<Object> stream2 = Stream.ofNullable(null);
+     System.out.println(stream2.count()); // 0
+
+     Stream<String> stream3 = Stream.ofNullable("hello world");
+     System.out.println(stream3.count()); // 1
+}
+```
+
+#### 3. 重载的iterate()的使用
+这个iterate方法的新重载方法，可以让我们提供一个Predicate（判断条件）来指定什么时候结束迭代。
+```java
+public void test03() {
+     // 原来的控制终止方法
+     Stream.iterate(1, i -> i + 1).limit(10).forEach(x -> System.out.print(x + " ")); // 1 2 3 4 5 6 7 8 9 10
+     System.out.println();
+
+     // 现在的终止方式：
+     Stream.iterate(1, i -> i < 10, i -> i + 1).forEach(x -> System.out.print(x + " ")); // 1 2 3 4 5 6 7 8 9
+}
+```
 
 
 
