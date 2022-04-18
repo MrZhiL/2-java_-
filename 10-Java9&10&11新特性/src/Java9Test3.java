@@ -1,9 +1,6 @@
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -77,6 +74,23 @@ public class Java9Test3 {
 
         // 现在的终止方式：
         Stream.iterate(1, i -> i < 10, i -> i + 1).forEach(x -> System.out.print(x + " ")); // 1 2 3 4 5 6 7 8 9
+    }
+
+    @Test
+    public void test04() {
+        // java9的新特性十一：Optional类提供了新的stream方法
+        List<String> list = new ArrayList<>();
+        list.add("Tom");
+        list.add("jack");
+        list.add("merry");
+
+        Optional<List<String>> optional = Optional.ofNullable(list);
+
+        // 将Optional转换为Stream流
+        Stream<List<String>> stream = optional.stream();
+
+        // System.out.println(stream.count()); // 1, 当调用完stream.count()后该流会关闭，因此这里进行了注释
+        stream.flatMap(x -> x.stream()).forEach(System.out::println); // Tom jack merry
     }
 
 }

@@ -496,5 +496,25 @@ public void test03() {
 ```
 
 
+### 1.11 Optioinal 获取Stream 的方法
+Optional类中stream()的使用
+
+```java
+public void test04() {
+     // java9的新特性十一：Optional类提供了新的stream方法
+     List<String> list = new ArrayList<>();
+     list.add("Tom");
+     list.add("jack");
+     list.add("merry");
+
+     Optional<List<String>> optional = Optional.ofNullable(list);
+
+     // 将Optional转换为Stream流
+     Stream<List<String>> stream = optional.stream();
+
+     // System.out.println(stream.count()); // 1, 当调用完stream.count()后该流会关闭，因此这里进行了注释
+     stream.flatMap(x -> x.stream()).forEach(System.out::println); // Tom jack merry
+ }
+```
 
 
