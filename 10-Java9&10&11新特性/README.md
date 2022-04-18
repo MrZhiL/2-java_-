@@ -1,6 +1,6 @@
 # 十、Java9&10&11的新特性
 
-## 1. JDK9的发布
+## 1. JDK9的新特性
 - 经过4此跳票，历经曲折的Java 9终于在2017年9月21日发布
 - 从Java 9这个版本开始，Java的计划发布周期是6个月，下一个Java的主版本将于2018年3月发布，命名为Java 18.3,
 接着再过六个月将发布Java 18.9
@@ -516,5 +516,107 @@ public void test04() {
      stream.flatMap(x -> x.stream()).forEach(System.out::println); // Tom jack merry
  }
 ```
+
+### 1.12 Javascript引擎升级：Nashorn
+- Nashorn 项目在JDK 9中得到改进，它为java提供轻量级的JavaScript运行时。Nashorn 项目跟随Netscape的Rhino项目，
+目的是为了在java中实现一个高性能单轻量级的JavaScript运行时。Nashorn项目使得Java应用能够嵌入JavaScript。它在JDK 8
+中为Java提供了一个JavaScript引擎。
+- Jdk 9中包含一个用来解析Nashorn的ECMAScript 语法树的API。这个API使得IDE和服务端框架不需要依赖Nashorn项目的内部实现类，
+就能够分析ECMAScript
+
+
+## 2. JDK 10的新特性
+
+### 2.1 局部变量的类型推断 （var）
+- 产生背景
+
+  开发者经常抱怨Java中引用代码的程度。局部变量的显示类型声明，常常被认为是不必须的，给一个好听的名字
+可以很清楚的表达出下面应该怎样继续。
+
+- 好处
+  
+   减少了啰嗦和形式的代码，避免了信息冗余，而且对齐了变量名，更容易阅读！
+
+  - 举例如下
+    - 场景一：类实例化时
+  
+      作为Java开发者，在声明一个变量时，我们总是习惯了敲打两次变量类型，第一次用于声明变量类型，第二次用于构造器。
+
+      `LinkedHashSet<Integer> set = new LinkedHashSet<>();`
+    
+    - 场景二：返回值类型含复杂泛型结构
+       
+       变量的声明类型书写复杂且较长，尤其是加上泛型的使用。
+     
+       `Iterator<Map.Entry<Integer, Student>> iterator = set.iterator();`
+
+    - 场景三：
+    
+      我们也经常声明一种变量，它只会被使用一次，而且是用在下一行代码中，比如：
+    
+      ```java
+         URL url = new URL("http://www.baidu.com");
+         URLConnect connect = url.openConnection();
+         Reader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+         
+         // 使用局部类型推断后：
+         var url = new URL("http://www.baidu.com");
+         var connect = url.openConnection();
+         var reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+         // 从代码来看，使用var之后就好像之前已经声明了这些类型一样。事实上，这一特性只发生在编译阶段，与运行无关，所以对
+         // 运行时的性能不会产生任何影响。所以请放心，这不是JavaScript
+      ```
+      尽管IDE可以帮我们自动完成这些代码，但是当变量总是跳来跳去的时候，可读性还是会受到影响，因为变量类型的名称由
+      各种不同长度的字符组成。而且，有时候开发人员会尽力避免声明中间变量，因为太多的类型什么会分散注意力，不会带来额外的好处。
+  
+
+- var不可以使用的情况：
+   1. 没有初始化的局部变量声明： var s = null;
+   2. 方法的返回类型 // error: public var method1() { return 0;}
+   3. 方法的参数类型 // error: public void method2(var num) {}
+   4. 构造器的参数类型 // public Student(var name){}, error
+   5. 属性 // var num = 10; error --> int num = 10; 
+   6. catch块
+
+
+### 2.2 工作原理和注意
+1. 在处理var时，编译器显示查看表达式右边部分，并根据右边变量值的类型进行推断，作为左边变量的类型，然后将该类型写入字节码当中。
+2. 注意：
+   1. var不是一个关键字
+      
+      因此不需要担心变量名或方法与var发生冲突，因为var实际上并不是一个关键字，而是一个类型名，只有在编译器需要知道类型的地方
+      才需要用到它。除此之外，它就是一个普通合法的标识符。也就是说，除了不能用它作为类名，其他的都可以，但极少数人会用它作为类名。
+   
+   2. 这不是JavaScript
+      
+      首先需要说明的是：var并不会改变jva 是一门静态类型语言的事实。编译器负责推断出类型，并把结果写入字节码文件，就好像是开发人员
+      敲入类型一样。
+
+### 2.3 java10的新特性二：集合中新增的copyof()，用于创建一个猪只读的集合
+下面示例1和示例2代码基本一致，为什么一个为true，一个为false？
+
+结论：copyOf(xxx coll):如果参数coll本身就是一个只读集合，则copyOf()返回值即为当前的coll；
+    <br>
+    如果参数coll不是一个只读集合，则copyOf()就会返回一个新的集合，这个集合是只读的。
+
+```java
+// java10的新增特性二：集合中新增的copyof()，用于创建一个只读的集合
+public void test05() {
+    // 示例1.
+    var list1 = List.of("java", "python", "C");
+    var copy1 = List.copyOf(list1);
+    System.out.println(list1 == copy1); // true
+
+    // 示例2.
+    var list2 = new ArrayList<String>();
+    // list2.add("aaa");
+    var copy2 = List.copyOf(list2);
+    System.out.println(list2 == copy2); // false
+
+}
+```
+
+
+## 3. JDK 11的新特性
 
 

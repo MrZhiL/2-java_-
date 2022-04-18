@@ -93,4 +93,19 @@ public class Java9Test3 {
         stream.flatMap(x -> x.stream()).forEach(System.out::println); // Tom jack merry
     }
 
+    @Test
+    // java10的新增特性二：集合中新增的copyof()，用于创建一个只读的集合
+    public void test05() {
+        // 1.
+        var list1 = List.of("java", "python", "C");
+        var copy1 = List.copyOf(list1);
+        System.out.println(list1 == copy1); // true
+
+        // 2.
+        var list2 = new ArrayList<String>();
+        // list2.add("aaa");
+        var copy2 = List.copyOf(list2);
+        System.out.println(list2 == copy2); // false
+
+    }
 }
