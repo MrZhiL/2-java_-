@@ -616,7 +616,156 @@ public void test05() {
 }
 ```
 
-
 ## 3. JDK 11的新特性
+JDK 11是一个长期支持版本（LTS, Long Term-Support）
+
+- 对于企业来说，选择11将意味着长期的、可靠的、可预测的技术路线图。其中免费的OpenJDK 11确定将
+得到OpenJDK社区的长期支持，LTS版本将是可以放心选择的版本。
+
+- 从JVM GC的角度，JDK11引入了两种新的GC，其中包括也许是划时代的意义的ZGC，虽然其目前还是实验特性，
+但是从能力上来看，这是JDK的一个巨大突破，为特定生产环境的苛刻需求提供了一个可能的选择。例如，对部分
+企业核心存储等产品，如果能够保证不超过10ms的GC暂停，可靠性会上一个大的台阶，这是过去我们进行GC调优
+几乎做不到的，是能与不能的问题。
+
+### 3.1 新增一系列字符串处理方法
+
+| 描述         | 举例                                                |
+|------------|---------------------------------------------------|
+| 判断字符串是否为空白 | " ".isBlank(); // true                            |
+| 去除首尾空白     | "  Javastack  ".strip(); // "javastack"           |
+| 去除尾部空格     | "  Javastack  ".stripTrailint(); // "  Javastack" |
+| 去除首部格    | "  Javastack  ".stripLeading(); // "Javastack  "  |
+| 复制字符串      | "Java".repeat(3); // "JavaJavaJava"              |
+| 行数统计       | "A\nB\C".lines().count(); // 3                    |
+
+```java
+public void test01() {
+    String str = "  Javastack  ";
+    System.out.println(str);
+
+    // 1. isBlank();
+    System.out.println("----- isBlank()测试 -----");
+    System.out.println(str.isBlank()); // false
+    System.out.println("    ".isBlank()); // true
+
+    // 2. strip()
+    System.out.println("----- strip()测试 -----");
+    System.out.println(str.strip()); // "Javastack"
+
+    // 3. stripTrailing()
+    System.out.println("----- stripTrailing()测试 -----");
+    System.out.println(str.stripTrailing()); // "  Javastack"
+
+    // 4. stropLeading()
+    System.out.println("----- stropLeading()测试 -----");
+    System.out.println(str.stripLeading()); // "Javastack  "
+
+    // 5. repeat()
+    System.out.println("----- repeat()测试 -----");
+    System.out.println(str.repeat(3)); // "  Javastack    Javastack    Javastack  "
+
+    // 6. lines()
+    System.out.println("----- lines()测试 -----");
+    System.out.println(str.lines().count()); // 1
+    System.out.println("A\nB\nC".lines().count()); // 3
+}
+```
+
+### 3.2 Optional加强
+Optional 也增加了几个非常酷的方法，现在可以很方便的将一个Optional 转换成一个Stream，或者当一个空Optional
+时给它一个替代的。
+
+| 新增方法                                                     | 描述                                                         | 新增的版本 |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ---------- |
+| boolean isEmpty()                                            | 判断value是否为空                                            | JDK11      |
+| ifPresentOrElse(Consumer<? super T> action, Runnable emptyAction) | value非空，执行参数1功能；如果value为空，执行参数2的功能     | JDK 9      |
+| Optional<T> or(Supplier<? extends Optional<? extends T>> supplier) | value非空，返回对应的Optional；value为空：返回形参封装的Optional | JDK 9      |
+| Stream<T> stream()                                           | value非空，返回仅包含此value的Stream；否则，返回一个空的Stream | JDK 9      |
+| T orElseThrow()                                              | value非空，返回value；否则抛出NoSuchElementException         | JDK 10     |
 
 
+### 3.3 局部变量类型推断升级
+在var上添加注解的语法格式，在jdk 10中是不能实现的。在JDK 11中加入了这样的语法。
+```java
+// 错误的形式：必须要有类型，可以加上var
+// Consumer<String> con1 = (@Deprecated t) -> System.out.println(t.toUpperCase());
+
+// 正确的形式
+// 使用var的好处是在使用lambda表达式时给参数加上注解
+Consmuer<String> con2 = (@Deprecated var t) -> System.out.println(t.toUpperCase());
+```
+
+
+### 3.4 Http API
+
+### 3.5 更简化的编译运行程序
+// 编译： javac Javastack.java
+// 运行： java Javastack
+
+在我们之前的操作中，要运行一个Java源代码必须先编译，再运行，两部执行步骤。
+而在java 11中，通过一个java命令就可以直接运行了，如下所示：
+
+java JavaStack.java
+
+
+一个命令编译运行源代码的注意点：
+ - 执行源文件中的第一个类，第一个类必须包含主方法
+ - 并且不可以使用其他源文件中的自定义类，本文件中自定义类是可以使用的。
+
+### 3.6 其他新特性：废弃Nashorn引擎
+废除Nashorn javascript引擎，在后续版本中准备移除掉，有需要的可以考虑使用GraalVM。
+
+
+### 3.7 ZGC
+- GC是java主要优势之一。然而，当GC停顿太长，就会开始影响应用的相应时间。
+消除或者减少GC停顿时长，java将对更广泛的应用场景是一个更有吸引力的平台。
+此外，现代系统中可用内存不断增长，用户和程序员希望JVM能够以高效的方式充分
+利用这些内存，并且无需长时间的GC暂停时间。
+
+- ZGC， A Scalable Low-Latency Garbage Collector(Experimental) 
+ZGC, 这应该是JDK11最为瞩目的特性，没有之一。但是后面带了Experimental,
+说明这还不建议用到生产环境。
+
+- ZGC是一个并发，基于region，压缩性的垃圾收集器，只有root扫描阶段会STW
+（stop the world），因此GC停顿时间不会随着堆的增长和存活对象的增长而变长。
+
+- 优势：
+    - ZGC暂停时间不会超过10ms
+    - 既能处理几百兆小堆，也能处理几个T的大堆（OMG）
+    - 和G1相比，应用吞吐能力下降不会超过15%
+    - 为未来的GC功能和利用colord指针以及Load barriers优化奠定基础
+    - 初始只支持64为系统
+- ZGC的设计目标是：支持TB级内存容量，暂定时间低（< 10ms），对整个程序
+吞吐量的影响小于15%。将来还可以扩展实现机制，以支持不少于令人兴奋的功能，
+例如多层堆（即热对象置于DRAM和冷对象置于NVMe内存），或压缩堆。
+
+### 3.8 其他新特性：
+- Unicode 10
+- Deprecate thePack200 Tools and API
+- 新的Epsilon垃圾收集器
+- 完全支持Linux容器（包括Docker）
+- 支持G1上的并行完全垃圾收集
+- 最新的HTTPS安全协议TLS 1.3
+- Java Flight Recoder
+
+### 在当前JDK中看不到什么？
+1. 一个标准化和轻量级的JSON API
+    一个标准化和轻量级的JSON API被许多java开发人员所青睐。但是由于资金问题无法在Java当前版本中见到，
+但并不会削减掉。Java平台首席架构师Mark Reinhold在JDK 9邮件列中说：“这个JEP将是平台上的一个有用的补充，
+但是在计划中，它并不像Oracle资助的其它功能那么重要，可能会重新考虑JDK 10或更好版本中实现。”
+
+2. 新的货币API 
+    - 对许多应用而言货币价值都是一个关键的特性，但JDK对此却没有任何支持。
+   严格的讲，现有的java.util.Currency类只是代表了当前ISO 4217货币的一个数据结构，
+   但并没有关联的值或者自定义货币。JDK对货币的运算及转换也没有内建的支持，更别说有一个
+   能够代表货币值的标准类型了
+    - 此前，Oracle公布的JSR 354定义了一套新的Java 货币API：JavaMoney，计划会在Java
+   9中正式引入。但是目前没有出现在JDK新特性中。
+    - 不过，如果你用的是Maven的话，可以做如下的添加，即可使用相关的API处理货币：
+     ```java
+      <dependency>
+        <groupld>org.javamoney</groupld>
+        <artifactld>moneta</artifactld>
+        <version>0.9</version>
+      </dependency> 
+    ```
