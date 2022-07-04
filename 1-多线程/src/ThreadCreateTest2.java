@@ -1,3 +1,5 @@
+package src;
+
 /**
  * @Description: ava-多线程的创建方式二：通过实现Runnable接口来实现
  * @author : zhilx(zhilx1997@sina.com)
